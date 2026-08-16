@@ -1,0 +1,22 @@
+app.get('/api/weather', (req, res) => {
+  res.json([
+    {
+      station:'ws1',
+      temp:28,
+      hum:55,
+      press:1010,
+      wind:2.3,
+      dir:'N',
+      rain:0
+    },
+    {
+      station:'ws2',
+      temp:27,
+      hum:60,
+      press:1008,
+      wind:3.1,
+      dir:'NE',
+      rain:2.5
+    }
+  ]);
+});
