@@ -47,22 +47,31 @@ export default async function handler(req, res) {
         pressure,
         windS,
         windD,
-        rainy
+        rain  // من ESP32
       } = req.body ?? {};
 
       if (!allowedDevices.includes(device_id)) {
         return res.status(400).json({ error: "invalid device" });
       }
 
-      // تحويل rainy إلى boolean
+      // تحويل rain إلى boolean
       let rainValue = false;
-      if (rainy !== undefined && rainy !== null) {
-        if (typeof rainy === 'string') {
-          rainValue = rainy.toLowerCase() === 'true' || rainy === '1';
+      if (rain !== undefined && rain !== null) {
+        if (typeof rain === 'string') {
+          // إذا كانت القيمة "rainy" أو "true" أو "1"
+          rainValue = rain.toLowerCase() === 'rainy' || 
+                      rain.toLowerCase() === 'true' || 
+                      rain === '1';
         } else {
-          rainValue = Boolean(rainy);
+          rainValue = Boolean(rain);
         }
       }
+
+      console.log('=== POST Request ===');
+      console.log('device_id:', device_id);
+      console.log('rain received:', rain);
+      console.log('rain converted:', rainValue);
+      console.log('===================');
 
       await sql`
         INSERT INTO weather_data
@@ -78,7 +87,10 @@ export default async function handler(req, res) {
         )
       `;
 
-      return res.status(200).json({ status: "saved" });
+      return res.status(200).json({ 
+        status: "saved", 
+        rainy: rainValue 
+      });
     }
 
     /* ========= GET ========= */
