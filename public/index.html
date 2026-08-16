@@ -1024,7 +1024,7 @@
             updateReadingValue('pressureValue', pressure.toFixed(1) + 'hPa');
             updateReadingValue('windSpeedValue', windSpeed.toFixed(1) + 'm/s');
             
-            // تحديث حالة المطر في سطر واحد
+            // تحديث حالة المطر
             const rainValue = document.getElementById('rainValue');
             if (rainValue) {
                 if (rainy === true || rainy === 1 || rainy === 'true') {
@@ -1144,11 +1144,11 @@
                                     <div class="reading-value" id="windSpeedValue">0.0m/s</div>
                                 </div>
                             </div>
-                            <div class="reading-item" id="rainItem">
+                            <div class="reading-item" id="rainItem" style="grid-column: span 2;">
                                 <div class="reading-icon"><i class="fas fa-cloud-rain"></i></div>
                                 <div class="reading-info">
                                     <h3>حالة المطر</h3>
-                                    <div class="reading-value" id="rainValue">☀️ غير ممطر</div>
+                                    <div class="reading-value" id="rainValue" style="font-size: 1.4rem;">☀️ غير ممطر</div>
                                 </div>
                             </div>
                         </div>
