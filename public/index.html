@@ -33,7 +33,7 @@
       margin: auto;
       padding: 20px;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 20px;
     }
 
@@ -61,6 +61,22 @@
     .unit {
       font-size: 16px;
       color: var(--muted);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 15px;
+      font-size: 14px;
+    }
+
+    select {
+      background: var(--card);
+      color: var(--text);
+      border: none;
+      padding: 8px;
+      border-radius: 6px;
+      margin-top: 10px;
     }
 
     /* بوصلة حقيقية */
@@ -92,7 +108,6 @@
       align-items: center;
     }
 
-    /* النقاط الأساسية للبوصلة */
     .compass-point {
       position: absolute;
       font-size: 14px;
@@ -105,7 +120,6 @@
     .compass-point.e { right: 5px; top: 50%; transform: translateY(-50%); }
     .compass-point.w { left: 5px; top: 50%; transform: translateY(-50%); }
 
-    /* إبرة البوصلة */
     .needle {
       position: absolute;
       width: 4px;
@@ -146,34 +160,11 @@
       border: 2px solid var(--bg);
     }
 
-    /* مؤشر اتجاه الرياح النصي */
     .wind-direction-text {
       text-align: center;
       font-size: 18px;
       color: var(--accent);
       margin-top: 10px;
-    }
-
-    footer {
-      text-align: center;
-      color: var(--muted);
-      padding: 15px;
-      font-size: 14px;
-    }
-
-    select {
-      background: var(--card);
-      color: var(--text);
-      border: none;
-      padding: 8px;
-      border-radius: 6px;
-      margin-top: 10px;
-    }
-
-    /* تنسيق أيقونة المطر */
-    .rain-icon {
-      font-size: 40px;
-      margin-top: 5px;
     }
   </style>
 </head>
@@ -217,13 +208,19 @@
   </div>
 
   <div class="card">
+    <h3>Wind Direction</h3>
+    <div class="value" id="windD">--</div>
+    <div class="unit">Direction</div>
+  </div>
+
+  <div class="card">
     <h3>Rain</h3>
     <div class="value" id="rain">--</div>
-    <div class="unit">mm</div>
+    <div class="unit">Status</div>
   </div>
 </div>
 
-<!-- بوصلة حقيقية لاتجاه الرياح -->
+<!-- بوصلة حقيقية -->
 <div class="compass-container">
   <div class="compass">
     <div class="compass-inner">
@@ -240,7 +237,7 @@
 <div class="wind-direction-text" id="windDirectionText">Direction: --</div>
 
 <footer>
-  ESP32 + BME280 + Rain Sensor + Neon + Vercel
+  ESP32 + BME280 + Neon + Vercel
 </footer>
 
 <script>
@@ -249,10 +246,11 @@
   const humEl  = document.getElementById("hum");
   const presEl = document.getElementById("pres");
   const windSEl = document.getElementById("windS");
-  const windDEl = document.getElementById("windDirectionText");
+  const windDEl = document.getElementById("windD");
   const rainEl = document.getElementById("rain");
   const deviceSelect = document.getElementById("deviceSelect");
   const needle = document.getElementById("needle");
+  const windDirectionText = document.getElementById("windDirectionText");
 
   async function fetchData() {
     const device = deviceSelect.value;
@@ -267,33 +265,30 @@
     humEl.textContent   = last.humidity.toFixed(1);
     presEl.textContent  = last.pressure.toFixed(1);
     windSEl.textContent = last.windS.toFixed(1);
-    rainEl.textContent  = last.rain ? last.rain.toFixed(1) : "0.0";
+    windDEl.textContent = last.windD;
+
+    // عرض حالة المطر
+    if (last.rainy === true || last.rainy === 1) {
+      rainEl.textContent = "🌧️ Rainy";
+    } else if (last.rainy === false || last.rainy === 0) {
+      rainEl.textContent = "☀️ Not Rainy";
+    } else {
+      rainEl.textContent = "--";
+    }
 
     // تحديث البوصلة
     const windDirection = last.windD || "N";
     const angle = getWindAngle(windDirection);
     needle.style.transform = `translate(-50%, -100%) rotate(${angle}deg)`;
-    windDEl.textContent = `Direction: ${windDirection}`;
+    windDirectionText.textContent = `Direction: ${windDirection}`;
   }
 
   function getWindAngle(direction) {
     const directions = {
-      'N': 0,
-      'NNE': 22.5,
-      'NE': 45,
-      'ENE': 67.5,
-      'E': 90,
-      'ESE': 112.5,
-      'SE': 135,
-      'SSE': 157.5,
-      'S': 180,
-      'SSW': 202.5,
-      'SW': 225,
-      'WSW': 247.5,
-      'W': 270,
-      'WNW': 292.5,
-      'NW': 315,
-      'NNW': 337.5
+      'N': 0, 'NNE': 22.5, 'NE': 45, 'ENE': 67.5,
+      'E': 90, 'ESE': 112.5, 'SE': 135, 'SSE': 157.5,
+      'S': 180, 'SSW': 202.5, 'SW': 225, 'WSW': 247.5,
+      'W': 270, 'WNW': 292.5, 'NW': 315, 'NNW': 337.5
     };
     return directions[direction] || 0;
   }
