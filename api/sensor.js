@@ -20,6 +20,7 @@ async function archiveYesterdayData() {
     `;
   } catch (err) {
     console.error("Archive error:", err);
+    // لا نرمي الخطأ لأن الأرشفة ليست حرجة
   }
 }
 
@@ -34,8 +35,6 @@ export default async function handler(req, res) {
     if (req.method === "OPTIONS") {
       return res.status(200).end();
     }
-
-    await archiveYesterdayData();
 
     /* ========= POST ========= */
     if (req.method === "POST") {
@@ -54,6 +53,16 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "invalid device" });
       }
 
+      // تحويل rainy إلى boolean
+      let rainValue = false;
+      if (rainy !== undefined && rainy !== null) {
+        if (typeof rainy === 'string') {
+          rainValue = rainy.toLowerCase() === 'true' || rainy === '1';
+        } else {
+          rainValue = Boolean(rainy);
+        }
+      }
+
       await sql`
         INSERT INTO weather_data
         (device_id, temperture, humidity, pressure, windS, windD, rainy)
@@ -64,7 +73,7 @@ export default async function handler(req, res) {
           ${Number(pressure)},
           ${Number(windS)},
           ${windD},
-          ${rainy}
+          ${rainValue}
         )
       `;
 
@@ -83,7 +92,7 @@ export default async function handler(req, res) {
       /* ===== طلب أرشيف حسب تاريخ ===== */
       if (date) {
         const rows = await sql`
-          SELECT *
+          SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date as time
           FROM weather_archive
           WHERE device_id = ${device}
           AND reading_date = ${date}
@@ -94,16 +103,18 @@ export default async function handler(req, res) {
 
       /* ===== الوضع الافتراضي ===== */
 
+      // جلب بيانات اليوم
       const todayRows = await sql`
-        SELECT *
+        SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, time
         FROM weather_data
         WHERE device_id = ${device}
         AND DATE(time) = CURRENT_DATE
         ORDER BY time ASC
       `;
 
+      // جلب بيانات الأمس من الأرشيف
       const yesterdayRows = await sql`
-        SELECT *
+        SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date as time
         FROM weather_archive
         WHERE device_id = ${device}
         AND reading_date = CURRENT_DATE - INTERVAL '1 day'
@@ -119,6 +130,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "method not allowed" });
 
   } catch (err) {
+    console.error("Server error:", err);
     return res.status(500).json({
       error: "server error",
       details: err.message
