@@ -3,59 +3,124 @@ import { neon } from "@neondatabase/serverless";
 const sql = neon(process.env.DATABASE_URL);
 const allowedDevices = ["max1", "max2", "max3", "max4"];
 
+/* ===== أرشفة بيانات الأمس مرة واحدة فقط ===== */
+async function archiveYesterdayData() {
+  try {
+    await sql`
+      INSERT INTO weather_archive
+      (device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date)
+      SELECT device_id, temperture, humidity, pressure, windS, windD, rainy, DATE(time)
+      FROM weather_data
+      WHERE DATE(time) = CURRENT_DATE - INTERVAL '1 day'
+      AND NOT EXISTS (
+        SELECT 1 FROM weather_archive wa
+        WHERE wa.device_id = weather_data.device_id
+        AND wa.reading_date = DATE(weather_data.time)
+      )
+    `;
+  } catch (err) {
+    console.error("Archive error:", err);
+  }
+}
+
 export default async function handler(req, res) {
   try {
 
-    /* =======================
-       POST (ESP32 → Database)
-       ======================= */
+    /* ===== CORS ===== */
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+      return res.status(200).end();
+    }
+
+    await archiveYesterdayData();
+
+    /* ========= POST ========= */
     if (req.method === "POST") {
-      const { device_id, temperture, humidity, pressure, windS, windD, rain } = req.body || {};
-        
+
+      const {
+        device_id,
+        temperture,
+        humidity,
+        pressure,
+        windS,
+        windD,
+        rainy
+      } = req.body ?? {};
+
       if (!allowedDevices.includes(device_id)) {
-        return res.status(400).json({
-          message: "Invalid device (must be max1..max4)",
-          received: device_id
-        });
+        return res.status(400).json({ error: "invalid device" });
       }
 
       await sql`
-        INSERT INTO weather_data (device_id, temperture, humidity, pressure, windS, windD, rain)
-        VALUES (${device_id}, ${temperture}, ${humidity}, ${pressure}, ${windS}, ${windD}, ${rain})
+        INSERT INTO weather_data
+        (device_id, temperture, humidity, pressure, windS, windD, rainy)
+        VALUES (
+          ${device_id},
+          ${Number(temperture)},
+          ${Number(humidity)},
+          ${Number(pressure)},
+          ${Number(windS)},
+          ${windD},
+          ${rainy}
+        )
       `;
 
-      return res.status(200).json({ message: "Data saved successfully" });
+      return res.status(200).json({ status: "saved" });
     }
 
-    /* =======================
-       GET (Dashboard ← DB)
-       ======================= */
+    /* ========= GET ========= */
     if (req.method === "GET") {
-      const device = req.query.device;
+
+      const { device, date } = req.query;
 
       if (!allowedDevices.includes(device)) {
-        return res.status(400).json({
-          message: "Invalid device (must be max1..max4)",
-          received: device
-        });
+        return res.status(400).json({ error: "invalid device" });
       }
 
-      const rows = await sql`
-        SELECT device_id, temperture, humidity, pressure, windS, windD, rain
+      /* ===== طلب أرشيف حسب تاريخ ===== */
+      if (date) {
+        const rows = await sql`
+          SELECT *
+          FROM weather_archive
+          WHERE device_id = ${device}
+          AND reading_date = ${date}
+          ORDER BY reading_date ASC
+        `;
+        return res.status(200).json(rows);
+      }
+
+      /* ===== الوضع الافتراضي ===== */
+
+      const todayRows = await sql`
+        SELECT *
         FROM weather_data
         WHERE device_id = ${device}
+        AND DATE(time) = CURRENT_DATE
         ORDER BY time ASC
       `;
 
-      return res.status(200).json(rows);
+      const yesterdayRows = await sql`
+        SELECT *
+        FROM weather_archive
+        WHERE device_id = ${device}
+        AND reading_date = CURRENT_DATE - INTERVAL '1 day'
+        ORDER BY reading_date ASC
+      `;
+
+      return res.status(200).json({
+        today: todayRows,
+        yesterday: yesterdayRows
+      });
     }
 
-    return res.status(405).json({ message: "Method not allowed" });
+    return res.status(405).json({ error: "method not allowed" });
 
   } catch (err) {
-    console.error("API Error:", err);
     return res.status(500).json({
-      error: "Server error",
+      error: "server error",
       details: err.message
     });
   }
