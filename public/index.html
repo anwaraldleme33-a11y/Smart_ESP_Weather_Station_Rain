@@ -5,8 +5,6 @@
     <title>مركز بحوث وتكنولوجيا المعلومات والاتصالات - محطة الطقس</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- إضافة مكتبة Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- إضافة مكتبة Flatpickr للتقويم -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -621,30 +619,6 @@
             color: #94a3b8;
         }
         
-        .charts-section {
-            grid-column: 1 / -1;
-            background: rgba(30, 41, 59, 0.9);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
-        }
-        
-        .chart-container {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            height: 300px;
-        }
-        
         .system-info {
             display: flex;
             justify-content: space-between;
@@ -774,10 +748,6 @@
                 grid-template-columns: 1fr;
             }
             
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-            
             .header {
                 flex-direction: column;
                 text-align: center;
@@ -790,10 +760,6 @@
             .compass-wrapper {
                 width: 220px;
                 height: 220px;
-            }
-            
-            .chart-container {
-                height: 250px;
             }
             
             .controls {
@@ -962,14 +928,6 @@
         let currentDevice = 'max1';
         let autoRefreshEnabled = true;
         let refreshInterval = null;
-        let charts = {};
-        let recentData = {
-            temperature: [],
-            humidity: [],
-            pressure: [],
-            windSpeed: [],
-            timestamps: []
-        };
         let currentCompassRotation = 0;
 
         const contentArea = document.getElementById('contentArea');
@@ -1036,17 +994,12 @@
                 const latestReading = todayData[todayData.length - 1];
                 
                 updateStatus('متصل', true);
-                updateChartData(latestReading);
                 
                 if (!document.getElementById('temperatureValue')) {
                     createCurrentDataInterface();
                 }
                 
                 updateCurrentData(latestReading);
-                
-                if (recentData.temperature.length > 1) {
-                    createCharts();
-                }
                 
             } catch (error) {
                 console.error('خطأ في تحميل البيانات:', error);
@@ -1063,12 +1016,23 @@
             const pressure = data.pressure || 0;
             const windSpeed = data.winds || data.windS || 0;
             const windDirection = data.windd || data.windD || 'غير معروف';
+            const rainy = data.rainy || false;
             const readingTime = data.time ? new Date(data.time).toLocaleString('ar-SA') : 'الآن';
             
             updateReadingValue('temperatureValue', temperature.toFixed(1) + '°C');
             updateReadingValue('humidityValue', humidity.toFixed(1) + '%');
             updateReadingValue('pressureValue', pressure.toFixed(1) + 'hPa');
             updateReadingValue('windSpeedValue', windSpeed.toFixed(1) + 'm/s');
+            
+            // تحديث حالة المطر
+            const rainValue = document.getElementById('rainValue');
+            if (rainValue) {
+                if (rainy === true || rainy === 1 || rainy === 'true') {
+                    rainValue.textContent = '🌧️ ممطر';
+                } else {
+                    rainValue.textContent = '☀️ غير ممطر';
+                }
+            }
             
             const timeElement = document.getElementById('readingTime');
             if (timeElement) {
@@ -1105,7 +1069,15 @@
                 'شمال': 0,
                 'شرق': 90,
                 'جنوب': 180,
-                'غرب': 270
+                'غرب': 270,
+                'N': 0,
+                'NE': 45,
+                'E': 90,
+                'SE': 135,
+                'S': 180,
+                'SW': 225,
+                'W': 270,
+                'NW': 315
             };
             return directions[direction] || 0;
         }
@@ -1132,37 +1104,6 @@
                 rotation = currentCompassRotation + diff;
                 currentCompassRotation = rotation;
                 needle.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-            }
-        }
-
-        function updateChartData(data) {
-            const now = new Date();
-            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            
-            recentData.temperature.push(data.temperture || 0);
-            recentData.humidity.push(data.humidity || 0);
-            recentData.pressure.push(data.pressure || 0);
-            recentData.windSpeed.push(data.winds || data.windS || 0);
-            recentData.timestamps.push(timeStr);
-            
-            const maxReadings = 15;
-            if (recentData.temperature.length > maxReadings) {
-                recentData.temperature.shift();
-                recentData.humidity.shift();
-                recentData.pressure.shift();
-                recentData.windSpeed.shift();
-                recentData.timestamps.shift();
-            }
-            
-            if (charts.temperature) {
-                charts.temperature.data.labels = recentData.timestamps;
-                charts.temperature.data.datasets[0].data = recentData.temperature;
-                charts.temperature.update('none');
-            }
-            if (charts.humidity) {
-                charts.humidity.data.labels = recentData.timestamps;
-                charts.humidity.data.datasets[0].data = recentData.humidity;
-                charts.humidity.update('none');
             }
         }
 
@@ -1201,6 +1142,13 @@
                                 <div class="reading-info">
                                     <h3>سرعة الرياح</h3>
                                     <div class="reading-value" id="windSpeedValue">0.0m/s</div>
+                                </div>
+                            </div>
+                            <div class="reading-item" id="rainItem">
+                                <div class="reading-icon"><i class="fas fa-cloud-rain"></i></div>
+                                <div class="reading-info">
+                                    <h3>حالة المطر</h3>
+                                    <div class="reading-value" id="rainValue">☀️ غير ممطر</div>
                                 </div>
                             </div>
                         </div>
@@ -1243,108 +1191,9 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="charts-section" id="chartsSection" style="display: none;">
-                    <h2 class="card-title">
-                        <i class="fas fa-chart-area"></i>
-                        الرسوم البيانية
-                    </h2>
-                    <div class="charts-grid">
-                        <div class="chart-container">
-                            <canvas id="temperatureChart"></canvas>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="humidityChart"></canvas>
-                        </div>
-                    </div>
-                </div>
             `;
             
             contentArea.innerHTML = content;
-        }
-
-        function createCharts() {
-            const chartsSection = document.getElementById('chartsSection');
-            if (chartsSection) {
-                chartsSection.style.display = 'block';
-            }
-            
-            if (charts.temperature) charts.temperature.destroy();
-            if (charts.humidity) charts.humidity.destroy();
-            
-            const tempCtx = document.getElementById('temperatureChart')?.getContext('2d');
-            if (tempCtx) {
-                charts.temperature = new Chart(tempCtx, {
-                    type: 'line',
-                    data: {
-                        labels: recentData.timestamps,
-                        datasets: [{
-                            label: 'درجة الحرارة',
-                            data: recentData.temperature,
-                            borderColor: '#ef4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#ef4444',
-                            pointRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 0 },
-                        plugins: {
-                            legend: { labels: { color: '#e2e8f0', font: { size: 14 } } }
-                        },
-                        scales: {
-                            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
-                            y: { 
-                                ticks: { color: '#94a3b8' }, 
-                                grid: { color: '#334155' },
-                                title: { display: true, text: 'درجة الحرارة (°C)', color: '#94a3b8' }
-                            }
-                        }
-                    }
-                });
-            }
-            
-            const humidityCtx = document.getElementById('humidityChart')?.getContext('2d');
-            if (humidityCtx) {
-                charts.humidity = new Chart(humidityCtx, {
-                    type: 'line',
-                    data: {
-                        labels: recentData.timestamps,
-                        datasets: [{
-                            label: 'الرطوبة',
-                            data: recentData.humidity,
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointBackgroundColor: '#3b82f6',
-                            pointRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 0 },
-                        plugins: {
-                            legend: { labels: { color: '#e2e8f0', font: { size: 14 } } }
-                        },
-                        scales: {
-                            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
-                            y: { 
-                                ticks: { color: '#94a3b8' }, 
-                                grid: { color: '#334155' },
-                                title: { display: true, text: 'الرطوبة (%)', color: '#94a3b8' }
-                            }
-                        }
-                    }
-                });
-            }
         }
 
         async function loadArchiveData() {
@@ -1408,6 +1257,7 @@
                                 <th>الضغط الجوي</th>
                                 <th>سرعة الرياح</th>
                                 <th>اتجاه الرياح</th>
+                                <th>حالة المطر</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1420,6 +1270,8 @@
                 const pressure = item.pressure || 0;
                 const windSpeed = item.winds || item.windS || 0;
                 const windDirection = item.windd || item.windD || '--';
+                const rainy = item.rainy || false;
+                const rainStatus = (rainy === true || rainy === 1 || rainy === 'true') ? '🌧️ ممطر' : '☀️ غير ممطر';
                 
                 tableHTML += `
                     <tr>
@@ -1430,6 +1282,7 @@
                         <td>${pressure.toFixed(1)}hPa</td>
                         <td>${windSpeed.toFixed(1)}m/s</td>
                         <td>${windDirection}</td>
+                        <td>${rainStatus}</td>
                     </tr>
                 `;
             });
