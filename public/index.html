@@ -37,7 +37,7 @@
         body {
             background: linear-gradient(135deg, #0c0c2e 0%, #1a1a3e 100%);
             color: var(--light);
-            padding: 20px;
+            padding: 10px;
         }
         
         /* ===== الصفحة الرئيسية ===== */
@@ -120,7 +120,7 @@
         }
 
         .organization-name {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             background: linear-gradient(135deg, #38bdf8, #818cf8);
             -webkit-background-clip: text;
@@ -131,7 +131,7 @@
         }
 
         .organization-sub {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             color: #94a3b8;
             margin-bottom: 3px;
             font-weight: 600;
@@ -146,14 +146,14 @@
         }
 
         .organization-desc {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: 600;
             color: #60a5fa;
             margin-bottom: 5px;
         }
 
         .organization-department {
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #94a3b8;
             margin-bottom: 20px;
             font-weight: 500;
@@ -217,25 +217,25 @@
         #weatherPage {
             display: none;
             height: 100vh;
-            overflow-y: auto;
-            padding: 20px;
+            overflow: hidden;
+            padding: 10px;
         }
 
         /* زر العودة */
         .back-home-btn {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             background: rgba(30, 41, 59, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: white;
-            padding: 12px 20px;
-            border-radius: 12px;
+            padding: 8px 15px;
+            border-radius: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1rem;
+            gap: 8px;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
             z-index: 100;
             backdrop-filter: blur(10px);
@@ -247,52 +247,55 @@
             transform: translateX(-5px);
         }
 
-        /* ===== أنماط الطقس الحالية (نفس الكود الأصلي) ===== */
+        /* ===== أنماط الطقس الحالية ===== */
         .container {
-            max-width: 1600px;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         
         .header {
             background: rgba(30, 41, 59, 0.9);
-            border-radius: 20px;
-            padding: 25px 30px;
-            margin-bottom: 30px;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 10px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 10px;
         }
         
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 1.5rem;
             background: linear-gradient(90deg, #38bdf8, #818cf8);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
         
         .header-info {
             display: flex;
             align-items: center;
-            gap: 30px;
+            gap: 15px;
             flex-wrap: wrap;
         }
         
         .device-selector {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             background: rgba(15, 23, 42, 0.6);
-            padding: 12px 20px;
-            border-radius: 12px;
+            padding: 8px 15px;
+            border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
@@ -300,10 +303,10 @@
             background: transparent;
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 1rem;
-            min-width: 150px;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            min-width: 120px;
             cursor: pointer;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
@@ -311,16 +314,16 @@
         .status-indicator {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             background: rgba(16, 185, 129, 0.2);
-            padding: 10px 20px;
-            border-radius: 12px;
+            padding: 8px 15px;
+            border-radius: 10px;
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
         
         .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
@@ -342,8 +345,8 @@
         .controls {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 10px;
+            margin-bottom: 10px;
             flex-wrap: wrap;
         }
         
@@ -351,21 +354,21 @@
             background: linear-gradient(135deg, var(--primary), #6366f1);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 12px;
-            font-size: 1rem;
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transition: all 0.3s ease;
-            min-width: 180px;
+            min-width: 120px;
             justify-content: center;
         }
         
         .control-btn:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
         }
         
@@ -385,28 +388,31 @@
             background: transparent;
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 12px 15px;
+            padding: 8px 12px;
             border-radius: 8px;
-            font-size: 1rem;
-            width: 200px;
+            font-size: 0.85rem;
+            width: 150px;
             cursor: pointer;
         }
         
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            flex: 1;
+            min-height: 0;
         }
         
         .readings-card {
             background: rgba(30, 41, 59, 0.9);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 15px;
+            padding: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
         .readings-card::before {
@@ -415,32 +421,33 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 3px;
             background: linear-gradient(90deg, #38bdf8, #818cf8);
         }
         
         .card-title {
-            font-size: 1.5rem;
-            margin-bottom: 25px;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
             color: #38bdf8;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .readings-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            flex: 1;
         }
         
         .reading-item {
             background: rgba(15, 23, 42, 0.6);
-            border-radius: 15px;
-            padding: 20px;
+            border-radius: 12px;
+            padding: 12px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -455,39 +462,40 @@
         }
         
         .reading-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.2));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.1rem;
             color: #60a5fa;
+            flex-shrink: 0;
         }
         
         .reading-info h3 {
-            font-size: 0.9rem;
+            font-size: 0.7rem;
             color: #94a3b8;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
         
         .reading-value {
-            font-size: 1.8rem;
+            font-size: 1.2rem;
             font-weight: 700;
             color: white;
         }
         
         .reading-unit {
-            font-size: 1rem;
+            font-size: 0.8rem;
             color: #94a3b8;
-            margin-right: 5px;
+            margin-right: 3px;
         }
         
         .compass-card {
             background: rgba(30, 41, 59, 0.9);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 15px;
+            padding: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
@@ -498,9 +506,9 @@
         
         .compass-wrapper {
             position: relative;
-            width: 280px;
-            height: 280px;
-            margin: 20px 0;
+            width: 200px;
+            height: 200px;
+            margin: 10px 0;
         }
         
         .compass-outer {
@@ -518,10 +526,10 @@
         
         .compass-inner {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            bottom: 15px;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
             background: var(--dark);
             border-radius: 50%;
             display: flex;
@@ -542,14 +550,14 @@
             position: absolute;
             font-weight: bold;
             color: white;
-            font-size: 1.3rem;
+            font-size: 1rem;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
         
-        .direction-n { top: 15px; left: 50%; transform: translateX(-50%); }
-        .direction-e { top: 50%; right: 15px; transform: translateY(-50%); }
-        .direction-s { bottom: 15px; left: 50%; transform: translateX(-50%); }
-        .direction-w { top: 50%; left: 15px; transform: translateY(-50%); }
+        .direction-n { top: 10px; left: 50%; transform: translateX(-50%); }
+        .direction-e { top: 50%; right: 10px; transform: translateY(-50%); }
+        .direction-s { bottom: 10px; left: 50%; transform: translateX(-50%); }
+        .direction-w { top: 50%; left: 10px; transform: translateY(-50%); }
         
         .compass-needle {
             position: absolute;
@@ -558,28 +566,28 @@
             transform-origin: center center;
             transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 10;
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
         }
         
         .needle {
-            width: 4px;
-            height: 120px;
+            width: 3px;
+            height: 85px;
             background: linear-gradient(to bottom, #f8fafc, #ef4444);
             border-radius: 2px;
             position: absolute;
-            top: -120px;
-            left: 3px;
+            top: -85px;
+            left: 2.5px;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
         
         .needle::after {
             content: '';
             position: absolute;
-            top: -10px;
-            left: -8px;
-            width: 20px;
-            height: 20px;
+            top: -8px;
+            left: -6px;
+            width: 15px;
+            height: 15px;
             background: #ef4444;
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
         }
@@ -589,33 +597,33 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 25px;
-            height: 25px;
+            width: 18px;
+            height: 18px;
             background: #f8fafc;
             border-radius: 50%;
             z-index: 11;
-            border: 4px solid var(--dark);
+            border: 3px solid var(--dark);
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
         
         .direction-info {
-            margin-top: 20px;
+            margin-top: 10px;
             text-align: center;
             background: rgba(15, 23, 42, 0.6);
-            padding: 15px 30px;
-            border-radius: 12px;
-            min-width: 200px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            min-width: 150px;
         }
         
         .direction-text {
-            font-size: 1.4rem;
+            font-size: 1.1rem;
             color: #38bdf8;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         
         .direction-degree {
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             color: #94a3b8;
         }
         
@@ -624,22 +632,23 @@
             justify-content: space-between;
             align-items: center;
             background: rgba(15, 23, 42, 0.6);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 30px;
+            border-radius: 12px;
+            padding: 10px 15px;
+            margin-top: 10px;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 10px;
         }
         
         .info-item {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            font-size: 0.8rem;
         }
         
         .info-item i {
             color: #38bdf8;
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
         
         .archive-modal {
@@ -685,17 +694,18 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            font-size: 0.9rem;
         }
         
         .archive-table th {
             background: rgba(59, 130, 246, 0.2);
             color: #38bdf8;
-            padding: 12px;
+            padding: 10px;
             text-align: center;
         }
         
         .archive-table td {
-            padding: 10px;
+            padding: 8px;
             text-align: center;
             border-bottom: 1px solid #334155;
         }
@@ -745,7 +755,7 @@
             }
             
             .readings-grid {
-                grid-template-columns: 1fr;
+                grid-template-columns: 1fr 1fr;
             }
             
             .header {
@@ -758,27 +768,30 @@
             }
             
             .compass-wrapper {
-                width: 220px;
-                height: 220px;
+                width: 150px;
+                height: 150px;
             }
             
             .controls {
-                flex-direction: column;
+                flex-direction: row;
+                flex-wrap: wrap;
                 align-items: center;
             }
             
             .control-btn {
-                width: 100%;
-                max-width: 300px;
+                width: auto;
+                min-width: 100px;
+                padding: 6px 15px;
+                font-size: 0.75rem;
             }
 
-            .organization-name { font-size: 1.5rem; }
-            .organization-sub { font-size: 1.4rem; }
-            .organization-desc { font-size: 1.2rem; }
-            .organization-department { font-size: 1rem; }
-            .logo-container { width: 120px; height: 120px; }
-            .enter-btn { padding: 14px 35px; font-size: 1.1rem; }
-            .footer-info { gap: 12px; font-size: 0.75rem; }
+            .organization-name { font-size: 1.2rem; }
+            .organization-sub { font-size: 1.1rem; }
+            .organization-desc { font-size: 1rem; }
+            .organization-department { font-size: 0.9rem; }
+            .logo-container { width: 100px; height: 100px; }
+            .enter-btn { padding: 12px 30px; font-size: 1rem; }
+            .footer-info { gap: 10px; font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -827,7 +840,7 @@
 
         <button class="back-home-btn" onclick="goToHomePage()">
             <i class="fas fa-arrow-right"></i>
-            العودة للرئيسية
+            العودة
         </button>
 
         <div class="container">
@@ -835,21 +848,21 @@
             <div class="header">
                 <h1>
                     <i class="fas fa-cloud-sun"></i>
-                    لوحة تحكم محطة الطقس
+                    محطة الطقس
                 </h1>
                 <div class="header-info">
                     <div class="device-selector">
                         <i class="fas fa-satellite"></i>
                         <select id="deviceSelect">
-                            <option value="max1">محطة الطقس 1</option>
-                            <option value="max2">محطة الطقس 2</option>
-                            <option value="max3">محطة الطقس 3</option>
-                            <option value="max4">محطة الطقس 4</option>
+                            <option value="max1">محطة 1</option>
+                            <option value="max2">محطة 2</option>
+                            <option value="max3">محطة 3</option>
+                            <option value="max4">محطة 4</option>
                         </select>
                     </div>
                     <div class="status-indicator">
                         <div class="status-dot online" id="statusDot"></div>
-                        <span id="statusText">جاري التحميل...</span>
+                        <span id="statusText" style="font-size:0.85rem;">جاري التحميل...</span>
                     </div>
                 </div>
             </div>
@@ -858,18 +871,18 @@
             <div class="controls">
                 <button class="control-btn" onclick="loadCurrentData()">
                     <i class="fas fa-sync-alt"></i>
-                    تحديث البيانات
+                    تحديث
                 </button>
                 <button class="control-btn secondary" onclick="toggleAutoRefresh()">
                     <i class="fas fa-clock"></i>
-                    <span id="autoRefreshText">التحديث التلقائي: مفعل</span>
+                    <span id="autoRefreshText" style="font-size:0.75rem;">تلقائي</span>
                 </button>
                 <div class="calendar-container">
-                    <input type="text" id="archiveDate" class="flatpickr-input" placeholder="اختر تاريخ الأرشيف">
+                    <input type="text" id="archiveDate" class="flatpickr-input" placeholder="اختر تاريخ">
                 </div>
                 <button class="control-btn success" onclick="loadArchiveData()">
                     <i class="fas fa-history"></i>
-                    عرض الأرشيف
+                    أرشيف
                 </button>
             </div>
 
@@ -1024,7 +1037,6 @@
             updateReadingValue('pressureValue', pressure.toFixed(1) + 'hPa');
             updateReadingValue('windSpeedValue', windSpeed.toFixed(1) + 'm/s');
             
-            // تحديث حالة المطر
             const rainValue = document.getElementById('rainValue');
             if (rainValue) {
                 if (rainy === true || rainy === 1 || rainy === 'true') {
@@ -1113,13 +1125,13 @@
                     <div class="readings-card">
                         <h2 class="card-title">
                             <i class="fas fa-chart-line"></i>
-                            القراءات الحالية
+                            القراءات
                         </h2>
                         <div class="readings-grid">
                             <div class="reading-item" id="tempItem">
                                 <div class="reading-icon"><i class="fas fa-thermometer-half"></i></div>
                                 <div class="reading-info">
-                                    <h3>درجة الحرارة</h3>
+                                    <h3>الحرارة</h3>
                                     <div class="reading-value" id="temperatureValue">0.0°C</div>
                                 </div>
                             </div>
@@ -1133,7 +1145,7 @@
                             <div class="reading-item" id="pressureItem">
                                 <div class="reading-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 <div class="reading-info">
-                                    <h3>الضغط الجوي</h3>
+                                    <h3>الضغط</h3>
                                     <div class="reading-value" id="pressureValue">0.0hPa</div>
                                 </div>
                             </div>
@@ -1147,8 +1159,8 @@
                             <div class="reading-item" id="rainItem" style="grid-column: span 2;">
                                 <div class="reading-icon"><i class="fas fa-cloud-rain"></i></div>
                                 <div class="reading-info">
-                                    <h3>حالة المطر</h3>
-                                    <div class="reading-value" id="rainValue" style="font-size: 1.4rem;">☀️ غير ممطر</div>
+                                    <h3>المطر</h3>
+                                    <div class="reading-value" id="rainValue" style="font-size: 1.1rem;">☀️ غير ممطر</div>
                                 </div>
                             </div>
                         </div>
@@ -1159,7 +1171,7 @@
                             </div>
                             <div class="info-item">
                                 <i class="fas fa-satellite"></i>
-                                <span>المحطة: ${currentDevice}</span>
+                                <span>${currentDevice}</span>
                             </div>
                         </div>
                     </div>
@@ -1218,7 +1230,7 @@
                     archiveContent.innerHTML = `
                         <div class="no-data">
                             <i class="fas fa-database fa-3x" style="color: #64748b; margin-bottom: 20px;"></i>
-                            <h2 style="color: #94a3b8;">لا توجد بيانات في الأرشيف</h2>
+                            <h2 style="color: #94a3b8;">لا توجد بيانات</h2>
                             <p style="color: #64748b; margin-top: 10px;">لم يتم العثور على بيانات للتاريخ المحدد</p>
                         </div>
                     `;
@@ -1233,7 +1245,7 @@
                 archiveContent.innerHTML = `
                     <div class="no-data">
                         <i class="fas fa-exclamation-triangle fa-3x" style="color: #ef4444; margin-bottom: 20px;"></i>
-                        <h2 style="color: #ef4444;">خطأ في تحميل الأرشيف</h2>
+                        <h2 style="color: #ef4444;">خطأ في التحميل</h2>
                         <p style="color: #ef4444; margin-top: 10px;">${error.message}</p>
                     </div>
                 `;
@@ -1245,19 +1257,19 @@
 
         function displayArchiveData(data, date) {
             let tableHTML = `
-                <h3 style="color: #38bdf8; margin-bottom: 20px;">بيانات الأرشيف لتاريخ: ${date}</h3>
+                <h3 style="color: #38bdf8; margin-bottom: 20px;">بيانات الأرشيف: ${date}</h3>
                 <div style="overflow-x: auto;">
                     <table class="archive-table">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>الوقت</th>
-                                <th>درجة الحرارة</th>
+                                <th>الحرارة</th>
                                 <th>الرطوبة</th>
-                                <th>الضغط الجوي</th>
+                                <th>الضغط</th>
                                 <th>سرعة الرياح</th>
                                 <th>اتجاه الرياح</th>
-                                <th>حالة المطر</th>
+                                <th>المطر</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1271,7 +1283,7 @@
                 const windSpeed = item.winds || item.windS || 0;
                 const windDirection = item.windd || item.windD || '--';
                 const rainy = item.rainy || false;
-                const rainStatus = (rainy === true || rainy === 1 || rainy === 'true') ? '🌧️ ممطر' : '☀️ غير ممطر';
+                const rainStatus = (rainy === true || rainy === 1 || rainy === 'true') ? '🌧️' : '☀️';
                 
                 tableHTML += `
                     <tr>
@@ -1304,10 +1316,10 @@
             autoRefreshEnabled = !autoRefreshEnabled;
             if (autoRefreshEnabled) {
                 startAutoRefresh();
-                autoRefreshText.textContent = 'التحديث التلقائي: مفعل';
+                autoRefreshText.textContent = 'تلقائي';
             } else {
                 stopAutoRefresh();
-                autoRefreshText.textContent = 'التحديث التلقائي: معطل';
+                autoRefreshText.textContent = 'متوقف';
             }
         }
 
@@ -1333,16 +1345,16 @@
 
         function showLoadingEffect() {
             const refreshBtn = document.querySelector('.control-btn');
-            if (refreshBtn && refreshBtn.textContent.includes('تحديث البيانات')) {
-                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحديث...';
+            if (refreshBtn && refreshBtn.textContent.includes('تحديث')) {
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
                 refreshBtn.disabled = true;
             }
         }
 
         function hideLoadingEffect() {
             const refreshBtn = document.querySelector('.control-btn');
-            if (refreshBtn && refreshBtn.textContent.includes('جاري التحديث')) {
-                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> تحديث البيانات';
+            if (refreshBtn && refreshBtn.textContent.includes('جاري')) {
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> تحديث';
                 refreshBtn.disabled = false;
             }
         }
@@ -1362,7 +1374,7 @@
             if (!document.getElementById('temperatureValue')) {
                 createCurrentDataInterface();
             }
-            updateStatus('خطأ في الاتصال', false);
+            updateStatus('خطأ', false);
         }
 
         window.weatherInitialized = false;
