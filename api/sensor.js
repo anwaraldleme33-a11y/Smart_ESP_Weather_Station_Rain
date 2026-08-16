@@ -20,7 +20,6 @@ async function archiveYesterdayData() {
     `;
   } catch (err) {
     console.error("Archive error:", err);
-    // لا نرمي الخطأ لأن الأرشفة ليست حرجة
   }
 }
 
@@ -35,6 +34,8 @@ export default async function handler(req, res) {
     if (req.method === "OPTIONS") {
       return res.status(200).end();
     }
+
+    await archiveYesterdayData();
 
     /* ========= POST ========= */
     if (req.method === "POST") {
@@ -103,7 +104,6 @@ export default async function handler(req, res) {
 
       /* ===== الوضع الافتراضي ===== */
 
-      // جلب بيانات اليوم
       const todayRows = await sql`
         SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, time
         FROM weather_data
@@ -112,7 +112,6 @@ export default async function handler(req, res) {
         ORDER BY time ASC
       `;
 
-      // جلب بيانات الأمس من الأرشيف
       const yesterdayRows = await sql`
         SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date as time
         FROM weather_archive
