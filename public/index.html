@@ -980,21 +980,24 @@
             });
         }
 
-        // دالة لتنسيق الوقت بنظام 12 ساعة وتوقيت بغداد
+        // دالة لتنسيق الوقت بتوقيت بغداد - نظام 12 ساعة
         function formatBaghdadTime(dateString) {
             if (!dateString) return 'الآن';
             try {
                 const date = new Date(dateString);
                 if (isNaN(date.getTime())) return 'الآن';
                 
-                // استخدام toLocaleString مع توقيت بغداد ونظام 12 ساعة
-                return date.toLocaleString('ar-IQ', {
-                    timeZone: 'Asia/Baghdad',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: true
-                });
+                // إضافة 3 ساعات لتوقيت بغداد
+                const baghdadDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+                
+                let hours = baghdadDate.getHours();
+                const minutes = baghdadDate.getMinutes().toString().padStart(2, '0');
+                const seconds = baghdadDate.getSeconds().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'م' : 'ص';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                
+                return `${hours}:${minutes}:${seconds} ${ampm}`;
             } catch (e) {
                 return 'الآن';
             }
@@ -1052,7 +1055,7 @@
             const windDirection = data.windd || data.windD || 'غير معروف';
             const rainy = data.rainy || false;
             
-            // عرض الوقت بتوقيت بغداد ونظام 12 ساعة
+            // عرض الوقت بتوقيت بغداد
             let readingTime = 'الآن';
             if (data.time) {
                 readingTime = formatBaghdadTime(data.time);
@@ -1103,6 +1106,8 @@
         }
 
         function getWindDirectionDegree(direction) {
+            if (!direction) return 0;
+            
             const directions = {
                 'شمالي': 0,
                 'شمالي شرقي': 45,
@@ -1123,9 +1128,21 @@
                 'S': 180,
                 'SW': 225,
                 'W': 270,
-                'NW': 315
+                'NW': 315,
+                'north': 0,
+                'east': 90,
+                'south': 180,
+                'west': 270
             };
-            return directions[direction] || 0;
+            
+            // البحث في الكائن
+            for (let key in directions) {
+                if (direction.includes(key) || key.includes(direction)) {
+                    return directions[key];
+                }
+            }
+            
+            return 0;
         }
 
         function updateCompass(direction) {
@@ -1135,7 +1152,7 @@
             const degreeElement = document.getElementById('windDirectionDegree');
             
             if (directionElement) {
-                directionElement.textContent = direction;
+                directionElement.textContent = direction || 'غير معروف';
             }
             if (degreeElement) {
                 degreeElement.textContent = degrees + '°';
