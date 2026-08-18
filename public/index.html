@@ -1427,6 +1427,8 @@
 
         let currentForecast7 = [];
 
+        let currentForecastAIInfo = null;
+
 
         const contentArea =
             document.getElementById(
@@ -3132,27 +3134,46 @@
                 `;
 
 
-                const response =
-                    await fetch(
-                        '/api/forecast?device=' +
-                        encodeURIComponent(
-                            currentDevice
-                        )
+                const deviceQuery =
+                    encodeURIComponent(
+                        currentDevice
                     );
 
 
-                if (!response.ok) {
+                // نجلب التنبؤ الحالي وتنبؤ AI معاً.
+                // إذا فشل AI تبقى الواجهة تعمل بالتنبؤ السابق.
+                const responses =
+                    await Promise.allSettled([
+                        fetch(
+                            '/api/forecast?device=' +
+                            deviceQuery
+                        ),
+                        fetch(
+                            '/api/ai-forecast?device=' +
+                            deviceQuery
+                        )
+                    ]);
+
+
+                if (
+                    responses[0].status !== 'fulfilled' ||
+                    !responses[0].value.ok
+                ) {
+
+                    const status =
+                        responses[0].status === 'fulfilled'
+                            ? responses[0].value.status
+                            : 'network';
 
                     throw new Error(
-                        'خطأ في الخادم: ' +
-                        response.status
+                        'خطأ في الخادم: ' + status
                     );
 
                 }
 
 
                 const result =
-                    await response.json();
+                    await responses[0].value.json();
 
 
                 if (
@@ -3175,6 +3196,119 @@
                 currentForecast7 =
                     result.forecast7days ||
                     [];
+
+
+                currentForecastAIInfo = null;
+
+
+                // دمج توقع المطر من نماذج AI السبعة مع صفوف
+                // التنبؤ الحالية حتى لا نغيّر تصميم الواجهة.
+                if (
+                    responses[1].status === 'fulfilled' &&
+                    responses[1].value.ok
+                ) {
+
+                    try {
+
+                        const aiResult =
+                            await responses[1].value.json();
+
+                        if (
+                            aiResult.success &&
+                            Array.isArray(
+                                aiResult.forecast7days
+                            )
+                        ) {
+
+                            currentForecastAIInfo = {
+                                historyDays:
+                                    aiResult.historyDays || 0,
+                                bootstrapped:
+                                    Boolean(
+                                        aiResult.bootstrapped
+                                    ),
+                                model:
+                                    aiResult.model ||
+                                    'Weather AI'
+                            };
+
+
+                            const aiForecastByDate =
+                                new Map(
+                                    aiResult.forecast7days.map(
+                                        function(aiDay) {
+                                            return [
+                                                String(aiDay.date).slice(0, 10),
+                                                aiDay
+                                            ];
+                                        }
+                                    )
+                                );
+
+
+                            currentForecast7 =
+                                currentForecast7.map(
+                                    function(item) {
+
+                                        const itemDate =
+                                            String(item.date)
+                                                .slice(0, 10);
+
+
+                                        const ai =
+                                            aiForecastByDate.get(
+                                                itemDate
+                                            );
+
+
+                                        if (
+                                            !ai ||
+                                            ai.available !== true
+                                        ) {
+
+                                            return {
+                                                ...item,
+                                                aiAvailable: false,
+                                                aiError:
+                                                    ai
+                                                        ? ai.error
+                                                        : 'No matching AI forecast'
+                                            };
+
+                                        }
+
+
+                                        return {
+                                            ...item,
+                                            rainProbability:
+                                                ai.rainProbability,
+                                            rainfallMm:
+                                                ai.rainfallMm,
+                                            rawRainfallMm:
+                                                ai.rawRainfallMm,
+                                            rainExpected:
+                                                ai.rain,
+                                            aiThreshold:
+                                                ai.threshold,
+                                            aiAvailable: true,
+                                            aiDay:
+                                                ai.day
+                                        };
+                                    }
+                                );
+
+                        }
+
+                    } catch (aiError) {
+
+                        console.warn(
+                            'تعذر دمج تنبؤ AI:',
+                            aiError
+                        );
+
+                    }
+
+                }
 
 
                 displayForecast();
@@ -3370,7 +3504,7 @@
 
                                 <th>اتجاه الرياح</th>
 
-                                <th>احتمال المطر</th>
+                                <th>احتمال المطر AI</th>
 
                             </tr>
 
@@ -3394,29 +3528,38 @@
                         'rain-low';
 
 
+                    let rainIcon =
+                        '☀️';
+
+
                     if (
-                        probability >= 70
+                        item.aiAvailable === true
                     ) {
 
-                        rainClass =
-                            'rain-high';
+                        if (
+                            item.rainExpected === true
+                        ) {
 
-                    } else if (
-                        probability >= 40
-                    ) {
+                            rainClass =
+                                'rain-high';
 
-                        rainClass =
-                            'rain-medium';
+                            rainIcon =
+                                '🌧️';
+
+                        } else if (
+                            probability >=
+                            (Number(item.aiThreshold) * 0.6)
+                        ) {
+
+                            rainClass =
+                                'rain-medium';
+
+                            rainIcon =
+                                '🌦️';
+
+                        }
 
                     }
-
-
-                    const rainIcon =
-                        probability >= 70
-                            ? '🌧️'
-                            : probability >= 40
-                                ? '🌦️'
-                                : '☀️';
 
 
                     html += `
@@ -3462,7 +3605,24 @@
 
                                 ${rainIcon}
 
-                                ${probability.toFixed(0)}%
+                                ${probability.toFixed(1)}%
+
+                                ${
+                                    item.aiAvailable === true
+                                        ? `
+                                            <div style="
+                                                font-size:11px;
+                                                color:#94a3b8;
+                                                margin-top:3px;
+                                            ">
+                                                Threshold:
+                                                ${Number(
+                                                    item.aiThreshold
+                                                ).toFixed(1)}%
+                                            </div>
+                                          `
+                                        : ''
+                                }
 
                             </td>
 
@@ -3559,6 +3719,28 @@
                 </h3>
 
 
+                ${currentForecastAIInfo
+                    ? `
+                        <div style="
+                            margin:0 0 16px 0;
+                            padding:10px 14px;
+                            border-radius:10px;
+                            background:rgba(56,189,248,0.08);
+                            color:#94a3b8;
+                            font-size:14px;
+                        ">
+                            <i class="fas fa-brain"></i>
+                            احتمال وكمية المطر من AI
+                            — أيام تاريخية فعلية:
+                            ${currentForecastAIInfo.historyDays}
+                            ${currentForecastAIInfo.bootstrapped
+                                ? ' — وضع تمهيدي حتى يكتمل الأرشيف'
+                                : ''}
+                        </div>
+                    `
+                    : ''}
+
+
                 <div style="overflow-x:auto;">
 
                     <table class="archive-table">
@@ -3580,6 +3762,8 @@
                                 <th>اتجاه الرياح</th>
 
                                 <th>احتمال المطر</th>
+
+                                <th>كمية المطر AI</th>
 
                             </tr>
 
@@ -3673,6 +3857,14 @@
 
                                 ${probability.toFixed(0)}%
 
+                            </td>
+
+                            <td>
+                                ${item.aiAvailable === true
+                                    ? safeNumber(
+                                        item.rainfallMm
+                                      ) + ' mm'
+                                    : '--'}
                             </td>
 
                         </tr>
