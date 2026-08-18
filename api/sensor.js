@@ -3,15 +3,31 @@ import { neon } from "@neondatabase/serverless";
 const sql = neon(process.env.DATABASE_URL);
 const allowedDevices = ["max1", "max2", "max3", "max4"];
 
+// ===== دالة للحصول على وقت بغداد =====
+function getBaghdadTime() {
+    const now = new Date();
+    const baghdadTime = new Date(now.getTime() + (3 * 60 * 60 * 1000));
+    return baghdadTime.toISOString();
+}
+
+// ===== دالة للحصول على تاريخ بغداد =====
+function getBaghdadDate() {
+    const now = new Date();
+    const baghdadTime = new Date(now.getTime() + (3 * 60 * 60 * 1000));
+    return baghdadTime.toISOString().split('T')[0];
+}
+
 /* ===== أرشفة بيانات الأمس مرة واحدة فقط ===== */
 async function archiveYesterdayData() {
   try {
+    const baghdadDate = getBaghdadDate();
+    
     await sql`
       INSERT INTO weather_archive
       (device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time)
       SELECT device_id, temperture, humidity, pressure, windS, windD, rainy, DATE(time), time
       FROM weather_data
-      WHERE DATE(time) = CURRENT_DATE - INTERVAL '1 day'
+      WHERE DATE(time) = ${baghdadDate} - INTERVAL '1 day'
       AND NOT EXISTS (
         SELECT 1 FROM weather_archive wa
         WHERE wa.device_id = weather_data.device_id
@@ -67,15 +83,21 @@ export default async function handler(req, res) {
         }
       }
 
+      // الحصول على وقت وتاريخ بغداد
+      const baghdadTime = getBaghdadTime();
+      const baghdadDate = getBaghdadDate();
+
       console.log('=== POST Request ===');
       console.log('device_id:', device_id);
       console.log('rain received:', rain);
       console.log('rain converted:', rainValue);
+      console.log('Baghdad Time:', baghdadTime);
+      console.log('Baghdad Date:', baghdadDate);
       console.log('===================');
 
       await sql`
         INSERT INTO weather_data
-        (device_id, temperture, humidity, pressure, windS, windD, rainy, time)
+        (device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time)
         VALUES (
           ${device_id},
           ${Number(temperture)},
@@ -84,13 +106,16 @@ export default async function handler(req, res) {
           ${Number(windS)},
           ${windD},
           ${rainValue},
-          NOW()
+          ${baghdadDate},
+          ${baghdadTime}
         )
       `;
 
       return res.status(200).json({ 
         status: "saved", 
-        rainy: rainValue 
+        rainy: rainValue,
+        time: baghdadTime,
+        date: baghdadDate
       });
     }
 
@@ -116,12 +141,15 @@ export default async function handler(req, res) {
       }
 
       /* ===== الوضع الافتراضي ===== */
+      
+      // الحصول على تاريخ بغداد الحالي
+      const baghdadDate = getBaghdadDate();
 
       const todayRows = await sql`
-        SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, time
+        SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time
         FROM weather_data
         WHERE device_id = ${device}
-        AND DATE(time) = CURRENT_DATE
+        AND reading_date = ${baghdadDate}
         ORDER BY time ASC
       `;
 
@@ -129,7 +157,7 @@ export default async function handler(req, res) {
         SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time
         FROM weather_archive
         WHERE device_id = ${device}
-        AND reading_date = CURRENT_DATE - INTERVAL '1 day'
+        AND reading_date = ${baghdadDate} - INTERVAL '1 day'
         ORDER BY reading_date ASC
       `;
 
