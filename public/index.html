@@ -5,7 +5,6 @@
     <title>مركز بحوث وتكنولوجيا المعلومات والاتصالات - محطة الطقس</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- إضافة مكتبة Flatpickr للتقويم -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
@@ -40,7 +39,6 @@
             padding: 10px;
         }
         
-        /* ===== الصفحة الرئيسية ===== */
         #mainPage {
             display: flex;
             flex-direction: column;
@@ -213,7 +211,6 @@
             color: #38bdf8;
         }
 
-        /* ===== صفحة الطقس ===== */
         #weatherPage {
             display: none;
             height: 100vh;
@@ -221,7 +218,6 @@
             padding: 10px;
         }
 
-        /* زر العودة */
         .back-home-btn {
             position: fixed;
             top: 10px;
@@ -247,7 +243,6 @@
             transform: translateX(-5px);
         }
 
-        /* ===== أنماط الطقس الحالية ===== */
         .container {
             max-width: 100%;
             margin: 0 auto;
@@ -797,9 +792,6 @@
 </head>
 <body>
 
-    <!-- ============================================================ -->
-    <!-- الصفحة الرئيسية -->
-    <!-- ============================================================ -->
     <div id="mainPage">
         <div class="main-content">
             <div class="logo-container">
@@ -833,9 +825,6 @@
         </div>
     </div>
 
-    <!-- ============================================================ -->
-    <!-- صفحة الطقس -->
-    <!-- ============================================================ -->
     <div id="weatherPage">
 
         <button class="back-home-btn" onclick="goToHomePage()">
@@ -844,7 +833,6 @@
         </button>
 
         <div class="container">
-            <!-- الهيدر -->
             <div class="header">
                 <h1>
                     <i class="fas fa-cloud-sun"></i>
@@ -867,7 +855,6 @@
                 </div>
             </div>
 
-            <!-- التحكم -->
             <div class="controls">
                 <button class="control-btn" onclick="loadCurrentData()">
                     <i class="fas fa-sync-alt"></i>
@@ -886,14 +873,11 @@
                 </button>
             </div>
 
-            <!-- منطقة العرض الرئيسية -->
             <div id="contentArea">
-                <!-- سيتم تعبئة المحتوى هنا -->
             </div>
         </div>
     </div>
 
-    <!-- نافذة الأرشيف -->
     <div id="archiveModal" class="archive-modal">
         <div class="archive-content">
             <div class="archive-header">
@@ -906,20 +890,15 @@
                 </button>
             </div>
             <div id="archiveContent">
-                <!-- سيتم تعبئة بيانات الأرشيف هنا -->
             </div>
         </div>
     </div>
 
-    <!-- شاشة التحميل -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner"></div>
     </div>
 
     <script>
-        // ================================================================
-        // التحكم بين الصفحات
-        // ================================================================
         function goToWeatherPage() {
             document.getElementById('mainPage').style.display = 'none';
             document.getElementById('weatherPage').style.display = 'block';
@@ -933,10 +912,6 @@
             document.getElementById('weatherPage').style.display = 'none';
             document.getElementById('mainPage').style.display = 'flex';
         }
-
-        // ================================================================
-        // كود الطقس
-        // ================================================================
         
         let currentDevice = 'max1';
         let autoRefreshEnabled = true;
@@ -984,67 +959,41 @@
         function formatBaghdadTime(dateString) {
             if (!dateString) return 'الآن';
             try {
-                const date = new Date(dateString);
+                var date = new Date(dateString);
                 if (isNaN(date.getTime())) return 'الآن';
                 
-                // الحصول على توقيت بغداد (UTC+3)
-                const baghdadDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+                // إضافة 3 ساعات لتوقيت بغداد
+                var baghdadDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
                 
-                let hours = baghdadDate.getHours();
-                const minutes = baghdadDate.getMinutes().toString().padStart(2, '0');
-                const seconds = baghdadDate.getSeconds().toString().padStart(2, '0');
-                const ampm = hours >= 12 ? 'م' : 'ص';
+                var hours = baghdadDate.getHours();
+                var minutes = baghdadDate.getMinutes();
+                var seconds = baghdadDate.getSeconds();
+                var ampm = hours >= 12 ? 'م' : 'ص';
                 hours = hours % 12;
                 hours = hours ? hours : 12;
                 
-                return `${hours}:${minutes}:${seconds} ${ampm}`;
+                return hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds + ' ' + ampm;
             } catch (e) {
                 return 'الآن';
             }
         }
 
-        // دالة تحويل اتجاه الرياح إلى درجات - معكوسة للبوصلة
+        // دالة تحويل اتجاه الرياح إلى درجات
         function getWindDirectionDegree(direction) {
             if (!direction) return 0;
             
-            // اتجاه البوصلة: 0 = شمال, 90 = شرق, 180 = جنوب, 270 = غرب
-            const directions = {
-                'شمالي': 0,
-                'شمالي شرقي': 45,
-                'شرقي': 90,
-                'جنوبي شرقي': 135,
-                'جنوبي': 180,
-                'جنوبي غربي': 225,
-                'غربي': 270,
-                'شمالي غربي': 315,
-                'شمال': 0,
-                'شرق': 90,
-                'جنوب': 180,
-                'غرب': 270,
-                'N': 0,
-                'NE': 45,
-                'E': 90,
-                'SE': 135,
-                'S': 180,
-                'SW': 225,
-                'W': 270,
-                'NW': 315,
-                'north': 0,
-                'east': 90,
-                'south': 180,
-                'west': 270
-            };
+            var dirLower = direction.toLowerCase().trim();
             
-            // البحث المطابق
-            const dirLower = direction.toLowerCase().trim();
-            for (let key in directions) {
-                if (dirLower === key.toLowerCase() || dirLower.includes(key.toLowerCase()) || key.toLowerCase().includes(dirLower)) {
-                    return directions[key];
-                }
-            }
+            if (dirLower === 'شمالي' || dirLower === 'شمال' || dirLower === 'north' || dirLower === 'n') return 0;
+            if (dirLower === 'شمالي شرقي' || dirLower === 'northeast' || dirLower === 'ne') return 45;
+            if (dirLower === 'شرقي' || dirLower === 'شرق' || dirLower === 'east' || dirLower === 'e') return 90;
+            if (dirLower === 'جنوبي شرقي' || dirLower === 'southeast' || dirLower === 'se') return 135;
+            if (dirLower === 'جنوبي' || dirLower === 'جنوب' || dirLower === 'south' || dirLower === 's') return 180;
+            if (dirLower === 'جنوبي غربي' || dirLower === 'southwest' || dirLower === 'sw') return 225;
+            if (dirLower === 'غربي' || dirLower === 'غرب' || dirLower === 'west' || dirLower === 'w') return 270;
+            if (dirLower === 'شمالي غربي' || dirLower === 'northwest' || dirLower === 'nw') return 315;
             
-            // محاولة استخراج الرقم إذا كان المدخل رقمياً
-            const numMatch = direction.match(/\d+/);
+            var numMatch = direction.match(/\d+/);
             if (numMatch) {
                 return parseInt(numMatch[0]) % 360;
             }
@@ -1056,15 +1005,15 @@
             try {
                 showLoadingEffect();
                 
-                const response = await fetch(`/api/sensor?device=${currentDevice}`);
+                var response = await fetch('/api/sensor?device=' + currentDevice);
                 
                 if (!response.ok) {
-                    throw new Error(`خطأ في الخادم: ${response.status}`);
+                    throw new Error('خطأ في الخادم: ' + response.status);
                 }
                 
-                const data = await response.json();
+                var data = await response.json();
                 
-                let todayData = [];
+                var todayData = [];
                 if (data.today && Array.isArray(data.today)) {
                     todayData = data.today;
                 } else if (Array.isArray(data)) {
@@ -1076,7 +1025,7 @@
                     return;
                 }
                 
-                const latestReading = todayData[todayData.length - 1];
+                var latestReading = todayData[todayData.length - 1];
                 
                 updateStatus('متصل', true);
                 
@@ -1096,34 +1045,31 @@
         }
 
         function updateCurrentData(data) {
-            // تحويل القيم إلى أرقام مع التحقق
-            const temperature = parseFloat(data.temperture || data.temperature || 0);
-            const humidity = parseFloat(data.humidity || 0);
-            const pressure = parseFloat(data.pressure || 0);
-            const windSpeed = parseFloat(data.winds || data.windS || 0);
-            const windDirection = data.windd || data.windD || 'غير معروف';
-            const rainy = data.rainy || false;
+            var temperature = parseFloat(data.temperture || data.temperature || 0);
+            var humidity = parseFloat(data.humidity || 0);
+            var pressure = parseFloat(data.pressure || 0);
+            var windSpeed = parseFloat(data.winds || data.windS || 0);
+            var windDirection = data.windd || data.windD || 'غير معروف';
+            var rainy = data.rainy || false;
             
-            // عرض الوقت بتوقيت بغداد
-            let readingTime = 'الآن';
+            var readingTime = 'الآن';
             if (data.time) {
                 readingTime = formatBaghdadTime(data.time);
             } else if (data.reading_date) {
                 readingTime = formatBaghdadTime(data.reading_date);
             }
             
-            // التحقق من صحة الأرقام
-            const validTemp = isNaN(temperature) ? 0 : temperature;
-            const validHumidity = isNaN(humidity) ? 0 : humidity;
-            const validPressure = isNaN(pressure) ? 0 : pressure;
-            const validWindSpeed = isNaN(windSpeed) ? 0 : windSpeed;
+            var validTemp = isNaN(temperature) ? 0 : temperature;
+            var validHumidity = isNaN(humidity) ? 0 : humidity;
+            var validPressure = isNaN(pressure) ? 0 : pressure;
+            var validWindSpeed = isNaN(windSpeed) ? 0 : windSpeed;
             
             updateReadingValue('temperatureValue', validTemp.toFixed(1) + '°C');
             updateReadingValue('humidityValue', validHumidity.toFixed(1) + '%');
             updateReadingValue('pressureValue', validPressure.toFixed(1) + 'hPa');
             updateReadingValue('windSpeedValue', validWindSpeed.toFixed(1) + 'm/s');
             
-            const rainValue = document.getElementById('rainValue');
+            var rainValue = document.getElementById('rainValue');
             if (rainValue) {
                 if (rainy === true || rainy === 1 || rainy === 'true' || rainy === '1') {
                     rainValue.textContent = '🌧️ ممطر';
@@ -1132,7 +1078,7 @@
                 }
             }
             
-            const timeElement = document.getElementById('readingTime');
+            var timeElement = document.getElementById('readingTime');
             if (timeElement) {
                 timeElement.textContent = readingTime;
             }
@@ -1141,12 +1087,12 @@
         }
 
         function updateReadingValue(elementId, newValue) {
-            const element = document.getElementById(elementId);
+            var element = document.getElementById(elementId);
             if (element) {
-                const parent = element.closest('.reading-item');
+                var parent = element.closest('.reading-item');
                 if (parent) {
                     parent.classList.add('updating');
-                    setTimeout(() => {
+                    setTimeout(function() {
                         parent.classList.remove('updating');
                     }, 1000);
                 }
@@ -1155,10 +1101,10 @@
         }
 
         function updateCompass(direction) {
-            const degrees = getWindDirectionDegree(direction);
+            var degrees = getWindDirectionDegree(direction);
             
-            const directionElement = document.getElementById('windDirectionText');
-            const degreeElement = document.getElementById('windDirectionDegree');
+            var directionElement = document.getElementById('windDirectionText');
+            var degreeElement = document.getElementById('windDirectionDegree');
             
             if (directionElement) {
                 directionElement.textContent = direction || 'غير معروف';
@@ -1167,11 +1113,10 @@
                 degreeElement.textContent = degrees + '°';
             }
             
-            const needle = document.getElementById('compassNeedle');
+            var needle = document.getElementById('compassNeedle');
             if (needle) {
-                // دوران عكسي للبوصلة (السهم يشير إلى الاتجاه الصحيح)
-                let rotation = degrees;
-                let diff = rotation - currentCompassRotation;
+                var rotation = degrees;
+                var diff = rotation - currentCompassRotation;
                 if (diff > 180) diff -= 360;
                 if (diff < -180) diff += 360;
                 rotation = currentCompassRotation + diff;
@@ -1181,7 +1126,7 @@
         }
 
         function createCurrentDataInterface() {
-            const content = `
+            var content = `
                 <div class="dashboard-grid">
                     <div class="readings-card">
                         <h2 class="card-title">
@@ -1232,7 +1177,7 @@
                             </div>
                             <div class="info-item">
                                 <i class="fas fa-satellite"></i>
-                                <span>${currentDevice}</span>
+                                <span>` + currentDevice + `</span>
                             </div>
                         </div>
                     </div>
@@ -1270,7 +1215,7 @@
         }
 
         async function loadArchiveData() {
-            const selectedDate = document.getElementById('archiveDate').value;
+            var selectedDate = document.getElementById('archiveDate').value;
             if (!selectedDate) {
                 alert('الرجاء اختيار تاريخ أولاً');
                 return;
@@ -1279,13 +1224,13 @@
             try {
                 showLoading(true);
                 
-                const response = await fetch(`/api/sensor?device=${currentDevice}&date=${selectedDate}`);
+                var response = await fetch('/api/sensor?device=' + currentDevice + '&date=' + selectedDate);
                 
                 if (!response.ok) {
-                    throw new Error(`خطأ في جلب الأرشيف: ${response.status}`);
+                    throw new Error('خطأ في جلب الأرشيف: ' + response.status);
                 }
                 
-                const archiveData = await response.json();
+                var archiveData = await response.json();
                 
                 if (!archiveData || archiveData.length === 0) {
                     archiveContent.innerHTML = `
@@ -1307,7 +1252,7 @@
                     <div class="no-data">
                         <i class="fas fa-exclamation-triangle fa-3x" style="color: #ef4444; margin-bottom: 20px;"></i>
                         <h2 style="color: #ef4444;">خطأ في التحميل</h2>
-                        <p style="color: #ef4444; margin-top: 10px;">${error.message}</p>
+                        <p style="color: #ef4444; margin-top: 10px;">` + error.message + `</p>
                     </div>
                 `;
                 archiveModal.style.display = 'flex';
@@ -1317,8 +1262,8 @@
         }
 
         function displayArchiveData(data, date) {
-            let tableHTML = `
-                <h3 style="color: #38bdf8; margin-bottom: 20px;">بيانات الأرشيف: ${date}</h3>
+            var tableHTML = `
+                <h3 style="color: #38bdf8; margin-bottom: 20px;">بيانات الأرشيف: ` + date + `</h3>
                 <div style="overflow-x: auto;">
                     <table class="archive-table">
                         <thead>
@@ -1336,37 +1281,37 @@
                         <tbody>
             `;
             
-            data.forEach((item, index) => {
-                let time = '--';
+            data.forEach(function(item, index) {
+                var time = '--';
                 if (item.time) {
                     time = formatBaghdadTime(item.time);
                 } else if (item.reading_date) {
                     time = formatBaghdadTime(item.reading_date);
                 }
                 
-                const temperature = parseFloat(item.temperture || item.temperature || 0);
-                const humidity = parseFloat(item.humidity || 0);
-                const pressure = parseFloat(item.pressure || 0);
-                const windSpeed = parseFloat(item.winds || item.windS || 0);
-                const windDirection = item.windd || item.windD || '--';
-                const rainy = item.rainy || false;
-                const rainStatus = (rainy === true || rainy === 1 || rainy === 'true' || rainy === '1') ? '🌧️' : '☀️';
+                var temperature = parseFloat(item.temperture || item.temperature || 0);
+                var humidity = parseFloat(item.humidity || 0);
+                var pressure = parseFloat(item.pressure || 0);
+                var windSpeed = parseFloat(item.winds || item.windS || 0);
+                var windDirection = item.windd || item.windD || '--';
+                var rainy = item.rainy || false;
+                var rainStatus = (rainy === true || rainy === 1 || rainy === 'true' || rainy === '1') ? '🌧️' : '☀️';
                 
-                const validTemp = isNaN(temperature) ? 0 : temperature;
-                const validHumidity = isNaN(humidity) ? 0 : humidity;
-                const validPressure = isNaN(pressure) ? 0 : pressure;
-                const validWindSpeed = isNaN(windSpeed) ? 0 : windSpeed;
+                var validTemp = isNaN(temperature) ? 0 : temperature;
+                var validHumidity = isNaN(humidity) ? 0 : humidity;
+                var validPressure = isNaN(pressure) ? 0 : pressure;
+                var validWindSpeed = isNaN(windSpeed) ? 0 : windSpeed;
                 
                 tableHTML += `
                     <tr>
-                        <td>${index + 1}</td>
-                        <td>${time}</td>
-                        <td>${validTemp.toFixed(1)}°C</td>
-                        <td>${validHumidity.toFixed(1)}%</td>
-                        <td>${validPressure.toFixed(1)}hPa</td>
-                        <td>${validWindSpeed.toFixed(1)}m/s</td>
-                        <td>${windDirection}</td>
-                        <td>${rainStatus}</td>
+                        <td>` + (index + 1) + `</td>
+                        <td>` + time + `</td>
+                        <td>` + validTemp.toFixed(1) + `°C</td>
+                        <td>` + validHumidity.toFixed(1) + `%</td>
+                        <td>` + validPressure.toFixed(1) + `hPa</td>
+                        <td>` + validWindSpeed.toFixed(1) + `m/s</td>
+                        <td>` + windDirection + `</td>
+                        <td>` + rainStatus + `</td>
                     </tr>
                 `;
             });
@@ -1409,23 +1354,23 @@
 
         function updateStatus(message, isConnected) {
             statusText.textContent = message;
-            const statusDot = document.getElementById('statusDot');
+            var statusDot = document.getElementById('statusDot');
             if (statusDot) {
                 statusDot.className = 'status-dot ' + (isConnected ? 'online' : 'offline');
             }
         }
 
         function showLoadingEffect() {
-            const refreshBtn = document.querySelector('.control-btn');
-            if (refreshBtn && refreshBtn.textContent.includes('تحديث')) {
+            var refreshBtn = document.querySelector('.control-btn');
+            if (refreshBtn && refreshBtn.textContent.indexOf('تحديث') !== -1) {
                 refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
                 refreshBtn.disabled = true;
             }
         }
 
         function hideLoadingEffect() {
-            const refreshBtn = document.querySelector('.control-btn');
-            if (refreshBtn && refreshBtn.textContent.includes('جاري')) {
+            var refreshBtn = document.querySelector('.control-btn');
+            if (refreshBtn && refreshBtn.textContent.indexOf('جاري') !== -1) {
                 refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> تحديث';
                 refreshBtn.disabled = false;
             }
