@@ -1031,7 +1031,30 @@
             const windSpeed = parseFloat(data.winds || data.windS || 0);
             const windDirection = data.windd || data.windD || 'غير معروف';
             const rainy = data.rainy || false;
-            const readingTime = data.time ? new Date(data.time).toLocaleString('ar-SA') : 'الآن';
+            
+            // عرض الوقت بتوقيت بغداد
+            let readingTime = 'الآن';
+            if (data.time) {
+                try {
+                    const date = new Date(data.time);
+                    readingTime = date.toLocaleString('ar-IQ', {
+                        timeZone: 'Asia/Baghdad',
+                        hour12: false
+                    });
+                } catch (e) {
+                    readingTime = data.time;
+                }
+            } else if (data.reading_date) {
+                try {
+                    const date = new Date(data.reading_date);
+                    readingTime = date.toLocaleString('ar-IQ', {
+                        timeZone: 'Asia/Baghdad',
+                        hour12: false
+                    });
+                } catch (e) {
+                    readingTime = data.reading_date;
+                }
+            }
             
             // التحقق من صحة الأرقام
             const validTemp = isNaN(temperature) ? 0 : temperature;
@@ -1283,7 +1306,19 @@
             `;
             
             data.forEach((item, index) => {
-                const time = item.time ? new Date(item.time).toLocaleTimeString('ar-SA') : '--';
+                let time = '--';
+                if (item.time) {
+                    try {
+                        const dateObj = new Date(item.time);
+                        time = dateObj.toLocaleTimeString('ar-IQ', {
+                            timeZone: 'Asia/Baghdad',
+                            hour12: false
+                        });
+                    } catch (e) {
+                        time = item.time;
+                    }
+                }
+                
                 const temperature = parseFloat(item.temperture || item.temperature || 0);
                 const humidity = parseFloat(item.humidity || 0);
                 const pressure = parseFloat(item.pressure || 0);
