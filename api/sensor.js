@@ -25,7 +25,7 @@ async function archiveYesterdayData() {
     await sql`
       INSERT INTO weather_archive
       (device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time)
-      SELECT device_id, temperture, humidity, pressure, windS, windD, rainy, DATE(time), time
+      SELECT device_id, temperture, humidity, pressure, windS, windD, rainy, DATE(time) as reading_date, time
       FROM weather_data
       WHERE DATE(time) = ${baghdadDate} - INTERVAL '1 day'
       AND NOT EXISTS (
@@ -34,6 +34,7 @@ async function archiveYesterdayData() {
         AND wa.reading_date = DATE(weather_data.time)
       )
     `;
+    console.log("Archive completed successfully");
   } catch (err) {
     console.error("Archive error:", err);
   }
@@ -41,7 +42,6 @@ async function archiveYesterdayData() {
 
 export default async function handler(req, res) {
   try {
-
     /* ===== CORS ===== */
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
@@ -55,7 +55,6 @@ export default async function handler(req, res) {
 
     /* ========= POST ========= */
     if (req.method === "POST") {
-
       const {
         device_id,
         temperture,
@@ -63,18 +62,16 @@ export default async function handler(req, res) {
         pressure,
         windS,
         windD,
-        rain  // من ESP32
+        rain
       } = req.body ?? {};
 
       if (!allowedDevices.includes(device_id)) {
         return res.status(400).json({ error: "invalid device" });
       }
 
-      // تحويل rain إلى boolean
       let rainValue = false;
       if (rain !== undefined && rain !== null) {
         if (typeof rain === 'string') {
-          // إذا كانت القيمة "rainy" أو "true" أو "1"
           rainValue = rain.toLowerCase() === 'rainy' || 
                       rain.toLowerCase() === 'true' || 
                       rain === '1';
@@ -83,13 +80,12 @@ export default async function handler(req, res) {
         }
       }
 
-      // الحصول على وقت وتاريخ بغداد
       const baghdadTime = getBaghdadTime();
       const baghdadDate = getBaghdadDate();
 
       console.log('=== POST Request ===');
       console.log('device_id:', device_id);
-      console.log('rain received:', rain);
+      console.log('rain:', rain);
       console.log('rain converted:', rainValue);
       console.log('Baghdad Time:', baghdadTime);
       console.log('Baghdad Date:', baghdadDate);
@@ -121,7 +117,6 @@ export default async function handler(req, res) {
 
     /* ========= GET ========= */
     if (req.method === "GET") {
-
       const { device, date } = req.query;
 
       if (!allowedDevices.includes(device)) {
@@ -130,6 +125,7 @@ export default async function handler(req, res) {
 
       /* ===== طلب أرشيف حسب تاريخ ===== */
       if (date) {
+        console.log("Fetching archive for date:", date, "device:", device);
         const rows = await sql`
           SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time
           FROM weather_archive
@@ -137,14 +133,16 @@ export default async function handler(req, res) {
           AND reading_date = ${date}
           ORDER BY reading_date ASC
         `;
+        console.log("Archive rows found:", rows.length);
         return res.status(200).json(rows);
       }
 
       /* ===== الوضع الافتراضي ===== */
-      
-      // الحصول على تاريخ بغداد الحالي
       const baghdadDate = getBaghdadDate();
 
+      console.log("Fetching today data for device:", device, "date:", baghdadDate);
+
+      // جلب بيانات اليوم
       const todayRows = await sql`
         SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time
         FROM weather_data
@@ -153,6 +151,9 @@ export default async function handler(req, res) {
         ORDER BY time ASC
       `;
 
+      console.log("Today rows found:", todayRows.length);
+
+      // جلب بيانات الأمس من الأرشيف
       const yesterdayRows = await sql`
         SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time
         FROM weather_archive
@@ -161,8 +162,25 @@ export default async function handler(req, res) {
         ORDER BY reading_date ASC
       `;
 
+      console.log("Yesterday rows found:", yesterdayRows.length);
+
+      // إذا لم توجد بيانات اليوم، جلب آخر 50 قراءة من weather_data
+      let finalTodayRows = todayRows;
+      if (todayRows.length === 0) {
+        console.log("No today data, fetching last 50 records");
+        const lastRows = await sql`
+          SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time
+          FROM weather_data
+          WHERE device_id = ${device}
+          ORDER BY time DESC
+          LIMIT 50
+        `;
+        finalTodayRows = lastRows.reverse();
+        console.log("Last 50 rows found:", finalTodayRows.length);
+      }
+
       return res.status(200).json({
-        today: todayRows,
+        today: finalTodayRows,
         yesterday: yesterdayRows
       });
     }
@@ -173,7 +191,8 @@ export default async function handler(req, res) {
     console.error("Server error:", err);
     return res.status(500).json({
       error: "server error",
-      details: err.message
+      details: err.message,
+      stack: process.env.NODE_ENV === "development" ? err.stack : undefined
     });
   }
 }
