@@ -1024,22 +1024,29 @@
         }
 
         function updateCurrentData(data) {
-            const temperature = data.temperture || 0;
-            const humidity = data.humidity || 0;
-            const pressure = data.pressure || 0;
-            const windSpeed = data.winds || data.windS || 0;
+            // تحويل القيم إلى أرقام مع التحقق
+            const temperature = parseFloat(data.temperture || data.temperature || 0);
+            const humidity = parseFloat(data.humidity || 0);
+            const pressure = parseFloat(data.pressure || 0);
+            const windSpeed = parseFloat(data.winds || data.windS || 0);
             const windDirection = data.windd || data.windD || 'غير معروف';
             const rainy = data.rainy || false;
             const readingTime = data.time ? new Date(data.time).toLocaleString('ar-SA') : 'الآن';
             
-            updateReadingValue('temperatureValue', temperature.toFixed(1) + '°C');
-            updateReadingValue('humidityValue', humidity.toFixed(1) + '%');
-            updateReadingValue('pressureValue', pressure.toFixed(1) + 'hPa');
-            updateReadingValue('windSpeedValue', windSpeed.toFixed(1) + 'm/s');
+            // التحقق من صحة الأرقام
+            const validTemp = isNaN(temperature) ? 0 : temperature;
+            const validHumidity = isNaN(humidity) ? 0 : humidity;
+            const validPressure = isNaN(pressure) ? 0 : pressure;
+            const validWindSpeed = isNaN(windSpeed) ? 0 : windSpeed;
+            
+            updateReadingValue('temperatureValue', validTemp.toFixed(1) + '°C');
+            updateReadingValue('humidityValue', validHumidity.toFixed(1) + '%');
+            updateReadingValue('pressureValue', validPressure.toFixed(1) + 'hPa');
+            updateReadingValue('windSpeedValue', validWindSpeed.toFixed(1) + 'm/s');
             
             const rainValue = document.getElementById('rainValue');
             if (rainValue) {
-                if (rainy === true || rainy === 1 || rainy === 'true') {
+                if (rainy === true || rainy === 1 || rainy === 'true' || rainy === '1') {
                     rainValue.textContent = '🌧️ ممطر';
                 } else {
                     rainValue.textContent = '☀️ غير ممطر';
@@ -1277,22 +1284,27 @@
             
             data.forEach((item, index) => {
                 const time = item.time ? new Date(item.time).toLocaleTimeString('ar-SA') : '--';
-                const temperature = item.temperture || item.temperature || 0;
-                const humidity = item.humidity || 0;
-                const pressure = item.pressure || 0;
-                const windSpeed = item.winds || item.windS || 0;
+                const temperature = parseFloat(item.temperture || item.temperature || 0);
+                const humidity = parseFloat(item.humidity || 0);
+                const pressure = parseFloat(item.pressure || 0);
+                const windSpeed = parseFloat(item.winds || item.windS || 0);
                 const windDirection = item.windd || item.windD || '--';
                 const rainy = item.rainy || false;
-                const rainStatus = (rainy === true || rainy === 1 || rainy === 'true') ? '🌧️' : '☀️';
+                const rainStatus = (rainy === true || rainy === 1 || rainy === 'true' || rainy === '1') ? '🌧️' : '☀️';
+                
+                const validTemp = isNaN(temperature) ? 0 : temperature;
+                const validHumidity = isNaN(humidity) ? 0 : humidity;
+                const validPressure = isNaN(pressure) ? 0 : pressure;
+                const validWindSpeed = isNaN(windSpeed) ? 0 : windSpeed;
                 
                 tableHTML += `
                     <tr>
                         <td>${index + 1}</td>
                         <td>${time}</td>
-                        <td>${temperature.toFixed(1)}°C</td>
-                        <td>${humidity.toFixed(1)}%</td>
-                        <td>${pressure.toFixed(1)}hPa</td>
-                        <td>${windSpeed.toFixed(1)}m/s</td>
+                        <td>${validTemp.toFixed(1)}°C</td>
+                        <td>${validHumidity.toFixed(1)}%</td>
+                        <td>${validPressure.toFixed(1)}hPa</td>
+                        <td>${validWindSpeed.toFixed(1)}m/s</td>
                         <td>${windDirection}</td>
                         <td>${rainStatus}</td>
                     </tr>
