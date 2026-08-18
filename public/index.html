@@ -987,7 +987,7 @@
                 const date = new Date(dateString);
                 if (isNaN(date.getTime())) return 'الآن';
                 
-                // إضافة 3 ساعات لتوقيت بغداد
+                // الحصول على توقيت بغداد (UTC+3)
                 const baghdadDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
                 
                 let hours = baghdadDate.getHours();
@@ -1001,6 +1001,55 @@
             } catch (e) {
                 return 'الآن';
             }
+        }
+
+        // دالة تحويل اتجاه الرياح إلى درجات - معكوسة للبوصلة
+        function getWindDirectionDegree(direction) {
+            if (!direction) return 0;
+            
+            // اتجاه البوصلة: 0 = شمال, 90 = شرق, 180 = جنوب, 270 = غرب
+            const directions = {
+                'شمالي': 0,
+                'شمالي شرقي': 45,
+                'شرقي': 90,
+                'جنوبي شرقي': 135,
+                'جنوبي': 180,
+                'جنوبي غربي': 225,
+                'غربي': 270,
+                'شمالي غربي': 315,
+                'شمال': 0,
+                'شرق': 90,
+                'جنوب': 180,
+                'غرب': 270,
+                'N': 0,
+                'NE': 45,
+                'E': 90,
+                'SE': 135,
+                'S': 180,
+                'SW': 225,
+                'W': 270,
+                'NW': 315,
+                'north': 0,
+                'east': 90,
+                'south': 180,
+                'west': 270
+            };
+            
+            // البحث المطابق
+            const dirLower = direction.toLowerCase().trim();
+            for (let key in directions) {
+                if (dirLower === key.toLowerCase() || dirLower.includes(key.toLowerCase()) || key.toLowerCase().includes(dirLower)) {
+                    return directions[key];
+                }
+            }
+            
+            // محاولة استخراج الرقم إذا كان المدخل رقمياً
+            const numMatch = direction.match(/\d+/);
+            if (numMatch) {
+                return parseInt(numMatch[0]) % 360;
+            }
+            
+            return 0;
         }
 
         async function loadCurrentData() {
@@ -1105,46 +1154,6 @@
             }
         }
 
-        function getWindDirectionDegree(direction) {
-            if (!direction) return 0;
-            
-            const directions = {
-                'شمالي': 0,
-                'شمالي شرقي': 45,
-                'شرقي': 90,
-                'جنوبي شرقي': 135,
-                'جنوبي': 180,
-                'جنوبي غربي': 225,
-                'غربي': 270,
-                'شمالي غربي': 315,
-                'شمال': 0,
-                'شرق': 90,
-                'جنوب': 180,
-                'غرب': 270,
-                'N': 0,
-                'NE': 45,
-                'E': 90,
-                'SE': 135,
-                'S': 180,
-                'SW': 225,
-                'W': 270,
-                'NW': 315,
-                'north': 0,
-                'east': 90,
-                'south': 180,
-                'west': 270
-            };
-            
-            // البحث في الكائن
-            for (let key in directions) {
-                if (direction.includes(key) || key.includes(direction)) {
-                    return directions[key];
-                }
-            }
-            
-            return 0;
-        }
-
         function updateCompass(direction) {
             const degrees = getWindDirectionDegree(direction);
             
@@ -1160,13 +1169,14 @@
             
             const needle = document.getElementById('compassNeedle');
             if (needle) {
+                // دوران عكسي للبوصلة (السهم يشير إلى الاتجاه الصحيح)
                 let rotation = degrees;
                 let diff = rotation - currentCompassRotation;
                 if (diff > 180) diff -= 360;
                 if (diff < -180) diff += 360;
                 rotation = currentCompassRotation + diff;
                 currentCompassRotation = rotation;
-                needle.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+                needle.style.transform = 'translate(-50%, -50%) rotate(' + rotation + 'deg)';
             }
         }
 
