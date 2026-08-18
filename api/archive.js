@@ -2,174 +2,78 @@ import { neon } from "@neondatabase/serverless";
 
 const sql = neon(process.env.DATABASE_URL);
 
-const allowedDevices = [
-  "max1",
-  "max2",
-  "max3",
-  "max4"
-];
-
 export default async function handler(req, res) {
 
-  // السماح بالتشغيل من Vercel Cron
   if (req.method !== "GET") {
     return res.status(405).json({
-      error: "طريقة غير مسموحة"
+      error: "Method not allowed"
     });
   }
 
   try {
 
-    // ==============================
-    // حساب الوقت بتوقيت بغداد
-    // ==============================
+    // =========================================
+    // 1. نقل البيانات القديمة إلى الأرشيف
+    // =========================================
 
-    const now = new Date();
+    const inserted = await sql`
+      INSERT INTO weather_archive (
+        device_id,
+        temperture,
+        humidity,
+        pressure,
+        winds,
+        windd,
+        rainy,
+        reading_date,
+        time
+      )
+      SELECT
+        device_id,
+        temperture,
+        humidity,
+        pressure,
+        winds,
+        windd,
+        rainy,
+        reading_date,
+        time
+      FROM weather_data
+      WHERE reading_date < CURRENT_DATE
 
-    const baghdadTime = new Date(
-      now.getTime() + (3 * 60 * 60 * 1000)
-    );
-
-    // نريد أرشفة بيانات الأمس
-    const archiveDate = new Date(baghdadTime);
-
-    archiveDate.setDate(
-      archiveDate.getDate() - 1
-    );
-
-    const archiveDateStr =
-      archiveDate.toISOString().split("T")[0];
-
-
-    let results = [];
-
-
-    // ==============================
-    // أرشفة كل محطة
-    // ==============================
-
-    for (const device of allowedDevices) {
-
-      // معرفة عدد البيانات الموجودة
-      const countResult = await sql`
-
-        SELECT COUNT(*)::int AS count
-
-        FROM weather_data
-
-        WHERE device_id = ${device}
-
-        AND reading_date = ${archiveDateStr}
-
-      `;
-
-      const rowCount = countResult[0].count;
+      ON CONFLICT (device_id, time)
+      DO NOTHING
+    `;
 
 
-      // إذا لم توجد بيانات
-      if (rowCount === 0) {
+    // =========================================
+    // 2. حذف البيانات القديمة فقط
+    // =========================================
 
-        results.push({
-          device: device,
-          archived: 0,
-          message: "لا توجد بيانات"
-        });
-
-        continue;
-      }
+    const deleted = await sql`
+      DELETE FROM weather_data
+      WHERE reading_date < CURRENT_DATE
+    `;
 
 
-      // ==============================
-      // نقل البيانات إلى الأرشيف
-      // ==============================
-
-      await sql`
-
-        INSERT INTO weather_archive
-        (
-          device_id,
-          temperture,
-          humidity,
-          pressure,
-          winds,
-          windd,
-          rainy,
-          reading_date,
-          time
-        )
-
-        SELECT
-          device_id,
-          temperture,
-          humidity,
-          pressure,
-          windS,
-          windD,
-          rainy,
-          reading_date,
-          time
-
-        FROM weather_data
-
-        WHERE device_id = ${device}
-
-        AND reading_date = ${archiveDateStr}
-
-      `;
-
-
-      // ==============================
-      // حذف البيانات بعد نجاح النقل
-      // ==============================
-
-      await sql`
-
-        DELETE FROM weather_data
-
-        WHERE device_id = ${device}
-
-        AND reading_date = ${archiveDateStr}
-
-      `;
-
-
-      results.push({
-
-        device: device,
-
-        archived: rowCount,
-
-        message: "تمت الأرشفة بنجاح"
-
-      });
-
-    }
-
+    // =========================================
+    // 3. النتيجة
+    // =========================================
 
     return res.status(200).json({
-
       success: true,
-
-      archive_date: archiveDateStr,
-
-      results: results
-
+      message: "Weather archive completed successfully",
+      inserted: inserted.length,
+      deleted: deleted.length
     });
 
   } catch (error) {
 
-    console.error(
-      "Archive error:",
-      error
-    );
+    console.error("Archive error:", error);
 
     return res.status(500).json({
-
       success: false,
-
       error: error.message
-
     });
-
   }
 }
