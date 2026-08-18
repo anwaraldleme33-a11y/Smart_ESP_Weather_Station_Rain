@@ -980,6 +980,26 @@
             });
         }
 
+        // دالة لتنسيق الوقت بنظام 12 ساعة وتوقيت بغداد
+        function formatBaghdadTime(dateString) {
+            if (!dateString) return 'الآن';
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return 'الآن';
+                
+                // استخدام toLocaleString مع توقيت بغداد ونظام 12 ساعة
+                return date.toLocaleString('ar-IQ', {
+                    timeZone: 'Asia/Baghdad',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            } catch (e) {
+                return 'الآن';
+            }
+        }
+
         async function loadCurrentData() {
             try {
                 showLoadingEffect();
@@ -1032,28 +1052,12 @@
             const windDirection = data.windd || data.windD || 'غير معروف';
             const rainy = data.rainy || false;
             
-            // عرض الوقت بتوقيت بغداد
+            // عرض الوقت بتوقيت بغداد ونظام 12 ساعة
             let readingTime = 'الآن';
             if (data.time) {
-                try {
-                    const date = new Date(data.time);
-                    readingTime = date.toLocaleString('ar-IQ', {
-                        timeZone: 'Asia/Baghdad',
-                        hour12: false
-                    });
-                } catch (e) {
-                    readingTime = data.time;
-                }
+                readingTime = formatBaghdadTime(data.time);
             } else if (data.reading_date) {
-                try {
-                    const date = new Date(data.reading_date);
-                    readingTime = date.toLocaleString('ar-IQ', {
-                        timeZone: 'Asia/Baghdad',
-                        hour12: false
-                    });
-                } catch (e) {
-                    readingTime = data.reading_date;
-                }
+                readingTime = formatBaghdadTime(data.reading_date);
             }
             
             // التحقق من صحة الأرقام
@@ -1308,15 +1312,9 @@
             data.forEach((item, index) => {
                 let time = '--';
                 if (item.time) {
-                    try {
-                        const dateObj = new Date(item.time);
-                        time = dateObj.toLocaleTimeString('ar-IQ', {
-                            timeZone: 'Asia/Baghdad',
-                            hour12: false
-                        });
-                    } catch (e) {
-                        time = item.time;
-                    }
+                    time = formatBaghdadTime(item.time);
+                } else if (item.reading_date) {
+                    time = formatBaghdadTime(item.reading_date);
                 }
                 
                 const temperature = parseFloat(item.temperture || item.temperature || 0);
