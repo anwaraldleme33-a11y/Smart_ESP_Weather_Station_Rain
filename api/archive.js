@@ -13,8 +13,13 @@ export default async function handler(req, res) {
 
   try {
 
+    // تاريخ اليوم حسب توقيت بغداد
+    const baghdadDate = await sql`
+      SELECT (NOW() AT TIME ZONE 'Asia/Baghdad')::date AS today
+    `;
+
     // =========================================
-    // 1. نقل بيانات الأيام السابقة إلى الأرشيف
+    // 1. نقل الأيام السابقة إلى الأرشيف
     // =========================================
 
     const inserted = await sql`
@@ -40,7 +45,9 @@ export default async function handler(req, res) {
         reading_date,
         time
       FROM weather_data
-      WHERE reading_date < CURRENT_DATE
+
+      WHERE reading_date <
+        (NOW() AT TIME ZONE 'Asia/Baghdad')::date
 
       ON CONFLICT (device_id, time)
       DO NOTHING
@@ -49,25 +56,29 @@ export default async function handler(req, res) {
     `;
 
     // =========================================
-    // 2. حذف البيانات القديمة من الجدول الحالي
+    // 2. حذف الأيام السابقة من weather_data
     // =========================================
 
     const deleted = await sql`
       DELETE FROM weather_data
-      WHERE reading_date < CURRENT_DATE
+
+      WHERE reading_date <
+        (NOW() AT TIME ZONE 'Asia/Baghdad')::date
+
       RETURNING id
     `;
 
     // =========================================
-    // 3. إرجاع النتيجة
+    // 3. النتيجة
     // =========================================
 
     return res.status(200).json({
       success: true,
       message: "Weather archive completed successfully",
+      baghdadDate: baghdadDate[0].today,
       inserted: inserted.length,
       deleted: deleted.length,
-      archiveDate: new Date().toISOString()
+      archiveTime: new Date().toISOString()
     });
 
   } catch (error) {
