@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <title>مركز بحوث وتكنولوجيا المعلومات والاتصالات - محطة الطقس</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ar.js"></script>
-    
+
     <style>
         :root {
             --primary: #3b82f6;
@@ -20,25 +22,25 @@
             --light: #f8fafc;
             --gray: #64748b;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Tajawal', 'Segoe UI', sans-serif;
         }
-        
+
         html, body {
             height: 100%;
             overflow: hidden;
         }
-        
+
         body {
             background: linear-gradient(135deg, #0c0c2e 0%, #1a1a3e 100%);
             color: var(--light);
             padding: 10px;
         }
-        
+
         #mainPage {
             display: flex;
             flex-direction: column;
@@ -58,16 +60,23 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+            background:
+                radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
             animation: bgFloat 20s ease-in-out infinite;
             z-index: 0;
         }
 
         @keyframes bgFloat {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(2%, -2%) rotate(5deg); }
-            66% { transform: translate(-2%, 2%) rotate(-5deg); }
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate(2%, -2%) rotate(5deg);
+            }
+            66% {
+                transform: translate(-2%, 2%) rotate(-5deg);
+            }
         }
 
         .main-content {
@@ -84,8 +93,14 @@
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .logo-container {
@@ -251,7 +266,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .header {
             background: rgba(30, 41, 59, 0.9);
             border-radius: 15px;
@@ -265,7 +280,7 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        
+
         .header h1 {
             font-size: 1.5rem;
             background: linear-gradient(90deg, #38bdf8, #818cf8);
@@ -276,14 +291,14 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .header-info {
             display: flex;
             align-items: center;
             gap: 15px;
             flex-wrap: wrap;
         }
-        
+
         .device-selector {
             display: flex;
             align-items: center;
@@ -293,7 +308,7 @@
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .device-selector select {
             background: transparent;
             color: white;
@@ -305,7 +320,7 @@
             cursor: pointer;
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
+
         .status-indicator {
             display: flex;
             align-items: center;
@@ -315,28 +330,32 @@
             border-radius: 10px;
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
-        
+
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
-        
+
         .status-dot.online {
             background: #10b981;
         }
-        
+
         .status-dot.offline {
             background: #ef4444;
             animation: none;
         }
-        
+
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
         }
-        
+
         .controls {
             display: flex;
             justify-content: center;
@@ -344,7 +363,7 @@
             margin-bottom: 10px;
             flex-wrap: wrap;
         }
-        
+
         .control-btn {
             background: linear-gradient(135deg, var(--primary), #6366f1);
             color: white;
@@ -361,24 +380,24 @@
             min-width: 120px;
             justify-content: center;
         }
-        
+
         .control-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
         }
-        
+
         .control-btn.secondary {
             background: linear-gradient(135deg, #64748b, #475569);
         }
-        
+
         .control-btn.success {
             background: linear-gradient(135deg, #10b981, #059669);
         }
-        
+
         .calendar-container {
             position: relative;
         }
-        
+
         .flatpickr-input {
             background: transparent;
             color: white;
@@ -389,15 +408,17 @@
             width: 150px;
             cursor: pointer;
         }
-        
+
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             flex: 1;
             min-height: 0;
+            overflow-y: auto;
+            padding-bottom: 10px;
         }
-        
+
         .readings-card {
             background: rgba(30, 41, 59, 0.9);
             border-radius: 15px;
@@ -409,7 +430,7 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .readings-card::before {
             content: '';
             position: absolute;
@@ -419,7 +440,7 @@
             height: 3px;
             background: linear-gradient(90deg, #38bdf8, #818cf8);
         }
-        
+
         .card-title {
             font-size: 1.1rem;
             margin-bottom: 10px;
@@ -428,14 +449,14 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .readings-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
             flex: 1;
         }
-        
+
         .reading-item {
             background: rgba(15, 23, 42, 0.6);
             border-radius: 12px;
@@ -446,16 +467,20 @@
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        
+
         .reading-item.updating {
             animation: update-pulse 1s ease;
         }
-        
+
         @keyframes update-pulse {
-            0% { background: rgba(59, 130, 246, 0.3); }
-            100% { background: rgba(15, 23, 42, 0.6); }
+            0% {
+                background: rgba(59, 130, 246, 0.3);
+            }
+            100% {
+                background: rgba(15, 23, 42, 0.6);
+            }
         }
-        
+
         .reading-icon {
             width: 35px;
             height: 35px;
@@ -468,25 +493,25 @@
             color: #60a5fa;
             flex-shrink: 0;
         }
-        
+
         .reading-info h3 {
             font-size: 0.7rem;
             color: #94a3b8;
             margin-bottom: 2px;
         }
-        
+
         .reading-value {
             font-size: 1.2rem;
             font-weight: 700;
             color: white;
         }
-        
+
         .reading-unit {
             font-size: 0.8rem;
             color: #94a3b8;
             margin-right: 3px;
         }
-        
+
         .compass-card {
             background: rgba(30, 41, 59, 0.9);
             border-radius: 15px;
@@ -498,27 +523,33 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .compass-wrapper {
             position: relative;
             width: 200px;
             height: 200px;
             margin: 10px 0;
         }
-        
+
         .compass-outer {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             background: conic-gradient(
-                #ef4444 0deg, #f97316 45deg, #eab308 90deg,
-                #22c55e 135deg, #0ea5e9 180deg, #3b82f6 225deg,
-                #8b5cf6 270deg, #ec4899 315deg, #ef4444 360deg
+                #ef4444 0deg,
+                #f97316 45deg,
+                #eab308 90deg,
+                #22c55e 135deg,
+                #0ea5e9 180deg,
+                #3b82f6 225deg,
+                #8b5cf6 270deg,
+                #ec4899 315deg,
+                #ef4444 360deg
             );
             position: relative;
             box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
         }
-        
+
         .compass-inner {
             position: absolute;
             top: 12px;
@@ -531,7 +562,7 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .compass-directions {
             position: absolute;
             top: 0;
@@ -540,7 +571,7 @@
             height: 100%;
             border-radius: 50%;
         }
-        
+
         .compass-direction {
             position: absolute;
             font-weight: bold;
@@ -548,12 +579,31 @@
             font-size: 1rem;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
-        
-        .direction-n { top: 10px; left: 50%; transform: translateX(-50%); }
-        .direction-e { top: 50%; right: 10px; transform: translateY(-50%); }
-        .direction-s { bottom: 10px; left: 50%; transform: translateX(-50%); }
-        .direction-w { top: 50%; left: 10px; transform: translateY(-50%); }
-        
+
+        .direction-n {
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .direction-e {
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+        }
+
+        .direction-s {
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .direction-w {
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+        }
+
         .compass-needle {
             position: absolute;
             top: 50%;
@@ -564,7 +614,7 @@
             width: 8px;
             height: 8px;
         }
-        
+
         .needle {
             width: 3px;
             height: 85px;
@@ -575,7 +625,7 @@
             left: 2.5px;
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
         }
-        
+
         .needle::after {
             content: '';
             position: absolute;
@@ -586,7 +636,7 @@
             background: #ef4444;
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
         }
-        
+
         .compass-center {
             position: absolute;
             top: 50%;
@@ -600,7 +650,7 @@
             border: 3px solid var(--dark);
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
-        
+
         .direction-info {
             margin-top: 10px;
             text-align: center;
@@ -609,19 +659,19 @@
             border-radius: 10px;
             min-width: 150px;
         }
-        
+
         .direction-text {
             font-size: 1.1rem;
             color: #38bdf8;
             font-weight: 600;
             margin-bottom: 3px;
         }
-        
+
         .direction-degree {
             font-size: 0.9rem;
             color: #94a3b8;
         }
-        
+
         .system-info {
             display: flex;
             justify-content: space-between;
@@ -633,19 +683,19 @@
             flex-wrap: wrap;
             gap: 10px;
         }
-        
+
         .info-item {
             display: flex;
             align-items: center;
             gap: 8px;
             font-size: 0.8rem;
         }
-        
+
         .info-item i {
             color: #38bdf8;
             font-size: 1rem;
         }
-        
+
         .archive-modal {
             display: none;
             position: fixed;
@@ -658,7 +708,7 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .archive-content {
             background: rgba(30, 41, 59, 0.95);
             border-radius: 20px;
@@ -668,14 +718,14 @@
             max-height: 80vh;
             overflow-y: auto;
         }
-        
+
         .archive-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-        
+
         .close-archive {
             background: none;
             border: none;
@@ -684,31 +734,31 @@
             cursor: pointer;
             padding: 5px;
         }
-        
+
         .archive-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
             font-size: 0.9rem;
         }
-        
+
         .archive-table th {
             background: rgba(59, 130, 246, 0.2);
             color: #38bdf8;
             padding: 10px;
             text-align: center;
         }
-        
+
         .archive-table td {
             padding: 8px;
             text-align: center;
             border-bottom: 1px solid #334155;
         }
-        
+
         .archive-table tr:hover {
             background: rgba(59, 130, 246, 0.1);
         }
-        
+
         .no-data {
             text-align: center;
             padding: 60px 20px;
@@ -716,7 +766,7 @@
             background: rgba(30, 41, 59, 0.9);
             border-radius: 20px;
         }
-        
+
         .loading-overlay {
             display: none;
             position: fixed;
@@ -729,7 +779,7 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .loading-spinner {
             width: 50px;
             height: 50px;
@@ -738,41 +788,46 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
+
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
-        
+
         @media (max-width: 768px) {
+
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .readings-grid {
                 grid-template-columns: 1fr 1fr;
             }
-            
+
             .header {
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .header-info {
                 justify-content: center;
             }
-            
+
             .compass-wrapper {
                 width: 150px;
                 height: 150px;
             }
-            
+
             .controls {
                 flex-direction: row;
                 flex-wrap: wrap;
                 align-items: center;
             }
-            
+
             .control-btn {
                 width: auto;
                 min-width: 100px;
@@ -780,628 +835,2290 @@
                 font-size: 0.75rem;
             }
 
-            .organization-name { font-size: 1.2rem; }
-            .organization-sub { font-size: 1.1rem; }
-            .organization-desc { font-size: 1rem; }
-            .organization-department { font-size: 0.9rem; }
-            .logo-container { width: 100px; height: 100px; }
-            .enter-btn { padding: 12px 30px; font-size: 1rem; }
-            .footer-info { gap: 10px; font-size: 0.7rem; }
+            .organization-name {
+                font-size: 1.2rem;
+            }
+
+            .organization-sub {
+                font-size: 1.1rem;
+            }
+
+            .organization-desc {
+                font-size: 1rem;
+            }
+
+            .organization-department {
+                font-size: 0.9rem;
+            }
+
+            .logo-container {
+                width: 100px;
+                height: 100px;
+            }
+
+            .enter-btn {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+
+            .footer-info {
+                gap: 10px;
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>
+
 <body>
 
+    <!-- ================= الصفحة الرئيسية ================= -->
+
     <div id="mainPage">
+
         <div class="main-content">
+
             <div class="logo-container">
                 <img src="logo.png" alt="شعار المركز" id="logoImage">
             </div>
+
             <div class="organization-name">
                 وزارة التعليم العالي والبحث العلمي
             </div>
+
             <div class="organization-sub">
                 هيئة البحث العلمي
             </div>
+
             <div class="divider-line"></div>
+
             <div class="organization-desc">
                 مركز بحوث وتكنولوجيا المعلومات والاتصالات
             </div>
+
             <div class="organization-department">
                 قسم الانتاج والتصنيع الالكتروني
             </div>
+
             <button class="enter-btn" onclick="goToWeatherPage()">
                 <i class="fas fa-cloud-sun"></i>
                 دخول إلى محطة الطقس
                 <i class="fas fa-arrow-left"></i>
             </button>
+
         </div>
 
         <div class="footer-info">
-            <span><i class="fas fa-map-marker-alt"></i> بغداد، العراق</span>
-            <span><i class="fas fa-envelope"></i> secres@rdd.edu.iq</span>
-            <span><i class="fas fa-phone"></i> +964 7731149340</span>
-            <span><i class="fas fa-globe"></i> www.src.edu.iq</span>
+
+            <span>
+                <i class="fas fa-map-marker-alt"></i>
+                بغداد، العراق
+            </span>
+
+            <span>
+                <i class="fas fa-envelope"></i>
+                secres@rdd.edu.iq
+            </span>
+
+            <span>
+                <i class="fas fa-phone"></i>
+                +964 7731149340
+            </span>
+
+            <span>
+                <i class="fas fa-globe"></i>
+                www.src.edu.iq
+            </span>
+
         </div>
+
     </div>
+
+
+    <!-- ================= صفحة الطقس ================= -->
 
     <div id="weatherPage">
 
         <button class="back-home-btn" onclick="goToHomePage()">
+
             <i class="fas fa-arrow-right"></i>
+
             العودة
+
         </button>
 
+
         <div class="container">
+
             <div class="header">
+
                 <h1>
+
                     <i class="fas fa-cloud-sun"></i>
+
                     محطة الطقس
+
                 </h1>
+
+
                 <div class="header-info">
+
                     <div class="device-selector">
+
                         <i class="fas fa-satellite"></i>
+
                         <select id="deviceSelect">
+
                             <option value="max1">محطة 1</option>
                             <option value="max2">محطة 2</option>
                             <option value="max3">محطة 3</option>
                             <option value="max4">محطة 4</option>
+
                         </select>
+
                     </div>
+
+
                     <div class="status-indicator">
-                        <div class="status-dot online" id="statusDot"></div>
-                        <span id="statusText" style="font-size:0.85rem;">جاري التحميل...</span>
+
+                        <div
+                            class="status-dot online"
+                            id="statusDot">
+                        </div>
+
+                        <span
+                            id="statusText"
+                            style="font-size:0.85rem;">
+                            جاري التحميل...
+                        </span>
+
                     </div>
+
                 </div>
+
             </div>
+
+
+            <!-- ================= أزرار التحكم ================= -->
 
             <div class="controls">
-                <button class="control-btn" onclick="loadCurrentData()">
+
+                <button
+                    class="control-btn"
+                    onclick="loadCurrentData()">
+
                     <i class="fas fa-sync-alt"></i>
+
                     تحديث
+
                 </button>
-                <button class="control-btn secondary" onclick="toggleAutoRefresh()">
+
+
+                <button
+                    class="control-btn secondary"
+                    onclick="toggleAutoRefresh()">
+
                     <i class="fas fa-clock"></i>
-                    <span id="autoRefreshText" style="font-size:0.75rem;">تلقائي</span>
+
+                    <span
+                        id="autoRefreshText"
+                        style="font-size:0.75rem;">
+                        تلقائي
+                    </span>
+
                 </button>
+
+
                 <div class="calendar-container">
-                    <input type="text" id="archiveDate" class="flatpickr-input" placeholder="اختر تاريخ">
+
+                    <input
+                        type="text"
+                        id="archiveDate"
+                        class="flatpickr-input"
+                        placeholder="اختر تاريخ">
+
                 </div>
-                <button class="control-btn success" onclick="loadArchiveData()">
+
+
+                <button
+                    class="control-btn success"
+                    onclick="loadArchiveData()">
+
                     <i class="fas fa-history"></i>
+
                     أرشيف
+
                 </button>
+
             </div>
 
-            <div id="contentArea">
-            </div>
+
+            <div id="contentArea"></div>
+
         </div>
+
     </div>
 
-    <div id="archiveModal" class="archive-modal">
+
+    <!-- ================= الأرشيف ================= -->
+
+    <div
+        id="archiveModal"
+        class="archive-modal">
+
         <div class="archive-content">
+
             <div class="archive-header">
+
                 <h2 class="card-title">
+
                     <i class="fas fa-history"></i>
+
                     بيانات الأرشيف
+
                 </h2>
-                <button class="close-archive" onclick="closeArchive()">
+
+
+                <button
+                    class="close-archive"
+                    onclick="closeArchive()">
+
                     <i class="fas fa-times"></i>
+
                 </button>
+
             </div>
-            <div id="archiveContent">
-            </div>
+
+
+            <div id="archiveContent"></div>
+
         </div>
+
     </div>
 
-    <div id="loadingOverlay" class="loading-overlay">
+
+    <!-- ================= التحميل ================= -->
+
+    <div
+        id="loadingOverlay"
+        class="loading-overlay">
+
         <div class="loading-spinner"></div>
+
     </div>
+
 
     <script>
+
         function goToWeatherPage() {
+
             document.getElementById('mainPage').style.display = 'none';
+
             document.getElementById('weatherPage').style.display = 'block';
+
             if (!window.weatherInitialized) {
+
                 initWeather();
+
                 window.weatherInitialized = true;
+
             }
+
         }
+
 
         function goToHomePage() {
+
             document.getElementById('weatherPage').style.display = 'none';
+
             document.getElementById('mainPage').style.display = 'flex';
+
         }
-        
+
+
         let currentDevice = 'max1';
+
         let autoRefreshEnabled = true;
+
         let refreshInterval = null;
+
         let currentCompassRotation = 0;
 
-        const contentArea = document.getElementById('contentArea');
-        const deviceSelect = document.getElementById('deviceSelect');
-        const statusText = document.getElementById('statusText');
-        const autoRefreshText = document.getElementById('autoRefreshText');
-        const archiveModal = document.getElementById('archiveModal');
-        const archiveContent = document.getElementById('archiveContent');
-        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        const contentArea =
+            document.getElementById('contentArea');
+
+        const deviceSelect =
+            document.getElementById('deviceSelect');
+
+        const statusText =
+            document.getElementById('statusText');
+
+        const autoRefreshText =
+            document.getElementById('autoRefreshText');
+
+        const archiveModal =
+            document.getElementById('archiveModal');
+
+        const archiveContent =
+            document.getElementById('archiveContent');
+
+        const loadingOverlay =
+            document.getElementById('loadingOverlay');
+
         let flatpickrInstance = null;
 
+
         function initWeather() {
+
             initializeCalendar();
+
             loadCurrentData();
+
+            // إضافة التنبؤ
+            loadForecast();
+
             startAutoRefresh();
+
             setupEventListeners();
+
         }
+
 
         function initializeCalendar() {
-            flatpickrInstance = flatpickr("#archiveDate", {
-                locale: "ar",
-                dateFormat: "Y-m-d",
-                maxDate: "today",
-                defaultDate: new Date(),
-                onChange: function(selectedDates, dateStr) {
-                    if (dateStr) {
-                        console.log("التاريخ المحدد:", dateStr);
-                    }
-                }
-            });
+
+            flatpickrInstance =
+                flatpickr("#archiveDate", {
+
+                    locale: "ar",
+
+                    dateFormat: "Y-m-d",
+
+                    maxDate: "today",
+
+                    defaultDate: new Date(),
+
+                    onChange:
+                        function(selectedDates, dateStr) {
+
+                            if (dateStr) {
+
+                                console.log(
+                                    "التاريخ المحدد:",
+                                    dateStr
+                                );
+
+                            }
+
+                        }
+
+                });
+
         }
+
 
         function setupEventListeners() {
-            deviceSelect.addEventListener('change', function() {
-                currentDevice = this.value;
-                loadCurrentData();
-            });
+
+            deviceSelect.addEventListener(
+                'change',
+                function() {
+
+                    currentDevice = this.value;
+
+                    loadCurrentData();
+
+                    // تحديث التنبؤ للمحطة الجديدة
+                    loadForecast();
+
+                }
+            );
+
         }
 
-        // دالة لتنسيق الوقت بتوقيت بغداد - نظام 12 ساعة
+
+        // =====================================================
+        // تنسيق وقت بغداد
+        // =====================================================
+
         function formatBaghdadTime(dateString) {
-            if (!dateString) return 'الآن';
-            try {
-                var date = new Date(dateString);
-                if (isNaN(date.getTime())) return 'الآن';
-                
-                // توقيت بغداد هو UTC+3
-                var baghdadDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
-                
-                var hours = baghdadDate.getHours();
-                var minutes = baghdadDate.getMinutes();
-                var ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
-                hours = hours % 12;
-                hours = hours ? hours : 12;
-                
-                return hours + ':' + (minutes < 10 ? '0' : '') + minutes + ' ' + ampm;
-            } catch (e) {
+
+            if (!dateString)
                 return 'الآن';
+
+            try {
+
+                var date =
+                    new Date(dateString);
+
+                if (isNaN(date.getTime()))
+                    return 'الآن';
+
+                var baghdadDate =
+                    new Date(
+                        date.getTime() +
+                        (3 * 60 * 60 * 1000)
+                    );
+
+                var hours =
+                    baghdadDate.getHours();
+
+                var minutes =
+                    baghdadDate.getMinutes();
+
+                var ampm =
+                    hours >= 12
+                        ? 'مساءً'
+                        : 'صباحاً';
+
+                hours =
+                    hours % 12;
+
+                hours =
+                    hours
+                        ? hours
+                        : 12;
+
+                return hours +
+                    ':' +
+                    (minutes < 10 ? '0' : '') +
+                    minutes +
+                    ' ' +
+                    ampm;
+
+            } catch (e) {
+
+                return 'الآن';
+
             }
+
         }
 
-        // دالة تحويل اتجاه الرياح إلى درجات
+
+        // =====================================================
+        // تحويل اتجاه الرياح إلى درجات
+        // =====================================================
+
         function getWindDirectionDegree(direction) {
-            if (!direction) return 0;
-            
-            var dirLower = direction.toLowerCase().trim();
-            
-            if (dirLower === 'شمالي' || dirLower === 'شمال' || dirLower === 'north' || dirLower === 'n') return 0;
-            if (dirLower === 'شمالي شرقي' || dirLower === 'northeast' || dirLower === 'ne') return 45;
-            if (dirLower === 'شرقي' || dirLower === 'شرق' || dirLower === 'east' || dirLower === 'e') return 90;
-            if (dirLower === 'جنوبي شرقي' || dirLower === 'southeast' || dirLower === 'se') return 135;
-            if (dirLower === 'جنوبي' || dirLower === 'جنوب' || dirLower === 'south' || dirLower === 's') return 180;
-            if (dirLower === 'جنوبي غربي' || dirLower === 'southwest' || dirLower === 'sw') return 225;
-            if (dirLower === 'غربي' || dirLower === 'غرب' || dirLower === 'west' || dirLower === 'w') return 270;
-            if (dirLower === 'شمالي غربي' || dirLower === 'northwest' || dirLower === 'nw') return 315;
-            
-            var numMatch = direction.match(/\d+/);
+
+            if (!direction)
+                return 0;
+
+            var dirLower =
+                direction
+                    .toLowerCase()
+                    .trim();
+
+
+            if (
+                dirLower === 'شمالي' ||
+                dirLower === 'شمال' ||
+                dirLower === 'north' ||
+                dirLower === 'n'
+            )
+                return 0;
+
+
+            if (
+                dirLower === 'شمالي شرقي' ||
+                dirLower === 'northeast' ||
+                dirLower === 'ne'
+            )
+                return 45;
+
+
+            if (
+                dirLower === 'شرقي' ||
+                dirLower === 'شرق' ||
+                dirLower === 'east' ||
+                dirLower === 'e'
+            )
+                return 90;
+
+
+            if (
+                dirLower === 'جنوبي شرقي' ||
+                dirLower === 'southeast' ||
+                dirLower === 'se'
+            )
+                return 135;
+
+
+            if (
+                dirLower === 'جنوبي' ||
+                dirLower === 'جنوب' ||
+                dirLower === 'south' ||
+                dirLower === 's'
+            )
+                return 180;
+
+
+            if (
+                dirLower === 'جنوبي غربي' ||
+                dirLower === 'southwest' ||
+                dirLower === 'sw'
+            )
+                return 225;
+
+
+            if (
+                dirLower === 'غربي' ||
+                dirLower === 'غرب' ||
+                dirLower === 'west' ||
+                dirLower === 'w'
+            )
+                return 270;
+
+
+            if (
+                dirLower === 'شمالي غربي' ||
+                dirLower === 'northwest' ||
+                dirLower === 'nw'
+            )
+                return 315;
+
+
+            var numMatch =
+                direction.match(/\d+/);
+
             if (numMatch) {
-                return parseInt(numMatch[0]) % 360;
+
+                return parseInt(
+                    numMatch[0]
+                ) % 360;
+
             }
-            
+
             return 0;
+
         }
+
+
+        // =====================================================
+        // البيانات الحالية
+        // =====================================================
 
         async function loadCurrentData() {
+
             try {
+
                 showLoadingEffect();
-                
-                var response = await fetch('/api/sensor?device=' + currentDevice);
-                
+
+                var response =
+                    await fetch(
+                        '/api/sensor?device=' +
+                        currentDevice
+                    );
+
+
                 if (!response.ok) {
-                    throw new Error('خطأ في الخادم: ' + response.status);
+
+                    throw new Error(
+                        'خطأ في الخادم: ' +
+                        response.status
+                    );
+
                 }
-                
-                var data = await response.json();
-                
+
+
+                var data =
+                    await response.json();
+
+
                 var todayData = [];
-                if (data.today && Array.isArray(data.today)) {
-                    todayData = data.today;
-                } else if (Array.isArray(data)) {
-                    todayData = data;
+
+
+                if (
+                    data.today &&
+                    Array.isArray(data.today)
+                ) {
+
+                    todayData =
+                        data.today;
+
+                } else if (
+                    Array.isArray(data)
+                ) {
+
+                    todayData =
+                        data;
+
                 }
-                
+
+
                 if (todayData.length === 0) {
+
                     showNoData();
+
                     return;
+
                 }
-                
-                var latestReading = todayData[todayData.length - 1];
-                
-                updateStatus('متصل', true);
-                
-                if (!document.getElementById('temperatureValue')) {
+
+
+                var latestReading =
+                    todayData[
+                        todayData.length - 1
+                    ];
+
+
+                updateStatus(
+                    'متصل',
+                    true
+                );
+
+
+                if (
+                    !document.getElementById(
+                        'temperatureValue'
+                    )
+                ) {
+
                     createCurrentDataInterface();
+
                 }
-                
-                updateCurrentData(latestReading);
-                
+
+
+                updateCurrentData(
+                    latestReading
+                );
+
+
             } catch (error) {
-                console.error('خطأ في تحميل البيانات:', error);
-                updateStatus('غير متصل', false);
-                showError(error.message);
+
+                console.error(
+                    'خطأ في تحميل البيانات:',
+                    error
+                );
+
+                updateStatus(
+                    'غير متصل',
+                    false
+                );
+
+                showError(
+                    error.message
+                );
+
+
             } finally {
+
                 hideLoadingEffect();
+
             }
+
         }
+
+
+        // =====================================================
+        // تحديث البيانات الحالية
+        // =====================================================
 
         function updateCurrentData(data) {
-            var temperature = parseFloat(data.temperture || data.temperature || 0);
-            var humidity = parseFloat(data.humidity || 0);
-            var pressure = parseFloat(data.pressure || 0);
-            var windSpeed = parseFloat(data.winds || data.windS || 0);
-            var windDirection = data.windd || data.windD || 'غير معروف';
-            var rainy = data.rainy || false;
-            
-            var readingTime = 'الآن';
+
+            var temperature =
+                parseFloat(
+                    data.temperture ||
+                    data.temperature ||
+                    0
+                );
+
+
+            var humidity =
+                parseFloat(
+                    data.humidity ||
+                    0
+                );
+
+
+            var pressure =
+                parseFloat(
+                    data.pressure ||
+                    0
+                );
+
+
+            var windSpeed =
+                parseFloat(
+                    data.winds ||
+                    data.windS ||
+                    0
+                );
+
+
+            var windDirection =
+                data.windd ||
+                data.windD ||
+                'غير معروف';
+
+
+            var rainy =
+                data.rainy ||
+                false;
+
+
+            var readingTime =
+                'الآن';
+
+
             if (data.time) {
-                readingTime = formatBaghdadTime(data.time);
-            } else if (data.reading_date) {
-                readingTime = formatBaghdadTime(data.reading_date);
+
+                readingTime =
+                    formatBaghdadTime(
+                        data.time
+                    );
+
+            } else if (
+                data.reading_date
+            ) {
+
+                readingTime =
+                    formatBaghdadTime(
+                        data.reading_date
+                    );
+
             }
-            
-            var validTemp = isNaN(temperature) ? 0 : temperature;
-            var validHumidity = isNaN(humidity) ? 0 : humidity;
-            var validPressure = isNaN(pressure) ? 0 : pressure;
-            var validWindSpeed = isNaN(windSpeed) ? 0 : windSpeed;
-            
-            updateReadingValue('temperatureValue', validTemp.toFixed(1) + '°C');
-            updateReadingValue('humidityValue', validHumidity.toFixed(1) + '%');
-            updateReadingValue('pressureValue', validPressure.toFixed(1) + 'hPa');
-            updateReadingValue('windSpeedValue', validWindSpeed.toFixed(1) + 'm/s');
-            
-            var rainValue = document.getElementById('rainValue');
+
+
+            var validTemp =
+                isNaN(temperature)
+                    ? 0
+                    : temperature;
+
+
+            var validHumidity =
+                isNaN(humidity)
+                    ? 0
+                    : humidity;
+
+
+            var validPressure =
+                isNaN(pressure)
+                    ? 0
+                    : pressure;
+
+
+            var validWindSpeed =
+                isNaN(windSpeed)
+                    ? 0
+                    : windSpeed;
+
+
+            updateReadingValue(
+                'temperatureValue',
+                validTemp.toFixed(1) +
+                '°C'
+            );
+
+
+            updateReadingValue(
+                'humidityValue',
+                validHumidity.toFixed(1) +
+                '%'
+            );
+
+
+            updateReadingValue(
+                'pressureValue',
+                validPressure.toFixed(1) +
+                'hPa'
+            );
+
+
+            updateReadingValue(
+                'windSpeedValue',
+                validWindSpeed.toFixed(1) +
+                'm/s'
+            );
+
+
+            var rainValue =
+                document.getElementById(
+                    'rainValue'
+                );
+
+
             if (rainValue) {
-                if (rainy === true || rainy === 1 || rainy === 'true' || rainy === '1') {
-                    rainValue.textContent = '🌧️ ممطر';
+
+                if (
+                    rainy === true ||
+                    rainy === 1 ||
+                    rainy === 'true' ||
+                    rainy === '1'
+                ) {
+
+                    rainValue.textContent =
+                        '🌧️ ممطر';
+
                 } else {
-                    rainValue.textContent = '☀️ غير ممطر';
+
+                    rainValue.textContent =
+                        '☀️ غير ممطر';
+
                 }
+
             }
-            
-            var timeElement = document.getElementById('readingTime');
+
+
+            var timeElement =
+                document.getElementById(
+                    'readingTime'
+                );
+
+
             if (timeElement) {
-                timeElement.textContent = readingTime;
+
+                timeElement.textContent =
+                    readingTime;
+
             }
-            
-            updateCompass(windDirection);
+
+
+            updateCompass(
+                windDirection
+            );
+
         }
 
-        function updateReadingValue(elementId, newValue) {
-            var element = document.getElementById(elementId);
+
+        function updateReadingValue(
+            elementId,
+            newValue
+        ) {
+
+            var element =
+                document.getElementById(
+                    elementId
+                );
+
+
             if (element) {
-                var parent = element.closest('.reading-item');
+
+                var parent =
+                    element.closest(
+                        '.reading-item'
+                    );
+
+
                 if (parent) {
-                    parent.classList.add('updating');
-                    setTimeout(function() {
-                        parent.classList.remove('updating');
-                    }, 1000);
+
+                    parent.classList.add(
+                        'updating'
+                    );
+
+
+                    setTimeout(
+                        function() {
+
+                            parent.classList.remove(
+                                'updating'
+                            );
+
+                        },
+                        1000
+                    );
+
                 }
-                element.textContent = newValue;
+
+
+                element.textContent =
+                    newValue;
+
             }
+
         }
+
+
+        // =====================================================
+        // البوصلة
+        // =====================================================
 
         function updateCompass(direction) {
-            var degrees = getWindDirectionDegree(direction);
-            
-            var directionElement = document.getElementById('windDirectionText');
-            var degreeElement = document.getElementById('windDirectionDegree');
-            
+
+            var degrees =
+                getWindDirectionDegree(
+                    direction
+                );
+
+
+            var directionElement =
+                document.getElementById(
+                    'windDirectionText'
+                );
+
+
+            var degreeElement =
+                document.getElementById(
+                    'windDirectionDegree'
+                );
+
+
             if (directionElement) {
-                directionElement.textContent = direction || 'غير معروف';
+
+                directionElement.textContent =
+                    direction ||
+                    'غير معروف';
+
             }
+
+
             if (degreeElement) {
-                degreeElement.textContent = degrees + '°';
+
+                degreeElement.textContent =
+                    degrees + '°';
+
             }
-            
-            var needle = document.getElementById('compassNeedle');
+
+
+            var needle =
+                document.getElementById(
+                    'compassNeedle'
+                );
+
+
             if (needle) {
-                var rotation = degrees;
-                var diff = rotation - currentCompassRotation;
-                if (diff > 180) diff -= 360;
-                if (diff < -180) diff += 360;
-                rotation = currentCompassRotation + diff;
-                currentCompassRotation = rotation;
-                needle.style.transform = 'translate(-50%, -50%) rotate(' + rotation + 'deg)';
+
+                var rotation =
+                    degrees;
+
+
+                var diff =
+                    rotation -
+                    currentCompassRotation;
+
+
+                if (diff > 180)
+                    diff -= 360;
+
+
+                if (diff < -180)
+                    diff += 360;
+
+
+                rotation =
+                    currentCompassRotation +
+                    diff;
+
+
+                currentCompassRotation =
+                    rotation;
+
+
+                needle.style.transform =
+                    'translate(-50%, -50%) rotate(' +
+                    rotation +
+                    'deg)';
+
             }
+
         }
+
+
+        // =====================================================
+        // إنشاء واجهة البيانات
+        // =====================================================
 
         function createCurrentDataInterface() {
+
             var content = `
+
                 <div class="dashboard-grid">
+
+                    <!-- ================= القراءات ================= -->
+
                     <div class="readings-card">
+
                         <h2 class="card-title">
+
                             <i class="fas fa-chart-line"></i>
+
                             القراءات
+
                         </h2>
+
+
                         <div class="readings-grid">
-                            <div class="reading-item" id="tempItem">
-                                <div class="reading-icon"><i class="fas fa-thermometer-half"></i></div>
+
+
+                            <div
+                                class="reading-item"
+                                id="tempItem">
+
+                                <div class="reading-icon">
+
+                                    <i class="fas fa-thermometer-half"></i>
+
+                                </div>
+
+
                                 <div class="reading-info">
+
                                     <h3>الحرارة</h3>
-                                    <div class="reading-value" id="temperatureValue">0.0°C</div>
+
+                                    <div
+                                        class="reading-value"
+                                        id="temperatureValue">
+                                        0.0°C
+                                    </div>
+
                                 </div>
+
                             </div>
-                            <div class="reading-item" id="humidityItem">
-                                <div class="reading-icon"><i class="fas fa-tint"></i></div>
+
+
+                            <div
+                                class="reading-item"
+                                id="humidityItem">
+
+                                <div class="reading-icon">
+
+                                    <i class="fas fa-tint"></i>
+
+                                </div>
+
+
                                 <div class="reading-info">
+
                                     <h3>الرطوبة</h3>
-                                    <div class="reading-value" id="humidityValue">0.0%</div>
+
+                                    <div
+                                        class="reading-value"
+                                        id="humidityValue">
+                                        0.0%
+                                    </div>
+
                                 </div>
+
                             </div>
-                            <div class="reading-item" id="pressureItem">
-                                <div class="reading-icon"><i class="fas fa-tachometer-alt"></i></div>
+
+
+                            <div
+                                class="reading-item"
+                                id="pressureItem">
+
+                                <div class="reading-icon">
+
+                                    <i class="fas fa-tachometer-alt"></i>
+
+                                </div>
+
+
                                 <div class="reading-info">
+
                                     <h3>الضغط</h3>
-                                    <div class="reading-value" id="pressureValue">0.0hPa</div>
+
+                                    <div
+                                        class="reading-value"
+                                        id="pressureValue">
+                                        0.0hPa
+                                    </div>
+
                                 </div>
+
                             </div>
-                            <div class="reading-item" id="windSpeedItem">
-                                <div class="reading-icon"><i class="fas fa-wind"></i></div>
+
+
+                            <div
+                                class="reading-item"
+                                id="windSpeedItem">
+
+                                <div class="reading-icon">
+
+                                    <i class="fas fa-wind"></i>
+
+                                </div>
+
+
                                 <div class="reading-info">
+
                                     <h3>سرعة الرياح</h3>
-                                    <div class="reading-value" id="windSpeedValue">0.0m/s</div>
+
+                                    <div
+                                        class="reading-value"
+                                        id="windSpeedValue">
+                                        0.0m/s
+                                    </div>
+
                                 </div>
+
                             </div>
-                            <div class="reading-item" id="rainItem" style="grid-column: span 2;">
-                                <div class="reading-icon"><i class="fas fa-cloud-rain"></i></div>
+
+
+                            <div
+                                class="reading-item"
+                                id="rainItem"
+                                style="grid-column: span 2;">
+
+                                <div class="reading-icon">
+
+                                    <i class="fas fa-cloud-rain"></i>
+
+                                </div>
+
+
                                 <div class="reading-info">
+
                                     <h3>المطر</h3>
-                                    <div class="reading-value" id="rainValue" style="font-size: 1.1rem;">☀️ غير ممطر</div>
+
+                                    <div
+                                        class="reading-value"
+                                        id="rainValue"
+                                        style="font-size: 1.1rem;">
+                                        ☀️ غير ممطر
+                                    </div>
+
                                 </div>
+
                             </div>
+
                         </div>
+
+
                         <div class="system-info">
+
                             <div class="info-item">
+
                                 <i class="far fa-clock"></i>
-                                <span>آخر تحديث: <span id="readingTime">الآن</span></span>
+
+                                <span>
+                                    آخر تحديث:
+                                    <span id="readingTime">
+                                        الآن
+                                    </span>
+                                </span>
+
                             </div>
+
+
                             <div class="info-item">
+
                                 <i class="fas fa-satellite"></i>
-                                <span>` + currentDevice + `</span>
+
+                                <span>
+                                    ${currentDevice}
+                                </span>
+
                             </div>
+
                         </div>
+
                     </div>
-                    
+
+
+                    <!-- ================= البوصلة ================= -->
+
                     <div class="compass-card">
+
                         <h2 class="card-title">
+
                             <i class="fas fa-compass"></i>
+
                             اتجاه الرياح
+
                         </h2>
+
+
                         <div class="compass-wrapper">
+
                             <div class="compass-outer">
+
                                 <div class="compass-inner">
+
                                     <div class="compass-directions">
-                                        <div class="compass-direction direction-n">N</div>
-                                        <div class="compass-direction direction-e">E</div>
-                                        <div class="compass-direction direction-s">S</div>
-                                        <div class="compass-direction direction-w">W</div>
+
+                                        <div
+                                            class="compass-direction direction-n">
+                                            N
+                                        </div>
+
+                                        <div
+                                            class="compass-direction direction-e">
+                                            E
+                                        </div>
+
+                                        <div
+                                            class="compass-direction direction-s">
+                                            S
+                                        </div>
+
+                                        <div
+                                            class="compass-direction direction-w">
+                                            W
+                                        </div>
+
                                     </div>
-                                    <div class="compass-needle" id="compassNeedle">
+
+
+                                    <div
+                                        class="compass-needle"
+                                        id="compassNeedle">
+
                                         <div class="needle"></div>
+
                                     </div>
+
+
                                     <div class="compass-center"></div>
+
                                 </div>
+
                             </div>
+
                         </div>
+
+
                         <div class="direction-info">
-                            <div class="direction-text" id="windDirectionText">غير معروف</div>
-                            <div class="direction-degree" id="windDirectionDegree">0°</div>
+
+                            <div
+                                class="direction-text"
+                                id="windDirectionText">
+                                غير معروف
+                            </div>
+
+                            <div
+                                class="direction-degree"
+                                id="windDirectionDegree">
+                                0°
+                            </div>
+
                         </div>
+
                     </div>
+
+
+                    <!-- ================================================= -->
+                    <!--        التنبؤ الجوي بالذكاء الاصطناعي            -->
+                    <!-- ================================================= -->
+
+                    <div
+                        class="readings-card"
+                        style="grid-column: 1 / -1;">
+
+                        <h2 class="card-title">
+
+                            <i class="fas fa-brain"></i>
+
+                            التنبؤ الجوي بالذكاء الاصطناعي
+
+                        </h2>
+
+
+                        <div class="readings-grid">
+
+
+                            <!-- احتمال المطر -->
+
+                            <div class="reading-item">
+
+                                <div class="reading-icon">
+
+                                    <i class="fas fa-cloud-rain"></i>
+
+                                </div>
+
+
+                                <div class="reading-info">
+
+                                    <h3>
+                                        احتمال هطول المطر
+                                    </h3>
+
+                                    <div
+                                        class="reading-value"
+                                        id="forecastProbability">
+                                        -- %
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- كمية المطر -->
+
+                            <div class="reading-item">
+
+                                <div class="reading-icon">
+
+                                    <i class="fas fa-water"></i>
+
+                                </div>
+
+
+                                <div class="reading-info">
+
+                                    <h3>
+                                        كمية المطر المتوقعة
+                                    </h3>
+
+                                    <div
+                                        class="reading-value"
+                                        id="forecastRainfall">
+                                        -- mm
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- حالة الطقس -->
+
+                            <div
+                                class="reading-item"
+                                style="grid-column: span 2;">
+
+                                <div class="reading-icon">
+
+                                    <i class="fas fa-cloud-sun"></i>
+
+                                </div>
+
+
+                                <div class="reading-info">
+
+                                    <h3>
+                                        الحالة المتوقعة
+                                    </h3>
+
+                                    <div
+                                        class="reading-value"
+                                        id="forecastStatus">
+                                        جاري التحميل...
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="system-info">
+
+
+                            <div class="info-item">
+
+                                <i class="fas fa-robot"></i>
+
+                                <span>
+                                    النموذج:
+                                    XGBoost + LightGBM
+                                </span>
+
+                            </div>
+
+
+                            <div class="info-item">
+
+                                <i class="far fa-clock"></i>
+
+                                <span>
+                                    آخر تنبؤ:
+                                    <span id="forecastTime">
+                                        --
+                                    </span>
+                                </span>
+
+                            </div>
+
+
+                            <button
+                                class="control-btn"
+                                onclick="loadForecast()"
+                                style="min-width:130px; padding:6px 12px;">
+
+                                <i class="fas fa-sync-alt"></i>
+
+                                تحديث التنبؤ
+
+                            </button>
+
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             `;
-            
-            contentArea.innerHTML = content;
+
+
+            contentArea.innerHTML =
+                content;
+
         }
+
+
+        // =====================================================
+        // التنبؤ الجوي AI
+        // =====================================================
+
+        async function loadForecast() {
+
+            try {
+
+                var probabilityElement =
+                    document.getElementById(
+                        'forecastProbability'
+                    );
+
+
+                var rainfallElement =
+                    document.getElementById(
+                        'forecastRainfall'
+                    );
+
+
+                var statusElement =
+                    document.getElementById(
+                        'forecastStatus'
+                    );
+
+
+                var timeElement =
+                    document.getElementById(
+                        'forecastTime'
+                    );
+
+
+                if (probabilityElement) {
+
+                    probabilityElement.textContent =
+                        'جاري...';
+
+                }
+
+
+                if (rainfallElement) {
+
+                    rainfallElement.textContent =
+                        'جاري...';
+
+                }
+
+
+                if (statusElement) {
+
+                    statusElement.textContent =
+                        'جاري التنبؤ...';
+
+                }
+
+
+                // استدعاء API التنبؤ
+                var response =
+                    await fetch(
+                        '/api/forecast?device=' +
+                        encodeURIComponent(
+                            currentDevice
+                        )
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        'خطأ في API التنبؤ: ' +
+                        response.status
+                    );
+
+                }
+
+
+                var data =
+                    await response.json();
+
+
+                console.log(
+                    'Forecast:',
+                    data
+                );
+
+
+                if (data.error) {
+
+                    throw new Error(
+                        data.error
+                    );
+
+                }
+
+
+                // =============================================
+                // قراءة احتمال المطر
+                // =============================================
+
+                var probability =
+                    parseFloat(
+                        data.rain_probability ??
+                        data.probability ??
+                        0
+                    );
+
+
+                // =============================================
+                // قراءة كمية المطر
+                // =============================================
+
+                var rainfall =
+                    parseFloat(
+                        data.predicted_rainfall_mm ??
+                        data.rainfall_mm ??
+                        data.predicted_rainfall ??
+                        0
+                    );
+
+
+                // =============================================
+                // قراءة حالة الطقس
+                // =============================================
+
+                var status =
+                    data.status ??
+                    data.weather_status ??
+                    data.prediction ??
+                    '';
+
+
+                if (isNaN(probability)) {
+
+                    probability = 0;
+
+                }
+
+
+                if (isNaN(rainfall)) {
+
+                    rainfall = 0;
+
+                }
+
+
+                // إذا كانت القيمة بين 0 و 1
+                // نحولها إلى نسبة مئوية
+
+                if (
+                    probability >= 0 &&
+                    probability <= 1
+                ) {
+
+                    probability =
+                        probability * 100;
+
+                }
+
+
+                // =============================================
+                // إنشاء الحالة إذا لم يرسلها API
+                // =============================================
+
+                if (!status) {
+
+                    if (
+                        probability >= 50 ||
+                        rainfall > 0
+                    ) {
+
+                        status =
+                            '🌧️ متوقع هطول المطر';
+
+                    } else {
+
+                        status =
+                            '☀️ غير متوقع هطول المطر';
+
+                    }
+
+                }
+
+
+                // =============================================
+                // عرض النتائج
+                // =============================================
+
+                if (probabilityElement) {
+
+                    probabilityElement.textContent =
+                        probability.toFixed(1) +
+                        ' %';
+
+                }
+
+
+                if (rainfallElement) {
+
+                    rainfallElement.textContent =
+                        rainfall.toFixed(2) +
+                        ' mm';
+
+                }
+
+
+                if (statusElement) {
+
+                    statusElement.textContent =
+                        status;
+
+                }
+
+
+                if (timeElement) {
+
+                    var now =
+                        new Date();
+
+
+                    timeElement.textContent =
+                        now.toLocaleTimeString(
+                            'ar-IQ',
+                            {
+                                hour: 'numeric',
+                                minute: '2-digit'
+                            }
+                        );
+
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    'خطأ في تحميل التنبؤ:',
+                    error
+                );
+
+
+                var probabilityElement =
+                    document.getElementById(
+                        'forecastProbability'
+                    );
+
+
+                var rainfallElement =
+                    document.getElementById(
+                        'forecastRainfall'
+                    );
+
+
+                var statusElement =
+                    document.getElementById(
+                        'forecastStatus'
+                    );
+
+
+                if (probabilityElement) {
+
+                    probabilityElement.textContent =
+                        '-- %';
+
+                }
+
+
+                if (rainfallElement) {
+
+                    rainfallElement.textContent =
+                        '-- mm';
+
+                }
+
+
+                if (statusElement) {
+
+                    statusElement.textContent =
+                        'تعذر تحميل التنبؤ';
+
+                }
+
+            }
+
+        }
+
+
+        // =====================================================
+        // الأرشيف
+        // =====================================================
 
         async function loadArchiveData() {
-            var selectedDate = document.getElementById('archiveDate').value;
+
+            var selectedDate =
+                document.getElementById(
+                    'archiveDate'
+                ).value;
+
+
             if (!selectedDate) {
-                alert('الرجاء اختيار تاريخ أولاً');
+
+                alert(
+                    'الرجاء اختيار تاريخ أولاً'
+                );
+
                 return;
+
             }
-            
+
+
             try {
+
                 showLoading(true);
-                
-                var response = await fetch('/api/sensor?device=' + currentDevice + '&date=' + selectedDate);
-                
+
+
+                var response =
+                    await fetch(
+                        '/api/sensor?device=' +
+                        currentDevice +
+                        '&date=' +
+                        selectedDate
+                    );
+
+
                 if (!response.ok) {
-                    throw new Error('خطأ في جلب الأرشيف: ' + response.status);
+
+                    throw new Error(
+                        'خطأ في جلب الأرشيف: ' +
+                        response.status
+                    );
+
                 }
-                
-                var archiveData = await response.json();
-                
-                if (!archiveData || archiveData.length === 0) {
+
+
+                var archiveData =
+                    await response.json();
+
+
+                if (
+                    !archiveData ||
+                    archiveData.length === 0
+                ) {
+
                     archiveContent.innerHTML = `
+
                         <div class="no-data">
-                            <i class="fas fa-database fa-3x" style="color: #64748b; margin-bottom: 20px;"></i>
-                            <h2 style="color: #94a3b8;">لا توجد بيانات</h2>
-                            <p style="color: #64748b; margin-top: 10px;">لم يتم العثور على بيانات للتاريخ المحدد</p>
+
+                            <i
+                                class="fas fa-database fa-3x"
+                                style="color: #64748b; margin-bottom: 20px;">
+                            </i>
+
+                            <h2
+                                style="color: #94a3b8;">
+                                لا توجد بيانات
+                            </h2>
+
+                            <p
+                                style="color: #64748b; margin-top: 10px;">
+                                لم يتم العثور على بيانات للتاريخ المحدد
+                            </p>
+
                         </div>
+
                     `;
+
                 } else {
-                    displayArchiveData(archiveData, selectedDate);
+
+                    displayArchiveData(
+                        archiveData,
+                        selectedDate
+                    );
+
                 }
-                
-                archiveModal.style.display = 'flex';
-                
+
+
+                archiveModal.style.display =
+                    'flex';
+
+
             } catch (error) {
-                console.error('خطأ في تحميل الأرشيف:', error);
+
+                console.error(
+                    'خطأ في تحميل الأرشيف:',
+                    error
+                );
+
+
                 archiveContent.innerHTML = `
+
                     <div class="no-data">
-                        <i class="fas fa-exclamation-triangle fa-3x" style="color: #ef4444; margin-bottom: 20px;"></i>
-                        <h2 style="color: #ef4444;">خطأ في التحميل</h2>
-                        <p style="color: #ef4444; margin-top: 10px;">` + error.message + `</p>
+
+                        <i
+                            class="fas fa-exclamation-triangle fa-3x"
+                            style="color: #ef4444; margin-bottom: 20px;">
+                        </i>
+
+                        <h2
+                            style="color: #ef4444;">
+                            خطأ في التحميل
+                        </h2>
+
+                        <p
+                            style="color: #ef4444; margin-top: 10px;">
+                            ${error.message}
+                        </p>
+
                     </div>
+
                 `;
-                archiveModal.style.display = 'flex';
+
+
+                archiveModal.style.display =
+                    'flex';
+
+
             } finally {
+
                 showLoading(false);
+
             }
+
         }
 
-        function displayArchiveData(data, date) {
+
+        function displayArchiveData(
+            data,
+            date
+        ) {
+
             var tableHTML = `
-                <h3 style="color: #38bdf8; margin-bottom: 20px;">بيانات الأرشيف: ` + date + `</h3>
-                <div style="overflow-x: auto;">
-                    <table class="archive-table">
+
+                <h3
+                    style="color: #38bdf8; margin-bottom: 20px;">
+                    بيانات الأرشيف: ${date}
+                </h3>
+
+
+                <div
+                    style="overflow-x: auto;">
+
+                    <table
+                        class="archive-table">
+
                         <thead>
+
                             <tr>
+
                                 <th>#</th>
+
                                 <th>الوقت</th>
+
                                 <th>الحرارة</th>
+
                                 <th>الرطوبة</th>
+
                                 <th>الضغط</th>
+
                                 <th>سرعة الرياح</th>
+
                                 <th>اتجاه الرياح</th>
+
                                 <th>المطر</th>
+
                             </tr>
+
                         </thead>
+
+
                         <tbody>
+
             `;
-            
-            data.forEach(function(item, index) {
-                var time = '--';
-                if (item.time) {
-                    time = formatBaghdadTime(item.time);
-                } else if (item.reading_date) {
-                    time = formatBaghdadTime(item.reading_date);
+
+
+            data.forEach(
+                function(item, index) {
+
+                    var time = '--';
+
+
+                    if (item.time) {
+
+                        time =
+                            formatBaghdadTime(
+                                item.time
+                            );
+
+                    } else if (
+                        item.reading_date
+                    ) {
+
+                        time =
+                            formatBaghdadTime(
+                                item.reading_date
+                            );
+
+                    }
+
+
+                    var temperature =
+                        parseFloat(
+                            item.temperture ||
+                            item.temperature ||
+                            0
+                        );
+
+
+                    var humidity =
+                        parseFloat(
+                            item.humidity ||
+                            0
+                        );
+
+
+                    var pressure =
+                        parseFloat(
+                            item.pressure ||
+                            0
+                        );
+
+
+                    var windSpeed =
+                        parseFloat(
+                            item.winds ||
+                            item.windS ||
+                            0
+                        );
+
+
+                    var windDirection =
+                        item.windd ||
+                        item.windD ||
+                        '--';
+
+
+                    var rainy =
+                        item.rainy ||
+                        false;
+
+
+                    var rainStatus =
+                        (
+                            rainy === true ||
+                            rainy === 1 ||
+                            rainy === 'true' ||
+                            rainy === '1'
+                        )
+                            ? '🌧️'
+                            : '☀️';
+
+
+                    var validTemp =
+                        isNaN(temperature)
+                            ? 0
+                            : temperature;
+
+
+                    var validHumidity =
+                        isNaN(humidity)
+                            ? 0
+                            : humidity;
+
+
+                    var validPressure =
+                        isNaN(pressure)
+                            ? 0
+                            : pressure;
+
+
+                    var validWindSpeed =
+                        isNaN(windSpeed)
+                            ? 0
+                            : windSpeed;
+
+
+                    tableHTML += `
+
+                        <tr>
+
+                            <td>
+                                ${index + 1}
+                            </td>
+
+                            <td>
+                                ${time}
+                            </td>
+
+                            <td>
+                                ${validTemp.toFixed(1)}°C
+                            </td>
+
+                            <td>
+                                ${validHumidity.toFixed(1)}%
+                            </td>
+
+                            <td>
+                                ${validPressure.toFixed(1)}hPa
+                            </td>
+
+                            <td>
+                                ${validWindSpeed.toFixed(1)}m/s
+                            </td>
+
+                            <td>
+                                ${windDirection}
+                            </td>
+
+                            <td>
+                                ${rainStatus}
+                            </td>
+
+                        </tr>
+
+                    `;
+
                 }
-                
-                var temperature = parseFloat(item.temperture || item.temperature || 0);
-                var humidity = parseFloat(item.humidity || 0);
-                var pressure = parseFloat(item.pressure || 0);
-                var windSpeed = parseFloat(item.winds || item.windS || 0);
-                var windDirection = item.windd || item.windD || '--';
-                var rainy = item.rainy || false;
-                var rainStatus = (rainy === true || rainy === 1 || rainy === 'true' || rainy === '1') ? '🌧️' : '☀️';
-                
-                var validTemp = isNaN(temperature) ? 0 : temperature;
-                var validHumidity = isNaN(humidity) ? 0 : humidity;
-                var validPressure = isNaN(pressure) ? 0 : pressure;
-                var validWindSpeed = isNaN(windSpeed) ? 0 : windSpeed;
-                
-                tableHTML += `
-                    <tr>
-                        <td>` + (index + 1) + `</td>
-                        <td>` + time + `</td>
-                        <td>` + validTemp.toFixed(1) + `°C</td>
-                        <td>` + validHumidity.toFixed(1) + `%</td>
-                        <td>` + validPressure.toFixed(1) + `hPa</td>
-                        <td>` + validWindSpeed.toFixed(1) + `m/s</td>
-                        <td>` + windDirection + `</td>
-                        <td>` + rainStatus + `</td>
-                    </tr>
-                `;
-            });
-            
+            );
+
+
             tableHTML += `
+
                         </tbody>
+
                     </table>
+
                 </div>
+
             `;
-            
-            archiveContent.innerHTML = tableHTML;
+
+
+            archiveContent.innerHTML =
+                tableHTML;
+
         }
+
 
         function closeArchive() {
-            archiveModal.style.display = 'none';
+
+            archiveModal.style.display =
+                'none';
+
         }
+
+
+        // =====================================================
+        // التحديث التلقائي
+        // =====================================================
 
         function toggleAutoRefresh() {
-            autoRefreshEnabled = !autoRefreshEnabled;
+
+            autoRefreshEnabled =
+                !autoRefreshEnabled;
+
+
             if (autoRefreshEnabled) {
+
                 startAutoRefresh();
-                autoRefreshText.textContent = 'تلقائي';
+
+                autoRefreshText.textContent =
+                    'تلقائي';
+
             } else {
+
                 stopAutoRefresh();
-                autoRefreshText.textContent = 'متوقف';
+
+                autoRefreshText.textContent =
+                    'متوقف';
+
             }
+
         }
+
 
         function startAutoRefresh() {
+
             stopAutoRefresh();
-            refreshInterval = setInterval(loadCurrentData, 5000);
+
+
+            refreshInterval =
+                setInterval(
+                    function() {
+
+                        loadCurrentData();
+
+                        // تحديث التنبؤ أيضًا
+                        loadForecast();
+
+                    },
+                    5000
+                );
+
         }
+
 
         function stopAutoRefresh() {
+
             if (refreshInterval) {
-                clearInterval(refreshInterval);
+
+                clearInterval(
+                    refreshInterval
+                );
+
                 refreshInterval = null;
+
             }
+
         }
 
-        function updateStatus(message, isConnected) {
-            statusText.textContent = message;
-            var statusDot = document.getElementById('statusDot');
+
+        // =====================================================
+        // حالة الاتصال
+        // =====================================================
+
+        function updateStatus(
+            message,
+            isConnected
+        ) {
+
+            statusText.textContent =
+                message;
+
+
+            var statusDot =
+                document.getElementById(
+                    'statusDot'
+                );
+
+
             if (statusDot) {
-                statusDot.className = 'status-dot ' + (isConnected ? 'online' : 'offline');
+
+                statusDot.className =
+                    'status-dot ' +
+                    (
+                        isConnected
+                            ? 'online'
+                            : 'offline'
+                    );
+
             }
+
         }
+
+
+        // =====================================================
+        // تأثير التحميل
+        // =====================================================
 
         function showLoadingEffect() {
-            var refreshBtn = document.querySelector('.control-btn');
-            if (refreshBtn && refreshBtn.textContent.indexOf('تحديث') !== -1) {
-                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+
+            var refreshBtn =
+                document.querySelector(
+                    '.control-btn'
+                );
+
+
+            if (
+                refreshBtn &&
+                refreshBtn.textContent.indexOf(
+                    'تحديث'
+                ) !== -1
+            ) {
+
+                refreshBtn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> جاري...';
+
                 refreshBtn.disabled = true;
+
             }
+
         }
+
 
         function hideLoadingEffect() {
-            var refreshBtn = document.querySelector('.control-btn');
-            if (refreshBtn && refreshBtn.textContent.indexOf('جاري') !== -1) {
-                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> تحديث';
+
+            var refreshBtn =
+                document.querySelector(
+                    '.control-btn'
+                );
+
+
+            if (
+                refreshBtn &&
+                refreshBtn.textContent.indexOf(
+                    'جاري'
+                ) !== -1
+            ) {
+
+                refreshBtn.innerHTML =
+                    '<i class="fas fa-sync-alt"></i> تحديث';
+
                 refreshBtn.disabled = false;
+
             }
+
         }
+
 
         function showLoading(show) {
-            loadingOverlay.style.display = show ? 'flex' : 'none';
+
+            loadingOverlay.style.display =
+                show
+                    ? 'flex'
+                    : 'none';
+
         }
+
 
         function showNoData() {
-            if (!document.getElementById('temperatureValue')) {
+
+            if (
+                !document.getElementById(
+                    'temperatureValue'
+                )
+            ) {
+
                 createCurrentDataInterface();
+
             }
-            updateStatus('لا توجد بيانات', false);
+
+
+            updateStatus(
+                'لا توجد بيانات',
+                false
+            );
+
         }
+
 
         function showError(message) {
-            if (!document.getElementById('temperatureValue')) {
+
+            if (
+                !document.getElementById(
+                    'temperatureValue'
+                )
+            ) {
+
                 createCurrentDataInterface();
+
             }
-            updateStatus('خطأ', false);
+
+
+            updateStatus(
+                'خطأ',
+                false
+            );
+
         }
 
-        window.weatherInitialized = false;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            createCurrentDataInterface();
-        });
+        window.weatherInitialized =
+            false;
 
-        archiveModal.addEventListener('click', function(e) {
-            if (e.target === this) closeArchive();
-        });
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            function() {
+
+                createCurrentDataInterface();
+
+            }
+        );
+
+
+        archiveModal.addEventListener(
+            'click',
+            function(e) {
+
+                if (e.target === this)
+                    closeArchive();
+
+            }
+        );
+
     </script>
+
 </body>
 </html>
