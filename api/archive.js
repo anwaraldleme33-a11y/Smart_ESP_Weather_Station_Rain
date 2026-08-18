@@ -6,6 +6,7 @@ export default async function handler(req, res) {
 
   if (req.method !== "GET") {
     return res.status(405).json({
+      success: false,
       error: "Method not allowed"
     });
   }
@@ -13,7 +14,7 @@ export default async function handler(req, res) {
   try {
 
     // =========================================
-    // 1. نقل البيانات القديمة إلى الأرشيف
+    // 1. نقل بيانات الأيام السابقة إلى الأرشيف
     // =========================================
 
     const inserted = await sql`
@@ -43,28 +44,30 @@ export default async function handler(req, res) {
 
       ON CONFLICT (device_id, time)
       DO NOTHING
+
+      RETURNING id
     `;
 
-
     // =========================================
-    // 2. حذف البيانات القديمة فقط
+    // 2. حذف البيانات القديمة من الجدول الحالي
     // =========================================
 
     const deleted = await sql`
       DELETE FROM weather_data
       WHERE reading_date < CURRENT_DATE
+      RETURNING id
     `;
 
-
     // =========================================
-    // 3. النتيجة
+    // 3. إرجاع النتيجة
     // =========================================
 
     return res.status(200).json({
       success: true,
       message: "Weather archive completed successfully",
       inserted: inserted.length,
-      deleted: deleted.length
+      deleted: deleted.length,
+      archiveDate: new Date().toISOString()
     });
 
   } catch (error) {
