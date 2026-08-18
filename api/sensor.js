@@ -1,83 +1,151 @@
 import { neon } from "@neondatabase/serverless";
 
-// تهيئة اتصال قاعدة البيانات
 const sql = neon(process.env.DATABASE_URL);
 const allowedDevices = ["max1", "max2", "max3", "max4"];
 
-export default async function handler(req, res) {
-  // إعدادات CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  // معالجة طلبات OPTIONS
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
-
+/* ===== أرشفة بيانات الأمس مرة واحدة فقط ===== */
+async function archiveYesterdayData() {
   try {
-    // POST - إضافة بيانات جديدة
-    if (req.method === "POST") {
-      const { device_id, temperture, humidity, pressure, windS, windD } = req.body || {};
+    await sql`
+      INSERT INTO weather_archive
+      (device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time)
+      SELECT device_id, temperture, humidity, pressure, windS, windD, rainy, DATE(time), time
+      FROM weather_data
+      WHERE DATE(time) = CURRENT_DATE - INTERVAL '1 day'
+      AND NOT EXISTS (
+        SELECT 1 FROM weather_archive wa
+        WHERE wa.device_id = weather_data.device_id
+        AND wa.reading_date = DATE(weather_data.time)
+      )
+    `;
+  } catch (err) {
+    console.error("Archive error:", err);
+  }
+}
 
-      if (!allowedDevices.includes(device_id)) {
-        return res.status(400).json({ error: "جهاز غير صالح" });
-      }
+export default async function handler(req, res) {
+  try {
 
-      await sql`
-        INSERT INTO weather_data (device_id, temperture, humidity, pressure, windS, windD)
-        VALUES (${device_id}, ${Number(temperture)}, ${Number(humidity)}, ${Number(pressure)}, ${Number(windS)}, ${windD})
-      `;
+    /* ===== CORS ===== */
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-      return res.status(200).json({ status: "تم الحفظ" });
+    if (req.method === "OPTIONS") {
+      return res.status(200).end();
     }
 
-    // GET - جلب البيانات
+    await archiveYesterdayData();
+
+    /* ========= POST ========= */
+    if (req.method === "POST") {
+
+      const {
+        device_id,
+        temperture,
+        humidity,
+        pressure,
+        windS,
+        windD,
+        rain  // من ESP32
+      } = req.body ?? {};
+
+      if (!allowedDevices.includes(device_id)) {
+        return res.status(400).json({ error: "invalid device" });
+      }
+
+      // تحويل rain إلى boolean
+      let rainValue = false;
+      if (rain !== undefined && rain !== null) {
+        if (typeof rain === 'string') {
+          // إذا كانت القيمة "rainy" أو "true" أو "1"
+          rainValue = rain.toLowerCase() === 'rainy' || 
+                      rain.toLowerCase() === 'true' || 
+                      rain === '1';
+        } else {
+          rainValue = Boolean(rain);
+        }
+      }
+
+      console.log('=== POST Request ===');
+      console.log('device_id:', device_id);
+      console.log('rain received:', rain);
+      console.log('rain converted:', rainValue);
+      console.log('===================');
+
+      await sql`
+        INSERT INTO weather_data
+        (device_id, temperture, humidity, pressure, windS, windD, rainy, time)
+        VALUES (
+          ${device_id},
+          ${Number(temperture)},
+          ${Number(humidity)},
+          ${Number(pressure)},
+          ${Number(windS)},
+          ${windD},
+          ${rainValue},
+          NOW()
+        )
+      `;
+
+      return res.status(200).json({ 
+        status: "saved", 
+        rainy: rainValue 
+      });
+    }
+
+    /* ========= GET ========= */
     if (req.method === "GET") {
+
       const { device, date } = req.query;
 
       if (!allowedDevices.includes(device)) {
-        return res.status(400).json({ error: "جهاز غير صالح" });
+        return res.status(400).json({ error: "invalid device" });
       }
 
-      // جلب بيانات الأرشيف حسب التاريخ
+      /* ===== طلب أرشيف حسب تاريخ ===== */
       if (date) {
         const rows = await sql`
-          SELECT * FROM weather_archive
-          WHERE device_id = ${device} AND reading_date = ${date}
+          SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time
+          FROM weather_archive
+          WHERE device_id = ${device}
+          AND reading_date = ${date}
           ORDER BY reading_date ASC
         `;
         return res.status(200).json(rows);
       }
 
-      // جلب بيانات اليوم
+      /* ===== الوضع الافتراضي ===== */
+
       const todayRows = await sql`
-        SELECT * FROM weather_data
-        WHERE device_id = ${device} AND DATE(time) = CURRENT_DATE
+        SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, time
+        FROM weather_data
+        WHERE device_id = ${device}
+        AND DATE(time) = CURRENT_DATE
         ORDER BY time ASC
       `;
 
-      // إذا لم توجد بيانات اليوم، جلب آخر 10 قراءات
-      if (todayRows.length === 0) {
-        const lastRows = await sql`
-          SELECT * FROM weather_data
-          WHERE device_id = ${device}
-          ORDER BY time DESC
-          LIMIT 10
-        `;
-        return res.status(200).json(lastRows.reverse());
-      }
+      const yesterdayRows = await sql`
+        SELECT id, device_id, temperture, humidity, pressure, windS, windD, rainy, reading_date, time
+        FROM weather_archive
+        WHERE device_id = ${device}
+        AND reading_date = CURRENT_DATE - INTERVAL '1 day'
+        ORDER BY reading_date ASC
+      `;
 
-      return res.status(200).json(todayRows);
+      return res.status(200).json({
+        today: todayRows,
+        yesterday: yesterdayRows
+      });
     }
 
-    return res.status(405).json({ error: "طريقة غير مسموحة" });
+    return res.status(405).json({ error: "method not allowed" });
 
-  } catch (error) {
-    console.error("خطأ في API:", error);
-    return res.status(500).json({ 
-      error: "خطأ في الخادم", 
-      details: error.message 
+  } catch (err) {
+    console.error("Server error:", err);
+    return res.status(500).json({
+      error: "server error",
+      details: err.message
     });
   }
 }
