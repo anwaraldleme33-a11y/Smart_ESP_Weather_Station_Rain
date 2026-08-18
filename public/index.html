@@ -962,17 +962,16 @@
                 var date = new Date(dateString);
                 if (isNaN(date.getTime())) return 'الآن';
                 
-                // إضافة 3 ساعات لتوقيت بغداد
+                // توقيت بغداد هو UTC+3
                 var baghdadDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
                 
                 var hours = baghdadDate.getHours();
                 var minutes = baghdadDate.getMinutes();
-                var seconds = baghdadDate.getSeconds();
-                var ampm = hours >= 12 ? 'م' : 'ص';
+                var ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
                 hours = hours % 12;
                 hours = hours ? hours : 12;
                 
-                return hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds + ' ' + ampm;
+                return hours + ':' + (minutes < 10 ? '0' : '') + minutes + ' ' + ampm;
             } catch (e) {
                 return 'الآن';
             }
