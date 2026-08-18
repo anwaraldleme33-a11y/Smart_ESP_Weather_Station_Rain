@@ -105,10 +105,90 @@ function xgBoostRaw(model, x) {
   return sum + baseScore;
 }
 
+function lightGBMCompactRaw(model, x) {
+
+  function evalNode(node) {
+
+    // Leaf node
+    if (node[0] === 0) {
+      return Number(node[1]);
+    }
+
+    const featureIndex = node[1];
+    const threshold = Number(node[2]);
+    const decisionType = node[3];
+    const defaultLeft = node[4] === 1;
+
+    const leftChild = node[5];
+    const rightChild = node[6];
+
+    const value = Number(x[featureIndex]);
+
+    // Missing value
+    if (!Number.isFinite(value)) {
+      return evalNode(
+        defaultLeft
+          ? leftChild
+          : rightChild
+      );
+    }
+
+    let goLeft = false;
+
+    if (decisionType === "<=") {
+
+      goLeft = value <= threshold;
+
+    } else if (decisionType === "<") {
+
+      goLeft = value < threshold;
+
+    } else {
+
+      throw new Error(
+        "Unsupported LightGBM decision type: " +
+        decisionType
+      );
+
+    }
+
+    return evalNode(
+      goLeft
+        ? leftChild
+        : rightChild
+    );
+  }
+
+
+  let rawScore = 0;
+
+
+  for (const tree of model.trees) {
+
+    rawScore += evalNode(tree);
+
+  }
+
+
+  return rawScore;
+}
 function modelRaw(model, type, x) {
-  if (type === "catboost") return catBoostRaw(model, x);
-  if (type === "xgboost") return xgBoostRaw(model, x);
-  throw new Error(`Unsupported model type: ${type}`);
+
+  if (type === "catboost") {
+    return catBoostRaw(model, x);
+  }
+
+  if (type === "xgboost") {
+    return xgBoostRaw(model, x);
+  }
+
+  if (type === "lightgbm_compact") {
+    return lightGBMCompactRaw(model, x);
+  }
+
+  throw new Error(
+    `Unsupported model type: ${type}`
+  );
 }
 
 function directionToDegrees(value) {
