@@ -1255,6 +1255,18 @@
 
                 </button>
 
+
+                <button
+                    class="control-btn secondary"
+                    onclick="toggleLanguage()"
+                    id="languageBtn">
+
+                    <i class="fas fa-language"></i>
+
+                    English
+
+                </button>
+
             </div>
 
 
@@ -4103,6 +4115,661 @@
             function() {
 
                 createCurrentDataInterface();
+
+            }
+        );
+
+
+
+        // =========================================
+        // تبديل اللغة العربية / الإنجليزية
+        // =========================================
+
+        let currentLanguage =
+            localStorage.getItem('weatherLanguage') === 'en'
+                ? 'en'
+                : 'ar';
+
+
+        const languagePairs = [
+
+            ['مركز بحوث وتكنولوجيا المعلومات والاتصالات - محطة الطقس',
+             'Research Center for Information and Communications Technology - Weather Station'],
+
+            ['وزارة التعليم العالي والبحث العلمي',
+             'Ministry of Higher Education and Scientific Research'],
+
+            ['هيئة البحث العلمي',
+             'Scientific Research Commission'],
+
+            ['مركز بحوث وتكنولوجيا المعلومات والاتصالات',
+             'Research Center for Information and Communications Technology'],
+
+            ['قسم الانتاج والتصنيع الالكتروني',
+             'Electronic Production and Manufacturing Department'],
+
+            ['دخول إلى محطة الطقس',
+             'Enter Weather Station'],
+
+            ['بغداد، العراق',
+             'Baghdad, Iraq'],
+
+            ['العودة',
+             'Back'],
+
+            ['محطة الطقس',
+             'Weather Station'],
+
+            ['محطة 1',
+             'Station 1'],
+
+            ['محطة 2',
+             'Station 2'],
+
+            ['محطة 3',
+             'Station 3'],
+
+            ['محطة 4',
+             'Station 4'],
+
+            ['جاري التحميل...',
+             'Loading...'],
+
+            ['تحديث',
+             'Refresh'],
+
+            ['تلقائي',
+             'Auto'],
+
+            ['متوقف',
+             'Stopped'],
+
+            ['جاري...',
+             'Loading...'],
+
+            ['أرشيف',
+             'Archive'],
+
+            ['التنبؤ',
+             'Forecast'],
+
+            ['اختر تاريخ',
+             'Select Date'],
+
+            ['بيانات الأرشيف',
+             'Archive Data'],
+
+            ['التنبؤ الجوي',
+             'Weather Forecast'],
+
+            ['الرجاء اختيار تاريخ أولاً',
+             'Please select a date first'],
+
+            ['لا توجد بيانات',
+             'No Data'],
+
+            ['لم يتم العثور على بيانات',
+             'No data found'],
+
+            ['للتاريخ المحدد',
+             'for the selected date'],
+
+            ['خطأ في التحميل',
+             'Loading Error'],
+
+            ['خطأ',
+             'Error'],
+
+            ['جاري إنشاء التنبؤ...',
+             'Generating forecast...'],
+
+            ['يتم تحليل بيانات المحطة',
+             'Analyzing station data'],
+
+            ['فشل إنشاء التنبؤ',
+             'Failed to generate forecast'],
+
+            ['تنبؤ 24 ساعة',
+             '24-Hour Forecast'],
+
+            ['تنبؤ 7 أيام',
+             '7-Day Forecast'],
+
+            ['لا توجد بيانات تنبؤ',
+             'No forecast data'],
+
+            ['التنبؤ خلال 24 ساعة للمحطة',
+             '24-Hour Forecast for Station'],
+
+            ['التنبؤ خلال 7 أيام للمحطة',
+             '7-Day Forecast for Station'],
+
+            ['احتمال وكمية المطر من AI',
+             'AI Rain Probability and Amount'],
+
+            ['أيام تاريخية فعلية:',
+             'Actual Historical Days:'],
+
+            ['وضع تمهيدي حتى يكتمل الأرشيف',
+             'Bootstrap mode until archive is complete'],
+
+            ['احتمال المطر AI',
+             'AI Rain Probability'],
+
+            ['كمية المطر AI',
+             'AI Rainfall'],
+
+            ['احتمال المطر',
+             'Rain Probability'],
+
+            ['القراءات',
+             'Readings'],
+
+            ['الحرارة',
+             'Temperature'],
+
+            ['الرطوبة',
+             'Humidity'],
+
+            ['الضغط',
+             'Pressure'],
+
+            ['سرعة الرياح',
+             'Wind Speed'],
+
+            ['اتجاه الرياح',
+             'Wind Direction'],
+
+            ['المطر',
+             'Rain'],
+
+            ['آخر تحديث:',
+             'Last Update:'],
+
+            ['🌧️ ممطر',
+             '🌧️ Rainy'],
+
+            ['☀️ غير ممطر',
+             '☀️ No Rain'],
+
+            ['متصل',
+             'Connected'],
+
+            ['غير متصل',
+             'Disconnected'],
+
+            ['غير معروف',
+             'Unknown'],
+
+            ['الآن',
+             'Now'],
+
+            ['صباحاً',
+             'AM'],
+
+            ['مساءً',
+             'PM'],
+
+            ['الوقت',
+             'Time'],
+
+            ['التاريخ',
+             'Date']
+        ];
+
+
+        const arToEn =
+            new Map(
+                languagePairs
+            );
+
+
+        const enToAr =
+            new Map(
+                languagePairs.map(
+                    function(pair) {
+
+                        return [
+                            pair[1],
+                            pair[0]
+                        ];
+
+                    }
+                )
+            );
+
+
+        function translateTextValue(
+            value
+        ) {
+
+            if (
+                typeof value !== 'string' ||
+                value.trim() === ''
+            ) {
+
+                return value;
+
+            }
+
+
+            let result =
+                value;
+
+
+            const map =
+                currentLanguage === 'en'
+                    ? arToEn
+                    : enToAr;
+
+
+            const entries =
+                Array.from(
+                    map.entries()
+                ).sort(
+                    function(a, b) {
+
+                        return (
+                            b[0].length -
+                            a[0].length
+                        );
+
+                    }
+                );
+
+
+            entries.forEach(
+                function(entry) {
+
+                    const from =
+                        entry[0];
+
+                    const to =
+                        entry[1];
+
+
+                    if (
+                        result.includes(from)
+                    ) {
+
+                        result =
+                            result.split(from)
+                                .join(to);
+
+                    }
+
+                }
+            );
+
+
+            return result;
+
+        }
+
+
+        let languageUpdateRunning =
+            false;
+
+
+        function translateNode(
+            root
+        ) {
+
+            if (!root)
+                return;
+
+
+            if (
+                root.nodeType ===
+                Node.TEXT_NODE
+            ) {
+
+                const translated =
+                    translateTextValue(
+                        root.nodeValue
+                    );
+
+
+                if (
+                    translated !==
+                    root.nodeValue
+                ) {
+
+                    root.nodeValue =
+                        translated;
+
+                }
+
+
+                return;
+
+            }
+
+
+            if (
+                root.nodeType !==
+                Node.ELEMENT_NODE &&
+                root.nodeType !==
+                Node.DOCUMENT_NODE
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                root.nodeType ===
+                Node.ELEMENT_NODE &&
+                (
+                    root.tagName === 'SCRIPT' ||
+                    root.tagName === 'STYLE'
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            const walker =
+                document.createTreeWalker(
+                    root,
+                    NodeFilter.SHOW_TEXT
+                );
+
+
+            const nodes = [];
+
+            let node;
+
+
+            while (
+                node =
+                    walker.nextNode()
+            ) {
+
+                const parent =
+                    node.parentElement;
+
+
+                if (
+                    parent &&
+                    parent.tagName !== 'SCRIPT' &&
+                    parent.tagName !== 'STYLE'
+                ) {
+
+                    nodes.push(node);
+
+                }
+
+            }
+
+
+            nodes.forEach(
+                function(textNode) {
+
+                    const translated =
+                        translateTextValue(
+                            textNode.nodeValue
+                        );
+
+
+                    if (
+                        translated !==
+                        textNode.nodeValue
+                    ) {
+
+                        textNode.nodeValue =
+                            translated;
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        function updateLanguageButton() {
+
+            const languageBtn =
+                document.getElementById(
+                    'languageBtn'
+                );
+
+
+            if (!languageBtn)
+                return;
+
+
+            const newHTML =
+                currentLanguage === 'ar'
+                    ? '<i class="fas fa-language"></i> English'
+                    : '<i class="fas fa-language"></i> العربية';
+
+
+            if (
+                languageBtn.innerHTML.trim() !==
+                newHTML.trim()
+            ) {
+
+                languageBtn.innerHTML =
+                    newHTML;
+
+            }
+
+        }
+
+
+        function updateLanguageDirection() {
+
+            const isArabic =
+                currentLanguage === 'ar';
+
+
+            document.documentElement.lang =
+                isArabic
+                    ? 'ar'
+                    : 'en';
+
+
+            document.documentElement.dir =
+                isArabic
+                    ? 'rtl'
+                    : 'ltr';
+
+
+            document.body.dir =
+                isArabic
+                    ? 'rtl'
+                    : 'ltr';
+
+        }
+
+
+        function updateLanguagePlaceholder() {
+
+            const archiveDate =
+                document.getElementById(
+                    'archiveDate'
+                );
+
+
+            if (archiveDate) {
+
+                archiveDate.placeholder =
+                    currentLanguage === 'ar'
+                        ? 'اختر تاريخ'
+                        : 'Select Date';
+
+            }
+
+        }
+
+
+        function updateFlatpickrLanguage() {
+
+            if (!flatpickrInstance)
+                return;
+
+
+            try {
+
+                if (
+                    currentLanguage === 'ar' &&
+                    flatpickr.l10ns &&
+                    flatpickr.l10ns.ar
+                ) {
+
+                    flatpickrInstance.set(
+                        'locale',
+                        flatpickr.l10ns.ar
+                    );
+
+                } else {
+
+                    flatpickrInstance.set(
+                        'locale',
+                        'default'
+                    );
+
+                }
+
+            } catch (error) {
+
+                console.log(
+                    'Language calendar update:',
+                    error
+                );
+
+            }
+
+        }
+
+
+        function applyLanguage() {
+
+            if (languageUpdateRunning)
+                return;
+
+
+            languageUpdateRunning =
+                true;
+
+
+            updateLanguageDirection();
+
+
+            document.title =
+                currentLanguage === 'ar'
+                    ? 'مركز بحوث وتكنولوجيا المعلومات والاتصالات - محطة الطقس'
+                    : 'Research Center for Information and Communications Technology - Weather Station';
+
+
+            translateNode(
+                document.body
+            );
+
+
+            updateLanguagePlaceholder();
+
+            updateLanguageButton();
+
+            updateFlatpickrLanguage();
+
+
+            languageUpdateRunning =
+                false;
+
+        }
+
+
+        function toggleLanguage() {
+
+            currentLanguage =
+                currentLanguage === 'ar'
+                    ? 'en'
+                    : 'ar';
+
+
+            localStorage.setItem(
+                'weatherLanguage',
+                currentLanguage
+            );
+
+
+            applyLanguage();
+
+        }
+
+
+        const languageObserver =
+            new MutationObserver(
+                function(mutations) {
+
+                    if (
+                        languageUpdateRunning
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    if (
+                        currentLanguage !== 'en'
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    mutations.forEach(
+                        function(mutation) {
+
+                            mutation.addedNodes.forEach(
+                                function(node) {
+
+                                    translateNode(
+                                        node
+                                    );
+
+                                }
+                            );
+
+                        }
+                    );
+
+
+                    updateLanguageButton();
+
+                }
+            );
+
+
+        languageObserver.observe(
+            document.body,
+            {
+                childList: true,
+                subtree: true
+            }
+        );
+
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            function() {
+
+                setTimeout(
+                    function() {
+
+                        applyLanguage();
+
+                    },
+                    150
+                );
 
             }
         );
