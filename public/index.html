@@ -16,15 +16,27 @@
 
     <style>
 
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap');
+
         :root {
             --primary: #3b82f6;
+            --primary-dark: #2563eb;
             --secondary: #1e293b;
             --accent: #10b981;
+            --accent-dark: #059669;
             --danger: #ef4444;
             --warning: #f59e0b;
             --dark: #0f172a;
             --light: #f8fafc;
             --gray: #64748b;
+            --gray-light: #94a3b8;
+            --card-bg: rgba(15, 23, 42, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            --shadow-glow: 0 0 60px rgba(59, 130, 246, 0.1);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -40,10 +52,14 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0c0c2e 0%, #1a1a3e 100%);
+            background: linear-gradient(145deg, #0a0a1a 0%, #0f1a2e 40%, #0a0e1a 100%);
             color: var(--light);
             padding: 10px;
         }
+
+        /* ========================================= */
+        /* الصفحة الرئيسية */
+        /* ========================================= */
 
         #mainPage {
             display: flex;
@@ -52,12 +68,9 @@
             justify-content: center;
             height: 100vh;
             padding: 20px;
-            background: linear-gradient(
-                135deg,
-                #0c0c2e 0%,
-                #1a1a3e 50%,
-                #0f172a 100%
-            );
+            background: radial-gradient(ellipse at 30% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 80%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+                        linear-gradient(145deg, #080816 0%, #0f1a2e 50%, #080816 100%);
             position: relative;
             overflow: hidden;
         }
@@ -65,37 +78,32 @@
         #mainPage::before {
             content: '';
             position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(99, 102, 241, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #mainPage::after {
+            content: '';
+            position: absolute;
             top: -50%;
             left: -50%;
             width: 200%;
             height: 200%;
             background:
-                radial-gradient(
-                    circle at 30% 50%,
-                    rgba(59, 130, 246, 0.05) 0%,
-                    transparent 50%
-                ),
-                radial-gradient(
-                    circle at 70% 50%,
-                    rgba(99, 102, 241, 0.05) 0%,
-                    transparent 50%
-                );
-            animation: bgFloat 20s ease-in-out infinite;
+                radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(99, 102, 241, 0.03) 0%, transparent 50%);
+            animation: bgFloat 25s ease-in-out infinite;
             z-index: 0;
         }
 
         @keyframes bgFloat {
-            0%, 100% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-
-            33% {
-                transform: translate(2%, -2%) rotate(5deg);
-            }
-
-            66% {
-                transform: translate(-2%, 2%) rotate(-5deg);
-            }
+            0%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            33% { transform: translate(1%, -1%) rotate(3deg) scale(1.02); }
+            66% { transform: translate(-1%, 1%) rotate(-3deg) scale(0.98); }
         }
 
         .main-content {
@@ -105,37 +113,27 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            max-width: 900px;
+            max-width: 800px;
             width: 100%;
             text-align: center;
-            animation: fadeInUp 1s ease-out;
+            animation: fadeInUp 0.8s ease-out;
+            padding: 20px;
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .logo-container {
-            width: 160px;
-            height: 160px;
-            margin-bottom: 20px;
+            width: 140px;
+            height: 140px;
+            margin-bottom: 24px;
             border-radius: 50%;
-            background: linear-gradient(
-                135deg,
-                rgba(59, 130, 246, 0.2),
-                rgba(99, 102, 241, 0.2)
-            );
-            padding: 15px;
-            box-shadow: 0 0 60px rgba(59, 130, 246, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.15));
+            padding: 8px;
+            box-shadow: 0 0 80px rgba(59, 130, 246, 0.12), inset 0 0 40px rgba(59, 130, 246, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             transition: all 0.5s ease;
             display: flex;
             align-items: center;
@@ -143,8 +141,9 @@
         }
 
         .logo-container:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 80px rgba(59, 130, 246, 0.25);
+            transform: scale(1.04);
+            box-shadow: 0 0 100px rgba(59, 130, 246, 0.2), inset 0 0 60px rgba(59, 130, 246, 0.08);
+            border-color: rgba(59, 130, 246, 0.2);
         }
 
         .logo-container img {
@@ -153,57 +152,54 @@
             object-fit: contain;
             border-radius: 50%;
             background: white;
-            padding: 5px;
+            padding: 6px;
         }
 
         .organization-name {
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #38bdf8, #818cf8);
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            margin-bottom: 5px;
-            line-height: 1.2;
+            line-height: 1.3;
+            letter-spacing: 0.5px;
         }
 
         .organization-sub {
-            font-size: 1.5rem;
-            color: #94a3b8;
-            margin-bottom: 3px;
+            font-size: 1.3rem;
+            color: var(--gray-light);
             font-weight: 600;
+            margin-top: 2px;
         }
 
         .divider-line {
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                #38bdf8,
-                transparent
-            );
-            margin: 10px auto;
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+            margin: 12px auto;
             border-radius: 2px;
         }
 
         .organization-desc {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 600;
             color: #60a5fa;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
+            letter-spacing: 0.3px;
         }
 
         .organization-department {
-            font-size: 1rem;
-            color: #94a3b8;
-            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: var(--gray-light);
+            margin-bottom: 28px;
             font-weight: 500;
+            opacity: 0.8;
         }
 
         .enter-btn {
-            padding: 16px 45px;
-            font-size: 1.2rem;
+            padding: 18px 50px;
+            font-size: 1.15rem;
             font-weight: 700;
             border: none;
             border-radius: 50px;
@@ -212,48 +208,77 @@
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             transition: all 0.4s ease;
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.35);
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .enter-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .enter-btn:hover::before {
+            opacity: 1;
         }
 
         .enter-btn:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.5);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 48px rgba(59, 130, 246, 0.5);
         }
 
         .enter-btn i {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             transition: transform 0.3s ease;
         }
 
         .enter-btn:hover i {
-            transform: translateX(5px) rotate(-5deg);
+            transform: translateX(4px) rotate(-4deg);
         }
 
         .footer-info {
             position: absolute;
-            bottom: 30px;
+            bottom: 28px;
             left: 0;
             right: 0;
             display: flex;
-            gap: 25px;
+            gap: 28px;
             flex-wrap: wrap;
             justify-content: center;
-            font-size: 0.85rem;
-            color: #64748b;
+            font-size: 0.8rem;
+            color: var(--gray-light);
             padding: 0 20px;
+            opacity: 0.7;
+            z-index: 1;
         }
 
         .footer-info span {
             display: flex;
             align-items: center;
             gap: 8px;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-info span:hover {
+            opacity: 1;
         }
 
         .footer-info i {
-            color: #38bdf8;
+            color: #60a5fa;
+            font-size: 0.9rem;
         }
+
+        /* ========================================= */
+        /* صفحة محطة الطقس */
+        /* ========================================= */
 
         #weatherPage {
             display: none;
@@ -264,27 +289,29 @@
 
         .back-home-btn {
             position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(30, 41, 59, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 10px;
+            top: 14px;
+            right: 14px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: var(--gray-light);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            transition: all var(--transition);
             z-index: 100;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
         .back-home-btn:hover {
-            background: rgba(59, 130, 246, 0.3);
-            border-color: rgba(59, 130, 246, 0.3);
-            transform: translateX(-5px);
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.2);
+            color: white;
+            transform: translateX(-4px);
         }
 
         .container {
@@ -296,23 +323,27 @@
             flex-direction: column;
         }
 
+        /* ===== Header ===== */
         .header {
-            background: rgba(30, 41, 59, 0.9);
-            border-radius: 15px;
-            padding: 15px 20px;
-            margin-bottom: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 16px 24px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .header h1 {
-            font-size: 1.5rem;
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
@@ -321,10 +352,15 @@
             gap: 10px;
         }
 
+        .header h1 i {
+            font-size: 1.3rem;
+            color: #60a5fa;
+        }
+
         .header-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 14px;
             flex-wrap: wrap;
         }
 
@@ -332,32 +368,53 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(15, 23, 42, 0.6);
-            padding: 8px 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 14px 6px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            transition: border-color var(--transition);
+        }
+
+        .device-selector:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .device-selector i {
+            color: #60a5fa;
+            font-size: 0.9rem;
         }
 
         .device-selector select {
             background: transparent;
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 5px 8px;
             border-radius: 6px;
-            font-size: 0.9rem;
-            min-width: 120px;
+            font-size: 0.85rem;
+            min-width: 110px;
             cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .device-selector select option {
+            background: #1a1a3e;
+            color: white;
         }
 
         .status-indicator {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(16, 185, 129, 0.2);
-            padding: 8px 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.08);
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            transition: all var(--transition);
+        }
+
+        .status-indicator.offline {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: rgba(239, 68, 68, 0.15);
         }
 
         .status-dot {
@@ -365,89 +422,98 @@
             height: 8px;
             border-radius: 50%;
             animation: pulse 2s infinite;
+            flex-shrink: 0;
         }
 
         .status-dot.online {
             background: #10b981;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
         }
 
         .status-dot.offline {
             background: #ef4444;
             animation: none;
+            box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
         }
 
         @keyframes pulse {
-            0%, 100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
         }
 
+        #statusText {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* ===== Controls ===== */
         .controls {
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             flex-wrap: wrap;
         }
 
         .control-btn {
-            background: linear-gradient(
-                135deg,
-                var(--primary),
-                #6366f1
-            );
+            background: linear-gradient(135deg, var(--primary), #6366f1);
             color: white;
             border: none;
-            padding: 8px 20px;
-            border-radius: 10px;
-            font-size: 0.85rem;
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.3s ease;
-            min-width: 120px;
+            transition: all var(--transition);
+            min-width: 100px;
             justify-content: center;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+            letter-spacing: 0.2px;
         }
 
         .control-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.35);
+        }
+
+        .control-btn:active {
+            transform: translateY(0px);
         }
 
         .control-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
+            transform: none !important;
         }
 
         .control-btn.secondary {
-            background: linear-gradient(
-                135deg,
-                #64748b,
-                #475569
-            );
+            background: linear-gradient(135deg, #475569, #334155);
+            box-shadow: 0 4px 16px rgba(71, 85, 105, 0.2);
+        }
+
+        .control-btn.secondary:hover {
+            box-shadow: 0 8px 24px rgba(71, 85, 105, 0.35);
         }
 
         .control-btn.success {
-            background: linear-gradient(
-                135deg,
-                #10b981,
-                #059669
-            );
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.2);
+        }
+
+        .control-btn.success:hover {
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.35);
         }
 
         .control-btn.forecast {
-            background: linear-gradient(
-                135deg,
-                #8b5cf6,
-                #6366f1
-            );
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
+        }
+
+        .control-btn.forecast:hover {
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.35);
         }
 
         .calendar-container {
@@ -455,34 +521,50 @@
         }
 
         .flatpickr-input {
-            background: transparent;
+            background: rgba(0, 0, 0, 0.3);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            width: 150px;
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.8rem;
+            width: 140px;
             cursor: pointer;
+            transition: border-color var(--transition);
+            height: 100%;
+            min-height: 42px;
+            font-weight: 500;
         }
 
+        .flatpickr-input:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .flatpickr-input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        /* ===== Dashboard ===== */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
             flex: 1;
             min-height: 0;
         }
 
         .readings-card {
-            background: rgba(30, 41, 59, 0.9);
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 18px 20px 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .readings-card::before {
@@ -491,21 +573,25 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
-            background: linear-gradient(
-                90deg,
-                #38bdf8,
-                #818cf8
-            );
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            opacity: 0.6;
         }
 
         .card-title {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            color: #38bdf8;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: #60a5fa;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .card-title i {
+            font-size: 1rem;
+            opacity: 0.8;
         }
 
         .readings-grid {
@@ -516,82 +602,103 @@
         }
 
         .reading-item {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 12px;
-            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 12px;
+            transition: all var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .reading-item:hover {
+            border-color: rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.4);
         }
 
         .reading-item.updating {
-            animation: update-pulse 1s ease;
+            animation: update-pulse 0.8s ease;
         }
 
         @keyframes update-pulse {
-            0% {
-                background: rgba(59, 130, 246, 0.3);
-            }
-
-            100% {
-                background: rgba(15, 23, 42, 0.6);
-            }
+            0% { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.3); }
+            100% { background: rgba(0, 0, 0, 0.3); border-color: transparent; }
         }
 
         .reading-icon {
-            width: 35px;
-            height: 35px;
-            border-radius: 10px;
-            background: linear-gradient(
-                135deg,
-                rgba(59, 130, 246, 0.2),
-                rgba(99, 102, 241, 0.2)
-            );
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(99, 102, 241, 0.15));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: #60a5fa;
             flex-shrink: 0;
         }
 
+        .reading-info {
+            flex: 1;
+            min-width: 0;
+        }
+
         .reading-info h3 {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            margin-bottom: 2px;
+            font-size: 0.65rem;
+            color: var(--gray-light);
+            margin-bottom: 1px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .reading-value {
-            font-size: 1.2rem;
+            font-size: 1.15rem;
             font-weight: 700;
             color: white;
+            letter-spacing: 0.3px;
         }
 
-        .reading-unit {
-            font-size: 0.8rem;
-            color: #94a3b8;
-            margin-right: 3px;
+        .reading-value .unit {
+            font-size: 0.7rem;
+            color: var(--gray-light);
+            font-weight: 500;
+            margin-right: 2px;
         }
 
+        /* ===== Compass ===== */
         .compass-card {
-            background: rgba(30, 41, 59, 0.9);
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 18px 20px 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: relative;
+        }
+
+        .compass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #8b5cf6, #ec4899);
+            opacity: 0.4;
         }
 
         .compass-wrapper {
             position: relative;
             width: 200px;
             height: 200px;
-            margin: 10px 0;
+            margin: 6px 0;
         }
 
         .compass-outer {
@@ -599,118 +706,80 @@
             height: 100%;
             border-radius: 50%;
             background: conic-gradient(
-                #ef4444 0deg,
-                #f97316 45deg,
-                #eab308 90deg,
-                #22c55e 135deg,
-                #0ea5e9 180deg,
-                #3b82f6 225deg,
-                #8b5cf6 270deg,
-                #ec4899 315deg,
-                #ef4444 360deg
+                #ef4444 0deg, #f97316 45deg, #eab308 90deg,
+                #22c55e 135deg, #0ea5e9 180deg, #3b82f6 225deg,
+                #8b5cf6 270deg, #ec4899 315deg, #ef4444 360deg
             );
             position: relative;
-            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(59, 130, 246, 0.05);
         }
 
         .compass-inner {
             position: absolute;
-            top: 12px;
-            left: 12px;
-            right: 12px;
-            bottom: 12px;
-            background: var(--dark);
+            top: 14px;
+            left: 14px;
+            right: 14px;
+            bottom: 14px;
+            background: radial-gradient(circle at center, #0f172a, #070b14);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
         }
 
         .compass-directions {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             border-radius: 50%;
         }
 
         .compass-direction {
             position: absolute;
-            font-weight: bold;
+            font-weight: 700;
             color: white;
-            font-size: 1rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 0.9rem;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+            opacity: 0.8;
         }
 
-        .direction-n {
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .direction-e {
-            top: 50%;
-            right: 10px;
-            transform: translateY(-50%);
-        }
-
-        .direction-s {
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .direction-w {
-            top: 50%;
-            left: 10px;
-            transform: translateY(-50%);
-        }
+        .direction-n { top: 8px; left: 50%; transform: translateX(-50%); }
+        .direction-e { top: 50%; right: 8px; transform: translateY(-50%); }
+        .direction-s { bottom: 8px; left: 50%; transform: translateX(-50%); }
+        .direction-w { top: 50%; left: 8px; transform: translateY(-50%); }
 
         .compass-needle {
             position: absolute;
             top: 50%;
             left: 50%;
             transform-origin: center center;
-            transition: transform 1s cubic-bezier(
-                0.34,
-                1.56,
-                0.64,
-                1
-            );
+            transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 10;
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
 
         .needle {
-            width: 3px;
-            height: 85px;
-            background: linear-gradient(
-                to bottom,
-                #f8fafc,
-                #ef4444
-            );
+            width: 2.5px;
+            height: 78px;
+            background: linear-gradient(to bottom, #f8fafc, #ef4444);
             border-radius: 2px;
             position: absolute;
-            top: -85px;
-            left: 2.5px;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            top: -78px;
+            left: 1.75px;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.3), 0 0 60px rgba(239, 68, 68, 0.1);
         }
 
         .needle::after {
             content: '';
             position: absolute;
-            top: -8px;
-            left: -6px;
-            width: 15px;
-            height: 15px;
+            top: -6px;
+            left: -5px;
+            width: 13px;
+            height: 13px;
             background: #ef4444;
-            clip-path: polygon(
-                50% 0%,
-                0% 100%,
-                100% 100%
-            );
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.3));
         }
 
         .compass-center {
@@ -718,83 +787,106 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 18px;
-            height: 18px;
-            background: #f8fafc;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle at center, #f8fafc, #cbd5e1);
             border-radius: 50%;
             z-index: 11;
-            border: 3px solid var(--dark);
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border: 2px solid #0f172a;
+            box-shadow: 0 0 16px rgba(0, 0, 0, 0.6);
         }
 
         .direction-info {
             margin-top: 10px;
             text-align: center;
-            background: rgba(15, 23, 42, 0.6);
-            padding: 10px 20px;
-            border-radius: 10px;
-            min-width: 150px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 20px;
+            border-radius: var(--radius-sm);
+            min-width: 140px;
+            border: 1px solid var(--border-color);
         }
 
         .direction-text {
-            font-size: 1.1rem;
-            color: #38bdf8;
+            font-size: 1rem;
+            color: #60a5fa;
             font-weight: 600;
-            margin-bottom: 3px;
         }
 
         .direction-degree {
-            font-size: 0.9rem;
-            color: #94a3b8;
+            font-size: 0.8rem;
+            color: var(--gray-light);
         }
 
+        /* ===== System Info ===== */
         .system-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 12px;
-            padding: 10px 15px;
-            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: var(--radius-sm);
+            padding: 8px 14px;
+            margin-top: 12px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 6px;
+            border: 1px solid var(--border-color);
         }
 
         .info-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
+            color: var(--gray-light);
         }
 
         .info-item i {
-            color: #38bdf8;
-            font-size: 1rem;
+            color: #60a5fa;
+            font-size: 0.85rem;
         }
 
+        /* ===== Modals ===== */
         .archive-modal {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 20px;
         }
 
         .archive-content {
-            background: rgba(30, 41, 59, 0.95);
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.97), rgba(10, 15, 30, 0.97));
             border-radius: 20px;
-            padding: 30px;
+            padding: 28px 30px;
             width: 90%;
             max-width: 1100px;
             max-height: 85vh;
             overflow-y: auto;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .archive-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .archive-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .archive-content::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 3px;
+        }
+
+        .archive-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.5);
         }
 
         .archive-header {
@@ -804,85 +896,113 @@
             margin-bottom: 20px;
         }
 
+        .archive-header h2 {
+            font-size: 1.2rem;
+            color: #60a5fa;
+        }
+
         .close-archive {
             background: none;
             border: none;
-            color: #94a3b8;
-            font-size: 1.5rem;
+            color: var(--gray-light);
+            font-size: 1.4rem;
             cursor: pointer;
-            padding: 5px;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition);
         }
 
         .close-archive:hover {
             color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
         }
 
+        /* ===== Tables ===== */
         .archive-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 0.9rem;
+            margin-top: 16px;
+            font-size: 0.85rem;
         }
 
         .archive-table th {
-            background: rgba(59, 130, 246, 0.2);
-            color: #38bdf8;
-            padding: 10px;
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            padding: 10px 12px;
             text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.1);
             white-space: nowrap;
         }
 
         .archive-table td {
-            padding: 8px;
+            padding: 8px 12px;
             text-align: center;
-            border-bottom: 1px solid #334155;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             white-space: nowrap;
+            color: var(--gray-light);
         }
 
-        .archive-table tr:hover {
-            background: rgba(59, 130, 246, 0.1);
+        .archive-table tr:hover td {
+            background: rgba(59, 130, 246, 0.04);
+            color: white;
+        }
+
+        .archive-table tr:last-child td {
+            border-bottom: none;
         }
 
         .no-data {
             text-align: center;
             padding: 60px 20px;
             grid-column: 1 / -1;
-            background: rgba(30, 41, 59, 0.9);
-            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius);
+            border: 1px dashed var(--border-color);
         }
 
+        .no-data i {
+            opacity: 0.4;
+        }
+
+        .no-data h2 {
+            color: var(--gray-light);
+            font-weight: 600;
+        }
+
+        .no-data p {
+            color: var(--gray);
+        }
+
+        /* ===== Loading ===== */
         .loading-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             background: rgba(0, 0, 0, 0.5);
             z-index: 999;
             justify-content: center;
             align-items: center;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
 
         .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(59, 130, 246, 0.3);
-            border-top: 4px solid var(--primary);
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(59, 130, 246, 0.15);
+            border-top: 3px solid var(--primary);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            animation: spin 0.8s linear infinite;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.1);
         }
 
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
+        /* ===== Forecast Tabs ===== */
         .forecast-tabs {
             display: flex;
             gap: 10px;
@@ -892,56 +1012,50 @@
         }
 
         .forecast-tab {
-            background: linear-gradient(
-                135deg,
-                #64748b,
-                #475569
-            );
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 10px;
+            background: rgba(71, 85, 105, 0.3);
+            color: var(--gray-light);
+            border: 1px solid transparent;
+            padding: 10px 28px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all var(--transition);
         }
 
         .forecast-tab:hover {
-            transform: translateY(-2px);
+            background: rgba(71, 85, 105, 0.5);
+            color: white;
         }
 
         .forecast-tab.active {
-            background: linear-gradient(
-                135deg,
-                #8b5cf6,
-                #6366f1
-            );
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: white;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+            border-color: transparent;
         }
 
         .forecast-title {
-            color: #38bdf8;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
+            color: #60a5fa;
+            margin-bottom: 16px;
+            font-size: 1.05rem;
+            font-weight: 600;
         }
 
         .rain-high {
             color: #38bdf8;
-            font-weight: bold;
+            font-weight: 700;
         }
-
         .rain-medium {
             color: #f59e0b;
-            font-weight: bold;
+            font-weight: 700;
         }
-
         .rain-low {
-            color: #94a3b8;
+            color: var(--gray-light);
         }
 
+        /* ===== Responsive ===== */
         @media (max-width: 768px) {
-
             .dashboard-grid {
                 grid-template-columns: 1fr;
             }
@@ -953,10 +1067,12 @@
             .header {
                 flex-direction: column;
                 text-align: center;
+                padding: 12px 16px;
             }
 
             .header-info {
                 justify-content: center;
+                width: 100%;
             }
 
             .compass-wrapper {
@@ -964,33 +1080,39 @@
                 height: 150px;
             }
 
+            .needle {
+                height: 58px;
+                top: -58px;
+            }
+
             .controls {
-                flex-direction: row;
-                flex-wrap: wrap;
-                align-items: center;
+                gap: 8px;
             }
 
             .control-btn {
-                width: auto;
-                min-width: 100px;
-                padding: 6px 15px;
-                font-size: 0.75rem;
+                min-width: 80px;
+                padding: 6px 12px;
+                font-size: 0.7rem;
+            }
+
+            .flatpickr-input {
+                width: 110px;
+                font-size: 0.7rem;
+                padding: 6px 10px;
+                min-height: 36px;
             }
 
             .organization-name {
                 font-size: 1.2rem;
             }
-
             .organization-sub {
-                font-size: 1.1rem;
-            }
-
-            .organization-desc {
                 font-size: 1rem;
             }
-
+            .organization-desc {
+                font-size: 0.95rem;
+            }
             .organization-department {
-                font-size: 0.9rem;
+                font-size: 0.8rem;
             }
 
             .logo-container {
@@ -999,28 +1121,128 @@
             }
 
             .enter-btn {
-                padding: 12px 30px;
+                padding: 14px 32px;
                 font-size: 1rem;
             }
 
             .footer-info {
-                gap: 10px;
-                font-size: 0.7rem;
+                gap: 12px;
+                font-size: 0.65rem;
             }
 
             .archive-content {
+                padding: 20px 14px;
                 width: 95%;
-                padding: 20px 12px;
             }
 
             .archive-table {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
             }
-
             .archive-table th,
             .archive-table td {
-                padding: 6px;
+                padding: 5px 6px;
             }
+
+            .back-home-btn {
+                top: 10px;
+                right: 10px;
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .readings-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .control-btn {
+                flex: 1;
+                min-width: 60px;
+                font-size: 0.65rem;
+                padding: 5px 10px;
+            }
+
+            .header h1 {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* ===== Flatpickr Overrides ===== */
+        .flatpickr-calendar {
+            background: #1a1a3e !important;
+            border-color: rgba(255,255,255,0.1) !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6) !important;
+            border-radius: var(--radius) !important;
+        }
+
+        .flatpickr-day {
+            color: #cbd5e1 !important;
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.selected:hover {
+            background: var(--primary) !important;
+            border-color: var(--primary) !important;
+        }
+
+        .flatpickr-day.today {
+            border-color: rgba(59, 130, 246, 0.3) !important;
+        }
+
+        .flatpickr-day:hover {
+            background: rgba(59, 130, 246, 0.15) !important;
+        }
+
+        .flatpickr-months .flatpickr-month {
+            color: #e2e8f0 !important;
+        }
+
+        .flatpickr-current-month .flatpickr-monthDropdown-months {
+            color: #e2e8f0 !important;
+        }
+
+        .flatpickr-weekday {
+            color: #60a5fa !important;
+        }
+
+        .flatpickr-prev-month,
+        .flatpickr-next-month {
+            color: #94a3b8 !important;
+        }
+
+        .flatpickr-prev-month:hover,
+        .flatpickr-next-month:hover {
+            color: white !important;
+        }
+
+        .flatpickr-input[readonly] {
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(59, 130, 246, 0.4);
         }
 
     </style>
@@ -1037,12 +1259,7 @@
         <div class="main-content">
 
             <div class="logo-container">
-
-                <img
-                    src="logo.png"
-                    alt="شعار المركز"
-                    id="logoImage">
-
+                <img src="logo.png" alt="شعار المركز" id="logoImage">
             </div>
 
             <div class="organization-name">
@@ -1063,42 +1280,19 @@
                 قسم الانتاج والتصنيع الالكتروني
             </div>
 
-            <button
-                class="enter-btn"
-                onclick="goToWeatherPage()">
-
+            <button class="enter-btn" onclick="goToWeatherPage()">
                 <i class="fas fa-cloud-sun"></i>
-
                 دخول إلى محطة الطقس
-
                 <i class="fas fa-arrow-left"></i>
-
             </button>
 
         </div>
 
         <div class="footer-info">
-
-            <span>
-                <i class="fas fa-map-marker-alt"></i>
-                بغداد، العراق
-            </span>
-
-            <span>
-                <i class="fas fa-envelope"></i>
-                secres@rdd.edu.iq
-            </span>
-
-            <span>
-                <i class="fas fa-phone"></i>
-                +964 7731149340
-            </span>
-
-            <span>
-                <i class="fas fa-globe"></i>
-                www.src.edu.iq
-            </span>
-
+            <span><i class="fas fa-map-marker-alt"></i> بغداد، العراق</span>
+            <span><i class="fas fa-envelope"></i> secres@rdd.edu.iq</span>
+            <span><i class="fas fa-phone"></i> +964 7731149340</span>
+            <span><i class="fas fa-globe"></i> www.src.edu.iq</span>
         </div>
 
     </div>
@@ -1110,80 +1304,36 @@
 
     <div id="weatherPage">
 
-        <button
-            class="back-home-btn"
-            onclick="goToHomePage()">
-
+        <button class="back-home-btn" onclick="goToHomePage()">
             <i class="fas fa-arrow-right"></i>
-
             العودة
-
         </button>
-
 
         <div class="container">
 
             <!-- Header -->
-
             <div class="header">
-
                 <h1>
-
                     <i class="fas fa-cloud-sun"></i>
-
                     محطة الطقس
-
                 </h1>
 
-
                 <div class="header-info">
-
                     <div class="device-selector">
-
                         <i class="fas fa-satellite"></i>
-
                         <select id="deviceSelect">
-
-                            <option value="max1">
-                                محطة 1
-                            </option>
-
-                            <option value="max2">
-                                محطة 2
-                            </option>
-
-                            <option value="max3">
-                                محطة 3
-                            </option>
-
-                            <option value="max4">
-                                محطة 4
-                            </option>
-
+                            <option value="max1">محطة 1</option>
+                            <option value="max2">محطة 2</option>
+                            <option value="max3">محطة 3</option>
+                            <option value="max4">محطة 4</option>
                         </select>
-
                     </div>
 
-
-                    <div class="status-indicator">
-
-                        <div
-                            class="status-dot online"
-                            id="statusDot">
-                        </div>
-
-                        <span
-                            id="statusText"
-                            style="font-size:0.85rem;">
-
-                            جاري التحميل...
-
-                        </span>
-
+                    <div class="status-indicator" id="statusIndicator">
+                        <div class="status-dot online" id="statusDot"></div>
+                        <span id="statusText" style="font-size:0.8rem;">جاري التحميل...</span>
                     </div>
-
                 </div>
-
             </div>
 
 
@@ -1193,78 +1343,33 @@
 
             <div class="controls">
 
-                <button
-                    class="control-btn"
-                    onclick="loadCurrentData()">
-
+                <button class="control-btn" onclick="loadCurrentData()">
                     <i class="fas fa-sync-alt"></i>
-
                     تحديث
-
                 </button>
 
-
-                <button
-                    class="control-btn secondary"
-                    onclick="toggleAutoRefresh()">
-
+                <button class="control-btn secondary" onclick="toggleAutoRefresh()">
                     <i class="fas fa-clock"></i>
-
-                    <span
-                        id="autoRefreshText"
-                        style="font-size:0.75rem;">
-
-                        تلقائي
-
-                    </span>
-
+                    <span id="autoRefreshText" style="font-size:0.7rem;">تلقائي</span>
                 </button>
-
 
                 <div class="calendar-container">
-
-                    <input
-                        type="text"
-                        id="archiveDate"
-                        class="flatpickr-input"
-                        placeholder="اختر تاريخ">
-
+                    <input type="text" id="archiveDate" class="flatpickr-input" placeholder="اختر تاريخ">
                 </div>
 
-
-                <button
-                    class="control-btn success"
-                    onclick="loadArchiveData()">
-
+                <button class="control-btn success" onclick="loadArchiveData()">
                     <i class="fas fa-history"></i>
-
                     أرشيف
-
                 </button>
 
-
-                <!-- زر التنبؤ -->
-
-                <button
-                    class="control-btn forecast"
-                    onclick="loadForecastData()">
-
+                <button class="control-btn forecast" onclick="loadForecastData()">
                     <i class="fas fa-cloud-sun-rain"></i>
-
                     التنبؤ
-
                 </button>
 
-
-                <button
-                    class="control-btn secondary"
-                    onclick="toggleLanguage()"
-                    id="languageBtn">
-
+                <button class="control-btn secondary" onclick="toggleLanguage()" id="languageBtn">
                     <i class="fas fa-language"></i>
-
                     English
-
                 </button>
 
             </div>
@@ -1286,36 +1391,21 @@
     <!-- نافذة الأرشيف -->
     <!-- ========================================= -->
 
-    <div
-        id="archiveModal"
-        class="archive-modal">
+    <div id="archiveModal" class="archive-modal">
 
         <div class="archive-content">
 
             <div class="archive-header">
-
                 <h2 class="card-title">
-
                     <i class="fas fa-history"></i>
-
                     بيانات الأرشيف
-
                 </h2>
-
-
-                <button
-                    class="close-archive"
-                    onclick="closeArchive()">
-
+                <button class="close-archive" onclick="closeArchive()">
                     <i class="fas fa-times"></i>
-
                 </button>
-
             </div>
 
-
-            <div id="archiveContent">
-            </div>
+            <div id="archiveContent"></div>
 
         </div>
 
@@ -1326,37 +1416,21 @@
     <!-- نافذة التنبؤ -->
     <!-- ========================================= -->
 
-    <div
-        id="forecastModal"
-        class="archive-modal">
+    <div id="forecastModal" class="archive-modal">
 
         <div class="archive-content">
 
             <div class="archive-header">
-
                 <h2 class="card-title">
-
                     <i class="fas fa-cloud-sun-rain"></i>
-
                     التنبؤ الجوي
-
                 </h2>
-
-
-                <button
-                    class="close-archive"
-                    onclick="closeForecast()">
-
+                <button class="close-archive" onclick="closeForecast()">
                     <i class="fas fa-times"></i>
-
                 </button>
-
             </div>
 
-
-            <div id="forecastContent">
-
-            </div>
+            <div id="forecastContent"></div>
 
         </div>
 
@@ -1367,12 +1441,8 @@
     <!-- Loading -->
     <!-- ========================================= -->
 
-    <div
-        id="loadingOverlay"
-        class="loading-overlay">
-
+    <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner"></div>
-
     </div>
 
 
@@ -1387,36 +1457,17 @@
         // =========================================
 
         function goToWeatherPage() {
-
-            document.getElementById(
-                'mainPage'
-            ).style.display = 'none';
-
-            document.getElementById(
-                'weatherPage'
-            ).style.display = 'block';
-
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('weatherPage').style.display = 'block';
             if (!window.weatherInitialized) {
-
                 initWeather();
-
                 window.weatherInitialized = true;
-
             }
-
         }
 
-
         function goToHomePage() {
-
-            document.getElementById(
-                'weatherPage'
-            ).style.display = 'none';
-
-            document.getElementById(
-                'mainPage'
-            ).style.display = 'flex';
-
+            document.getElementById('weatherPage').style.display = 'none';
+            document.getElementById('mainPage').style.display = 'flex';
         }
 
 
@@ -1425,75 +1476,25 @@
         // =========================================
 
         let currentDevice = 'max1';
-
         let autoRefreshEnabled = true;
-
         let refreshInterval = null;
-
         let currentCompassRotation = 0;
-
         let flatpickrInstance = null;
 
-
         let currentForecast24 = [];
-
         let currentForecast7 = [];
-
         let currentForecastAIInfo = null;
 
-
-        const contentArea =
-            document.getElementById(
-                'contentArea'
-            );
-
-
-        const deviceSelect =
-            document.getElementById(
-                'deviceSelect'
-            );
-
-
-        const statusText =
-            document.getElementById(
-                'statusText'
-            );
-
-
-        const autoRefreshText =
-            document.getElementById(
-                'autoRefreshText'
-            );
-
-
-        const archiveModal =
-            document.getElementById(
-                'archiveModal'
-            );
-
-
-        const archiveContent =
-            document.getElementById(
-                'archiveContent'
-            );
-
-
-        const forecastModal =
-            document.getElementById(
-                'forecastModal'
-            );
-
-
-        const forecastContent =
-            document.getElementById(
-                'forecastContent'
-            );
-
-
-        const loadingOverlay =
-            document.getElementById(
-                'loadingOverlay'
-            );
+        const contentArea = document.getElementById('contentArea');
+        const deviceSelect = document.getElementById('deviceSelect');
+        const statusText = document.getElementById('statusText');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const autoRefreshText = document.getElementById('autoRefreshText');
+        const archiveModal = document.getElementById('archiveModal');
+        const archiveContent = document.getElementById('archiveContent');
+        const forecastModal = document.getElementById('forecastModal');
+        const forecastContent = document.getElementById('forecastContent');
+        const loadingOverlay = document.getElementById('loadingOverlay');
 
 
         // =========================================
@@ -1501,17 +1502,11 @@
         // =========================================
 
         function initWeather() {
-
             initializeCalendar();
-
             createCurrentDataInterface();
-
             loadCurrentData();
-
             startAutoRefresh();
-
             setupEventListeners();
-
         }
 
 
@@ -1520,36 +1515,17 @@
         // =========================================
 
         function initializeCalendar() {
-
-            flatpickrInstance =
-                flatpickr(
-                    "#archiveDate",
-                    {
-                        locale: "ar",
-                        dateFormat: "Y-m-d",
-                        maxDate: "today",
-                        defaultDate: new Date(),
-
-                        onChange:
-                            function(
-                                selectedDates,
-                                dateStr
-                            ) {
-
-                                if (dateStr) {
-
-                                    console.log(
-                                        "التاريخ المحدد:",
-                                        dateStr
-                                    );
-
-                                }
-
-                            }
-
+            flatpickrInstance = flatpickr("#archiveDate", {
+                locale: "ar",
+                dateFormat: "Y-m-d",
+                maxDate: "today",
+                defaultDate: new Date(),
+                onChange: function(selectedDates, dateStr) {
+                    if (dateStr) {
+                        console.log("التاريخ المحدد:", dateStr);
                     }
-                );
-
+                }
+            });
         }
 
 
@@ -1558,19 +1534,10 @@
         // =========================================
 
         function setupEventListeners() {
-
-            deviceSelect.addEventListener(
-                'change',
-                function() {
-
-                    currentDevice =
-                        this.value;
-
-                    loadCurrentData();
-
-                }
-            );
-
+            deviceSelect.addEventListener('change', function() {
+                currentDevice = this.value;
+                loadCurrentData();
+            });
         }
 
 
@@ -1578,71 +1545,21 @@
         // توقيت بغداد
         // =========================================
 
-        function formatBaghdadTime(
-            dateString
-        ) {
-
-            if (!dateString)
-                return 'الآن';
-
+        function formatBaghdadTime(dateString) {
+            if (!dateString) return 'الآن';
             try {
-
-                const date =
-                    new Date(dateString);
-
-                if (
-                    isNaN(
-                        date.getTime()
-                    )
-                ) {
-                    return 'الآن';
-                }
-
-
-                const baghdadDate =
-                    new Date(
-                        date.getTime() +
-                        (3 * 60 * 60 * 1000)
-                    );
-
-
-                let hours =
-                    baghdadDate.getUTCHours();
-
-                const minutes =
-                    baghdadDate.getUTCMinutes();
-
-
-                const ampm =
-                    hours >= 12
-                        ? 'مساءً'
-                        : 'صباحاً';
-
-
-                hours =
-                    hours % 12;
-
-                hours =
-                    hours ? hours : 12;
-
-
-                return (
-                    hours +
-                    ':' +
-                    (minutes < 10
-                        ? '0'
-                        : '') +
-                    minutes +
-                    ' ' +
-                    ampm
-                );
-
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return 'الآن';
+                const baghdadDate = new Date(date.getTime() + (3 * 60 * 60 * 1000));
+                let hours = baghdadDate.getUTCHours();
+                const minutes = baghdadDate.getUTCMinutes();
+                const ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                return hours + ':' + (minutes < 10 ? '0' : '') + minutes + ' ' + ampm;
             } catch (e) {
-
                 return 'الآن';
-
             }
-
         }
 
 
@@ -1650,106 +1567,22 @@
         // اتجاه الرياح
         // =========================================
 
-        function getWindDirectionDegree(
-            direction
-        ) {
-
-            if (!direction)
-                return 0;
-
-
-            const dirLower =
-                String(direction)
-                    .toLowerCase()
-                    .trim();
-
-
-            if (
-                dirLower === 'شمالي' ||
-                dirLower === 'شمال' ||
-                dirLower === 'north' ||
-                dirLower === 'n'
-            )
-                return 0;
-
-
-            if (
-                dirLower === 'شمالي شرقي' ||
-                dirLower === 'northeast' ||
-                dirLower === 'ne'
-            )
-                return 45;
-
-
-            if (
-                dirLower === 'شرقي' ||
-                dirLower === 'شرق' ||
-                dirLower === 'east' ||
-                dirLower === 'e'
-            )
-                return 90;
-
-
-            if (
-                dirLower === 'جنوبي شرقي' ||
-                dirLower === 'southeast' ||
-                dirLower === 'se'
-            )
-                return 135;
-
-
-            if (
-                dirLower === 'جنوبي' ||
-                dirLower === 'جنوب' ||
-                dirLower === 'south' ||
-                dirLower === 's'
-            )
-                return 180;
-
-
-            if (
-                dirLower === 'جنوبي غربي' ||
-                dirLower === 'southwest' ||
-                dirLower === 'sw'
-            )
-                return 225;
-
-
-            if (
-                dirLower === 'غربي' ||
-                dirLower === 'غرب' ||
-                dirLower === 'west' ||
-                dirLower === 'w'
-            )
-                return 270;
-
-
-            if (
-                dirLower === 'شمالي غربي' ||
-                dirLower === 'northwest' ||
-                dirLower === 'nw'
-            )
-                return 315;
-
-
-            const numMatch =
-                String(direction)
-                    .match(/\d+/);
-
-
+        function getWindDirectionDegree(direction) {
+            if (!direction) return 0;
+            const dirLower = String(direction).toLowerCase().trim();
+            if (dirLower === 'شمالي' || dirLower === 'شمال' || dirLower === 'north' || dirLower === 'n') return 0;
+            if (dirLower === 'شمالي شرقي' || dirLower === 'northeast' || dirLower === 'ne') return 45;
+            if (dirLower === 'شرقي' || dirLower === 'شرق' || dirLower === 'east' || dirLower === 'e') return 90;
+            if (dirLower === 'جنوبي شرقي' || dirLower === 'southeast' || dirLower === 'se') return 135;
+            if (dirLower === 'جنوبي' || dirLower === 'جنوب' || dirLower === 'south' || dirLower === 's') return 180;
+            if (dirLower === 'جنوبي غربي' || dirLower === 'southwest' || dirLower === 'sw') return 225;
+            if (dirLower === 'غربي' || dirLower === 'غرب' || dirLower === 'west' || dirLower === 'w') return 270;
+            if (dirLower === 'شمالي غربي' || dirLower === 'northwest' || dirLower === 'nw') return 315;
+            const numMatch = String(direction).match(/\d+/);
             if (numMatch) {
-
-                return (
-                    parseInt(
-                        numMatch[0]
-                    ) % 360
-                );
-
+                return parseInt(numMatch[0]) % 360;
             }
-
-
             return 0;
-
         }
 
 
@@ -1758,122 +1591,36 @@
         // =========================================
 
         async function loadCurrentData() {
-
             try {
-
                 showLoadingEffect();
-
-
-                const response =
-                    await fetch(
-                        '/api/sensor?device=' +
-                        encodeURIComponent(
-                            currentDevice
-                        )
-                    );
-
-
+                const response = await fetch('/api/sensor?device=' + encodeURIComponent(currentDevice));
                 if (!response.ok) {
-
-                    throw new Error(
-                        'خطأ في الخادم: ' +
-                        response.status
-                    );
-
+                    throw new Error('خطأ في الخادم: ' + response.status);
                 }
-
-
-                const data =
-                    await response.json();
-
-
+                const data = await response.json();
                 let todayData = [];
-
-
-                if (
-                    data.today &&
-                    Array.isArray(
-                        data.today
-                    )
-                ) {
-
-                    todayData =
-                        data.today;
-
-                } else if (
-                    Array.isArray(data)
-                ) {
-
-                    todayData =
-                        data;
-
+                if (data.today && Array.isArray(data.today)) {
+                    todayData = data.today;
+                } else if (Array.isArray(data)) {
+                    todayData = data;
                 }
-
-
-                if (
-                    todayData.length === 0
-                ) {
-
+                if (todayData.length === 0) {
                     showNoData();
-
                     return;
-
                 }
-
-
-                const latestReading =
-                    todayData[
-                        todayData.length - 1
-                    ];
-
-
-                updateStatus(
-                    'متصل',
-                    true
-                );
-
-
-                if (
-                    !document.getElementById(
-                        'temperatureValue'
-                    )
-                ) {
-
+                const latestReading = todayData[todayData.length - 1];
+                updateStatus('متصل', true);
+                if (!document.getElementById('temperatureValue')) {
                     createCurrentDataInterface();
-
                 }
-
-
-                updateCurrentData(
-                    latestReading
-                );
-
-
+                updateCurrentData(latestReading);
             } catch (error) {
-
-                console.error(
-                    'خطأ في تحميل البيانات:',
-                    error
-                );
-
-
-                updateStatus(
-                    'غير متصل',
-                    false
-                );
-
-
-                showError(
-                    error.message
-                );
-
-
+                console.error('خطأ في تحميل البيانات:', error);
+                updateStatus('غير متصل', false);
+                showError(error.message);
             } finally {
-
                 hideLoadingEffect();
-
             }
-
         }
 
 
@@ -1881,170 +1628,46 @@
         // تحديث القراءات
         // =========================================
 
-        function updateCurrentData(
-            data
-        ) {
+        function updateCurrentData(data) {
+            const temperature = parseFloat(data.temperture || data.temperature || 0);
+            const humidity = parseFloat(data.humidity || 0);
+            const pressure = parseFloat(data.pressure || 0);
+            const windSpeed = parseFloat(data.winds || data.windS || 0);
+            const windDirection = data.windd || data.windD || 'غير معروف';
+            const rainy = data.rainy || false;
 
-            const temperature =
-                parseFloat(
-                    data.temperture ||
-                    data.temperature ||
-                    0
-                );
-
-
-            const humidity =
-                parseFloat(
-                    data.humidity || 0
-                );
-
-
-            const pressure =
-                parseFloat(
-                    data.pressure || 0
-                );
-
-
-            const windSpeed =
-                parseFloat(
-                    data.winds ||
-                    data.windS ||
-                    0
-                );
-
-
-            const windDirection =
-                data.windd ||
-                data.windD ||
-                'غير معروف';
-
-
-            const rainy =
-                data.rainy ||
-                false;
-
-
-            let readingTime =
-                'الآن';
-
-
+            let readingTime = 'الآن';
             if (data.time) {
-
-                readingTime =
-                    formatBaghdadTime(
-                        data.time
-                    );
-
-            } else if (
-                data.reading_date
-            ) {
-
-                readingTime =
-                    formatBaghdadTime(
-                        data.reading_date
-                    );
-
+                readingTime = formatBaghdadTime(data.time);
+            } else if (data.reading_date) {
+                readingTime = formatBaghdadTime(data.reading_date);
             }
 
+            const validTemp = isNaN(temperature) ? 0 : temperature;
+            const validHumidity = isNaN(humidity) ? 0 : humidity;
+            const validPressure = isNaN(pressure) ? 0 : pressure;
+            const validWindSpeed = isNaN(windSpeed) ? 0 : windSpeed;
 
-            const validTemp =
-                isNaN(temperature)
-                    ? 0
-                    : temperature;
+            updateReadingValue('temperatureValue', validTemp.toFixed(1) + '<span class="unit">°C</span>');
+            updateReadingValue('humidityValue', validHumidity.toFixed(1) + '<span class="unit">%</span>');
+            updateReadingValue('pressureValue', validPressure.toFixed(1) + '<span class="unit">hPa</span>');
+            updateReadingValue('windSpeedValue', validWindSpeed.toFixed(1) + '<span class="unit">m/s</span>');
 
-
-            const validHumidity =
-                isNaN(humidity)
-                    ? 0
-                    : humidity;
-
-
-            const validPressure =
-                isNaN(pressure)
-                    ? 0
-                    : pressure;
-
-
-            const validWindSpeed =
-                isNaN(windSpeed)
-                    ? 0
-                    : windSpeed;
-
-
-            updateReadingValue(
-                'temperatureValue',
-                validTemp.toFixed(1) +
-                '°C'
-            );
-
-
-            updateReadingValue(
-                'humidityValue',
-                validHumidity.toFixed(1) +
-                '%'
-            );
-
-
-            updateReadingValue(
-                'pressureValue',
-                validPressure.toFixed(1) +
-                'hPa'
-            );
-
-
-            updateReadingValue(
-                'windSpeedValue',
-                validWindSpeed.toFixed(1) +
-                'm/s'
-            );
-
-
-            const rainValue =
-                document.getElementById(
-                    'rainValue'
-                );
-
-
+            const rainValue = document.getElementById('rainValue');
             if (rainValue) {
-
-                if (
-                    rainy === true ||
-                    rainy === 1 ||
-                    rainy === 'true' ||
-                    rainy === '1'
-                ) {
-
-                    rainValue.textContent =
-                        '🌧️ ممطر';
-
+                if (rainy === true || rainy === 1 || rainy === 'true' || rainy === '1') {
+                    rainValue.textContent = '🌧️ ممطر';
                 } else {
-
-                    rainValue.textContent =
-                        '☀️ غير ممطر';
-
+                    rainValue.textContent = '☀️ غير ممطر';
                 }
-
             }
 
-
-            const timeElement =
-                document.getElementById(
-                    'readingTime'
-                );
-
-
+            const timeElement = document.getElementById('readingTime');
             if (timeElement) {
-
-                timeElement.textContent =
-                    readingTime;
-
+                timeElement.textContent = readingTime;
             }
 
-
-            updateCompass(
-                windDirection
-            );
-
+            updateCompass(windDirection);
         }
 
 
@@ -2052,51 +1675,18 @@
         // تحديث قيمة
         // =========================================
 
-        function updateReadingValue(
-            elementId,
-            newValue
-        ) {
-
-            const element =
-                document.getElementById(
-                    elementId
-                );
-
-
+        function updateReadingValue(elementId, newValue) {
+            const element = document.getElementById(elementId);
             if (element) {
-
-                const parent =
-                    element.closest(
-                        '.reading-item'
-                    );
-
-
+                const parent = element.closest('.reading-item');
                 if (parent) {
-
-                    parent.classList.add(
-                        'updating'
-                    );
-
-
-                    setTimeout(
-                        function() {
-
-                            parent.classList.remove(
-                                'updating'
-                            );
-
-                        },
-                        1000
-                    );
-
+                    parent.classList.add('updating');
+                    setTimeout(function() {
+                        parent.classList.remove('updating');
+                    }, 800);
                 }
-
-
-                element.textContent =
-                    newValue;
-
+                element.innerHTML = newValue;
             }
-
         }
 
 
@@ -2104,86 +1694,28 @@
         // البوصلة
         // =========================================
 
-        function updateCompass(
-            direction
-        ) {
-
-            const degrees =
-                getWindDirectionDegree(
-                    direction
-                );
-
-
-            const directionElement =
-                document.getElementById(
-                    'windDirectionText'
-                );
-
-
-            const degreeElement =
-                document.getElementById(
-                    'windDirectionDegree'
-                );
-
+        function updateCompass(direction) {
+            const degrees = getWindDirectionDegree(direction);
+            const directionElement = document.getElementById('windDirectionText');
+            const degreeElement = document.getElementById('windDirectionDegree');
 
             if (directionElement) {
-
-                directionElement.textContent =
-                    direction ||
-                    'غير معروف';
-
+                directionElement.textContent = direction || 'غير معروف';
             }
-
-
             if (degreeElement) {
-
-                degreeElement.textContent =
-                    degrees + '°';
-
+                degreeElement.textContent = degrees + '°';
             }
 
-
-            const needle =
-                document.getElementById(
-                    'compassNeedle'
-                );
-
-
+            const needle = document.getElementById('compassNeedle');
             if (needle) {
-
-                let rotation =
-                    degrees;
-
-
-                let diff =
-                    rotation -
-                    currentCompassRotation;
-
-
-                if (diff > 180)
-                    diff -= 360;
-
-
-                if (diff < -180)
-                    diff += 360;
-
-
-                rotation =
-                    currentCompassRotation +
-                    diff;
-
-
-                currentCompassRotation =
-                    rotation;
-
-
-                needle.style.transform =
-                    'translate(-50%, -50%) rotate(' +
-                    rotation +
-                    'deg)';
-
+                let rotation = degrees;
+                let diff = rotation - currentCompassRotation;
+                if (diff > 180) diff -= 360;
+                if (diff < -180) diff += 360;
+                rotation = currentCompassRotation + diff;
+                currentCompassRotation = rotation;
+                needle.style.transform = 'translate(-50%, -50%) rotate(' + rotation + 'deg)';
             }
-
         }
 
 
@@ -2192,301 +1724,114 @@
         // =========================================
 
         function createCurrentDataInterface() {
-
             const content = `
-
                 <div class="dashboard-grid">
 
                     <div class="readings-card">
-
                         <h2 class="card-title">
-
                             <i class="fas fa-chart-line"></i>
-
                             القراءات
-
                         </h2>
-
 
                         <div class="readings-grid">
 
-
-                            <div
-                                class="reading-item"
-                                id="tempItem">
-
+                            <div class="reading-item" id="tempItem">
                                 <div class="reading-icon">
-
                                     <i class="fas fa-thermometer-half"></i>
-
                                 </div>
-
                                 <div class="reading-info">
-
-                                    <h3>
-                                        الحرارة
-                                    </h3>
-
-                                    <div
-                                        class="reading-value"
-                                        id="temperatureValue">
-
-                                        0.0°C
-
-                                    </div>
-
+                                    <h3>الحرارة</h3>
+                                    <div class="reading-value" id="temperatureValue">0.0<span class="unit">°C</span></div>
                                 </div>
-
                             </div>
 
-
-                            <div
-                                class="reading-item"
-                                id="humidityItem">
-
+                            <div class="reading-item" id="humidityItem">
                                 <div class="reading-icon">
-
                                     <i class="fas fa-tint"></i>
-
                                 </div>
-
                                 <div class="reading-info">
-
-                                    <h3>
-                                        الرطوبة
-                                    </h3>
-
-                                    <div
-                                        class="reading-value"
-                                        id="humidityValue">
-
-                                        0.0%
-
-                                    </div>
-
+                                    <h3>الرطوبة</h3>
+                                    <div class="reading-value" id="humidityValue">0.0<span class="unit">%</span></div>
                                 </div>
-
                             </div>
 
-
-                            <div
-                                class="reading-item"
-                                id="pressureItem">
-
+                            <div class="reading-item" id="pressureItem">
                                 <div class="reading-icon">
-
                                     <i class="fas fa-tachometer-alt"></i>
-
                                 </div>
-
                                 <div class="reading-info">
-
-                                    <h3>
-                                        الضغط
-                                    </h3>
-
-                                    <div
-                                        class="reading-value"
-                                        id="pressureValue">
-
-                                        0.0hPa
-
-                                    </div>
-
+                                    <h3>الضغط</h3>
+                                    <div class="reading-value" id="pressureValue">0.0<span class="unit">hPa</span></div>
                                 </div>
-
                             </div>
 
-
-                            <div
-                                class="reading-item"
-                                id="windSpeedItem">
-
+                            <div class="reading-item" id="windSpeedItem">
                                 <div class="reading-icon">
-
                                     <i class="fas fa-wind"></i>
-
                                 </div>
-
                                 <div class="reading-info">
-
-                                    <h3>
-                                        سرعة الرياح
-                                    </h3>
-
-                                    <div
-                                        class="reading-value"
-                                        id="windSpeedValue">
-
-                                        0.0m/s
-
-                                    </div>
-
+                                    <h3>سرعة الرياح</h3>
+                                    <div class="reading-value" id="windSpeedValue">0.0<span class="unit">m/s</span></div>
                                 </div>
-
                             </div>
 
-
-                            <div
-                                class="reading-item"
-                                id="rainItem"
-                                style="grid-column: span 2;">
-
+                            <div class="reading-item" id="rainItem" style="grid-column: span 2;">
                                 <div class="reading-icon">
-
                                     <i class="fas fa-cloud-rain"></i>
-
                                 </div>
-
                                 <div class="reading-info">
-
-                                    <h3>
-                                        المطر
-                                    </h3>
-
-                                    <div
-                                        class="reading-value"
-                                        id="rainValue"
-                                        style="font-size:1.1rem;">
-
-                                        ☀️ غير ممطر
-
-                                    </div>
-
+                                    <h3>المطر</h3>
+                                    <div class="reading-value" id="rainValue" style="font-size:1.05rem;">☀️ غير ممطر</div>
                                 </div>
-
                             </div>
-
 
                         </div>
-
 
                         <div class="system-info">
-
                             <div class="info-item">
-
                                 <i class="far fa-clock"></i>
-
-                                <span>
-
-                                    آخر تحديث:
-
-                                    <span id="readingTime">
-                                        الآن
-                                    </span>
-
-                                </span>
-
+                                <span>آخر تحديث: <span id="readingTime">الآن</span></span>
                             </div>
-
-
                             <div class="info-item">
-
                                 <i class="fas fa-satellite"></i>
-
-                                <span>
-                                    ${currentDevice}
-                                </span>
-
+                                <span>${currentDevice}</span>
                             </div>
-
                         </div>
-
                     </div>
 
-
                     <!-- البوصلة -->
-
                     <div class="compass-card">
-
                         <h2 class="card-title">
-
                             <i class="fas fa-compass"></i>
-
                             اتجاه الرياح
-
                         </h2>
 
-
                         <div class="compass-wrapper">
-
                             <div class="compass-outer">
-
                                 <div class="compass-inner">
-
                                     <div class="compass-directions">
-
-                                        <div
-                                            class="compass-direction direction-n">
-                                            N
-                                        </div>
-
-                                        <div
-                                            class="compass-direction direction-e">
-                                            E
-                                        </div>
-
-                                        <div
-                                            class="compass-direction direction-s">
-                                            S
-                                        </div>
-
-                                        <div
-                                            class="compass-direction direction-w">
-                                            W
-                                        </div>
-
+                                        <div class="compass-direction direction-n">N</div>
+                                        <div class="compass-direction direction-e">E</div>
+                                        <div class="compass-direction direction-s">S</div>
+                                        <div class="compass-direction direction-w">W</div>
                                     </div>
-
-
-                                    <div
-                                        class="compass-needle"
-                                        id="compassNeedle">
-
+                                    <div class="compass-needle" id="compassNeedle">
                                         <div class="needle"></div>
-
                                     </div>
-
-
                                     <div class="compass-center"></div>
-
                                 </div>
-
                             </div>
-
                         </div>
-
 
                         <div class="direction-info">
-
-                            <div
-                                class="direction-text"
-                                id="windDirectionText">
-
-                                غير معروف
-
-                            </div>
-
-                            <div
-                                class="direction-degree"
-                                id="windDirectionDegree">
-
-                                0°
-
-                            </div>
-
+                            <div class="direction-text" id="windDirectionText">غير معروف</div>
+                            <div class="direction-degree" id="windDirectionDegree">0°</div>
                         </div>
-
                     </div>
 
                 </div>
-
             `;
-
-
-            contentArea.innerHTML =
-                content;
-
+            contentArea.innerHTML = content;
         }
 
 
@@ -2495,163 +1840,43 @@
         // =========================================
 
         async function loadArchiveData() {
-
-            const selectedDate =
-                document.getElementById(
-                    'archiveDate'
-                ).value;
-
-
+            const selectedDate = document.getElementById('archiveDate').value;
             if (!selectedDate) {
-
-                alert(
-                    'الرجاء اختيار تاريخ أولاً'
-                );
-
+                alert('الرجاء اختيار تاريخ أولاً');
                 return;
-
             }
-
-
             try {
-
                 showLoading(true);
-
-
-                const response =
-                    await fetch(
-                        '/api/sensor?device=' +
-                        encodeURIComponent(
-                            currentDevice
-                        ) +
-                        '&date=' +
-                        encodeURIComponent(
-                            selectedDate
-                        )
-                    );
-
-
+                const response = await fetch('/api/sensor?device=' + encodeURIComponent(currentDevice) + '&date=' + encodeURIComponent(selectedDate));
                 if (!response.ok) {
-
-                    throw new Error(
-                        'خطأ في جلب الأرشيف: ' +
-                        response.status
-                    );
-
+                    throw new Error('خطأ في جلب الأرشيف: ' + response.status);
                 }
-
-
-                const archiveData =
-                    await response.json();
-
-
-                if (
-                    !archiveData ||
-                    archiveData.length === 0
-                ) {
-
+                const archiveData = await response.json();
+                if (!archiveData || archiveData.length === 0) {
                     archiveContent.innerHTML = `
-
                         <div class="no-data">
-
-                            <i
-                                class="fas fa-database fa-3x"
-                                style="
-                                    color:#64748b;
-                                    margin-bottom:20px;
-                                ">
-                            </i>
-
-                            <h2
-                                style="
-                                    color:#94a3b8;
-                                ">
-
-                                لا توجد بيانات
-
-                            </h2>
-
-                            <p
-                                style="
-                                    color:#64748b;
-                                    margin-top:10px;
-                                ">
-
-                                لم يتم العثور على بيانات
-                                للتاريخ المحدد
-
-                            </p>
-
+                            <i class="fas fa-database fa-3x" style="color:#64748b; margin-bottom:20px;"></i>
+                            <h2 style="color:#94a3b8;">لا توجد بيانات</h2>
+                            <p style="color:#64748b; margin-top:10px;">لم يتم العثور على بيانات للتاريخ المحدد</p>
                         </div>
-
                     `;
-
                 } else {
-
-                    displayArchiveData(
-                        archiveData,
-                        selectedDate
-                    );
-
+                    displayArchiveData(archiveData, selectedDate);
                 }
-
-
-                archiveModal.style.display =
-                    'flex';
-
-
+                archiveModal.style.display = 'flex';
             } catch (error) {
-
-                console.error(
-                    'خطأ في تحميل الأرشيف:',
-                    error
-                );
-
-
+                console.error('خطأ في تحميل الأرشيف:', error);
                 archiveContent.innerHTML = `
-
                     <div class="no-data">
-
-                        <i
-                            class="fas fa-exclamation-triangle fa-3x"
-                            style="
-                                color:#ef4444;
-                                margin-bottom:20px;
-                            ">
-                        </i>
-
-                        <h2
-                            style="color:#ef4444;">
-
-                            خطأ في التحميل
-
-                        </h2>
-
-                        <p
-                            style="
-                                color:#ef4444;
-                                margin-top:10px;
-                            ">
-
-                            ${error.message}
-
-                        </p>
-
+                        <i class="fas fa-exclamation-triangle fa-3x" style="color:#ef4444; margin-bottom:20px;"></i>
+                        <h2 style="color:#ef4444;">خطأ في التحميل</h2>
+                        <p style="color:#ef4444; margin-top:10px;">${error.message}</p>
                     </div>
-
                 `;
-
-
-                archiveModal.style.display =
-                    'flex';
-
-
+                archiveModal.style.display = 'flex';
             } finally {
-
                 showLoading(false);
-
             }
-
         }
 
 
@@ -2659,215 +1884,65 @@
         // عرض الأرشيف
         // =========================================
 
-        function displayArchiveData(
-            data,
-            date
-        ) {
-
+        function displayArchiveData(data, date) {
             let tableHTML = `
-
-                <h3
-                    style="
-                        color:#38bdf8;
-                        margin-bottom:20px;
-                    ">
-
-                    بيانات الأرشيف:
-                    ${date}
-
+                <h3 style="color:#60a5fa; margin-bottom:20px; font-weight:600;">
+                    بيانات الأرشيف: ${date}
                 </h3>
-
-
                 <div style="overflow-x:auto;">
-
                     <table class="archive-table">
-
                         <thead>
-
                             <tr>
-
                                 <th>#</th>
-
                                 <th>الوقت</th>
-
                                 <th>الحرارة</th>
-
                                 <th>الرطوبة</th>
-
                                 <th>الضغط</th>
-
                                 <th>سرعة الرياح</th>
-
                                 <th>اتجاه الرياح</th>
-
                                 <th>المطر</th>
-
                             </tr>
-
                         </thead>
-
                         <tbody>
-
             `;
-
-
-            data.forEach(
-                function(item, index) {
-
-                    let time = '--';
-
-
-                    if (item.time) {
-
-                        time =
-                            formatBaghdadTime(
-                                item.time
-                            );
-
-                    } else if (
-                        item.reading_date
-                    ) {
-
-                        time =
-                            formatBaghdadTime(
-                                item.reading_date
-                            );
-
-                    }
-
-
-                    const temperature =
-                        parseFloat(
-                            item.temperture ||
-                            item.temperature ||
-                            0
-                        );
-
-
-                    const humidity =
-                        parseFloat(
-                            item.humidity || 0
-                        );
-
-
-                    const pressure =
-                        parseFloat(
-                            item.pressure || 0
-                        );
-
-
-                    const windSpeed =
-                        parseFloat(
-                            item.winds ||
-                            item.windS ||
-                            0
-                        );
-
-
-                    const windDirection =
-                        item.windd ||
-                        item.windD ||
-                        '--';
-
-
-                    const rainy =
-                        item.rainy ||
-                        false;
-
-
-                    const rainStatus =
-                        (
-                            rainy === true ||
-                            rainy === 1 ||
-                            rainy === 'true' ||
-                            rainy === '1'
-                        )
-                            ? '🌧️'
-                            : '☀️';
-
-
-                    const validTemp =
-                        isNaN(temperature)
-                            ? 0
-                            : temperature;
-
-
-                    const validHumidity =
-                        isNaN(humidity)
-                            ? 0
-                            : humidity;
-
-
-                    const validPressure =
-                        isNaN(pressure)
-                            ? 0
-                            : pressure;
-
-
-                    const validWindSpeed =
-                        isNaN(windSpeed)
-                            ? 0
-                            : windSpeed;
-
-
-                    tableHTML += `
-
-                        <tr>
-
-                            <td>
-                                ${index + 1}
-                            </td>
-
-                            <td>
-                                ${time}
-                            </td>
-
-                            <td>
-                                ${validTemp.toFixed(1)}°C
-                            </td>
-
-                            <td>
-                                ${validHumidity.toFixed(1)}%
-                            </td>
-
-                            <td>
-                                ${validPressure.toFixed(1)}hPa
-                            </td>
-
-                            <td>
-                                ${validWindSpeed.toFixed(1)}m/s
-                            </td>
-
-                            <td>
-                                ${windDirection}
-                            </td>
-
-                            <td>
-                                ${rainStatus}
-                            </td>
-
-                        </tr>
-
-                    `;
-
+            data.forEach(function(item, index) {
+                let time = '--';
+                if (item.time) {
+                    time = formatBaghdadTime(item.time);
+                } else if (item.reading_date) {
+                    time = formatBaghdadTime(item.reading_date);
                 }
-            );
+                const temperature = parseFloat(item.temperture || item.temperature || 0);
+                const humidity = parseFloat(item.humidity || 0);
+                const pressure = parseFloat(item.pressure || 0);
+                const windSpeed = parseFloat(item.winds || item.windS || 0);
+                const windDirection = item.windd || item.windD || '--';
+                const rainy = item.rainy || false;
+                const rainStatus = (rainy === true || rainy === 1 || rainy === 'true' || rainy === '1') ? '🌧️' : '☀️';
+                const validTemp = isNaN(temperature) ? 0 : temperature;
+                const validHumidity = isNaN(humidity) ? 0 : humidity;
+                const validPressure = isNaN(pressure) ? 0 : pressure;
+                const validWindSpeed = isNaN(windSpeed) ? 0 : windSpeed;
 
-
+                tableHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${time}</td>
+                        <td>${validTemp.toFixed(1)}°C</td>
+                        <td>${validHumidity.toFixed(1)}%</td>
+                        <td>${validPressure.toFixed(1)}hPa</td>
+                        <td>${validWindSpeed.toFixed(1)}m/s</td>
+                        <td>${windDirection}</td>
+                        <td>${rainStatus}</td>
+                    </tr>
+                `;
+            });
             tableHTML += `
-
                         </tbody>
-
                     </table>
-
                 </div>
-
             `;
-
-
-            archiveContent.innerHTML =
-                tableHTML;
-
+            archiveContent.innerHTML = tableHTML;
         }
 
 
@@ -2876,10 +1951,7 @@
         // =========================================
 
         function closeArchive() {
-
-            archiveModal.style.display =
-                'none';
-
+            archiveModal.style.display = 'none';
         }
 
 
@@ -2888,55 +1960,26 @@
         // =========================================
 
         function toggleAutoRefresh() {
-
-            autoRefreshEnabled =
-                !autoRefreshEnabled;
-
-
+            autoRefreshEnabled = !autoRefreshEnabled;
             if (autoRefreshEnabled) {
-
                 startAutoRefresh();
-
-                autoRefreshText.textContent =
-                    'تلقائي';
-
+                autoRefreshText.textContent = 'تلقائي';
             } else {
-
                 stopAutoRefresh();
-
-                autoRefreshText.textContent =
-                    'متوقف';
-
+                autoRefreshText.textContent = 'متوقف';
             }
-
         }
-
 
         function startAutoRefresh() {
-
             stopAutoRefresh();
-
-            refreshInterval =
-                setInterval(
-                    loadCurrentData,
-                    5000
-                );
-
+            refreshInterval = setInterval(loadCurrentData, 5000);
         }
 
-
         function stopAutoRefresh() {
-
             if (refreshInterval) {
-
-                clearInterval(
-                    refreshInterval
-                );
-
+                clearInterval(refreshInterval);
                 refreshInterval = null;
-
             }
-
         }
 
 
@@ -2944,33 +1987,19 @@
         // الحالة
         // =========================================
 
-        function updateStatus(
-            message,
-            isConnected
-        ) {
-
-            statusText.textContent =
-                message;
-
-
-            const statusDot =
-                document.getElementById(
-                    'statusDot'
-                );
-
-
+        function updateStatus(message, isConnected) {
+            statusText.textContent = message;
+            const statusDot = document.getElementById('statusDot');
             if (statusDot) {
-
-                statusDot.className =
-                    'status-dot ' +
-                    (
-                        isConnected
-                            ? 'online'
-                            : 'offline'
-                    );
-
+                statusDot.className = 'status-dot ' + (isConnected ? 'online' : 'offline');
             }
-
+            if (statusIndicator) {
+                if (isConnected) {
+                    statusIndicator.className = 'status-indicator';
+                } else {
+                    statusIndicator.className = 'status-indicator offline';
+                }
+            }
         }
 
 
@@ -2979,62 +2008,23 @@
         // =========================================
 
         function showLoadingEffect() {
-
-            const refreshBtn =
-                document.querySelector(
-                    '.control-btn'
-                );
-
-
-            if (
-                refreshBtn &&
-                refreshBtn.textContent
-                    .indexOf('تحديث') !== -1
-            ) {
-
-                refreshBtn.innerHTML =
-                    '<i class="fas fa-spinner fa-spin"></i> جاري...';
-
-                refreshBtn.disabled =
-                    true;
-
+            const refreshBtn = document.querySelector('.control-btn');
+            if (refreshBtn && refreshBtn.textContent.indexOf('تحديث') !== -1) {
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري...';
+                refreshBtn.disabled = true;
             }
-
         }
-
 
         function hideLoadingEffect() {
-
-            const refreshBtn =
-                document.querySelector(
-                    '.control-btn'
-                );
-
-
-            if (
-                refreshBtn &&
-                refreshBtn.textContent
-                    .indexOf('جاري') !== -1
-            ) {
-
-                refreshBtn.innerHTML =
-                    '<i class="fas fa-sync-alt"></i> تحديث';
-
-                refreshBtn.disabled =
-                    false;
-
+            const refreshBtn = document.querySelector('.control-btn');
+            if (refreshBtn && refreshBtn.textContent.indexOf('جاري') !== -1) {
+                refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> تحديث';
+                refreshBtn.disabled = false;
             }
-
         }
 
-
         function showLoading(show) {
-
-            loadingOverlay.style.display =
-                show
-                    ? 'flex'
-                    : 'none';
-
+            loadingOverlay.style.display = show ? 'flex' : 'none';
         }
 
 
@@ -3043,23 +2033,10 @@
         // =========================================
 
         function showNoData() {
-
-            if (
-                !document.getElementById(
-                    'temperatureValue'
-                )
-            ) {
-
+            if (!document.getElementById('temperatureValue')) {
                 createCurrentDataInterface();
-
             }
-
-
-            updateStatus(
-                'لا توجد بيانات',
-                false
-            );
-
+            updateStatus('لا توجد بيانات', false);
         }
 
 
@@ -3068,23 +2045,10 @@
         // =========================================
 
         function showError(message) {
-
-            if (
-                !document.getElementById(
-                    'temperatureValue'
-                )
-            ) {
-
+            if (!document.getElementById('temperatureValue')) {
                 createCurrentDataInterface();
-
             }
-
-
-            updateStatus(
-                'خطأ',
-                false
-            );
-
+            updateStatus('خطأ', false);
         }
 
 
@@ -3096,286 +2060,87 @@
 
 
         async function loadForecastData() {
-
             try {
-
                 showLoading(true);
-
-
-                forecastModal.style.display =
-                    'flex';
-
-
+                forecastModal.style.display = 'flex';
                 forecastContent.innerHTML = `
-
-                    <div
-                        style="
-                            text-align:center;
-                            padding:50px 20px;
-                        ">
-
-                        <i
-                            class="fas fa-spinner fa-spin fa-3x"
-                            style="
-                                color:#38bdf8;
-                            ">
-                        </i>
-
-                        <h3
-                            style="
-                                margin-top:20px;
-                                color:#94a3b8;
-                            ">
-
-                            جاري إنشاء التنبؤ...
-
-                        </h3>
-
-                        <p
-                            style="
-                                margin-top:10px;
-                                color:#64748b;
-                            ">
-
-                            يتم تحليل بيانات المحطة
-
-                        </p>
-
+                    <div style="text-align:center; padding:50px 20px;">
+                        <i class="fas fa-spinner fa-spin fa-3x" style="color:#60a5fa;"></i>
+                        <h3 style="margin-top:20px; color:#94a3b8; font-weight:600;">جاري إنشاء التنبؤ...</h3>
+                        <p style="margin-top:10px; color:#64748b;">يتم تحليل بيانات المحطة</p>
                     </div>
-
                 `;
+                const deviceQuery = encodeURIComponent(currentDevice);
+                const responses = await Promise.allSettled([
+                    fetch('/api/forecast?device=' + deviceQuery),
+                    fetch('/api/ai-forecast?device=' + deviceQuery)
+                ]);
 
-
-                const deviceQuery =
-                    encodeURIComponent(
-                        currentDevice
-                    );
-
-
-                // نجلب التنبؤ الحالي وتنبؤ AI معاً.
-                // إذا فشل AI تبقى الواجهة تعمل بالتنبؤ السابق.
-                const responses =
-                    await Promise.allSettled([
-                        fetch(
-                            '/api/forecast?device=' +
-                            deviceQuery
-                        ),
-                        fetch(
-                            '/api/ai-forecast?device=' +
-                            deviceQuery
-                        )
-                    ]);
-
-
-                if (
-                    responses[0].status !== 'fulfilled' ||
-                    !responses[0].value.ok
-                ) {
-
-                    const status =
-                        responses[0].status === 'fulfilled'
-                            ? responses[0].value.status
-                            : 'network';
-
-                    throw new Error(
-                        'خطأ في الخادم: ' + status
-                    );
-
+                if (responses[0].status !== 'fulfilled' || !responses[0].value.ok) {
+                    const status = responses[0].status === 'fulfilled' ? responses[0].value.status : 'network';
+                    throw new Error('خطأ في الخادم: ' + status);
                 }
-
-
-                const result =
-                    await responses[0].value.json();
-
-
-                if (
-                    !result.success
-                ) {
-
-                    throw new Error(
-                        result.error ||
-                        'فشل إنشاء التنبؤ'
-                    );
-
+                const result = await responses[0].value.json();
+                if (!result.success) {
+                    throw new Error(result.error || 'فشل إنشاء التنبؤ');
                 }
-
-
-                currentForecast24 =
-                    result.forecast24h ||
-                    [];
-
-
-                currentForecast7 =
-                    result.forecast7days ||
-                    [];
-
-
+                currentForecast24 = result.forecast24h || [];
+                currentForecast7 = result.forecast7days || [];
                 currentForecastAIInfo = null;
 
-
-                // دمج توقع المطر من نماذج AI السبعة مع صفوف
-                // التنبؤ الحالية حتى لا نغيّر تصميم الواجهة.
-                if (
-                    responses[1].status === 'fulfilled' &&
-                    responses[1].value.ok
-                ) {
-
+                if (responses[1].status === 'fulfilled' && responses[1].value.ok) {
                     try {
-
-                        const aiResult =
-                            await responses[1].value.json();
-
-                        if (
-                            aiResult.success &&
-                            Array.isArray(
-                                aiResult.forecast7days
-                            )
-                        ) {
-
+                        const aiResult = await responses[1].value.json();
+                        if (aiResult.success && Array.isArray(aiResult.forecast7days)) {
                             currentForecastAIInfo = {
-                                historyDays:
-                                    aiResult.historyDays || 0,
-                                bootstrapped:
-                                    Boolean(
-                                        aiResult.bootstrapped
-                                    ),
-                                model:
-                                    aiResult.model ||
-                                    'Weather AI'
+                                historyDays: aiResult.historyDays || 0,
+                                bootstrapped: Boolean(aiResult.bootstrapped),
+                                model: aiResult.model || 'Weather AI'
                             };
-
-
-                            const aiForecastByDate =
-                                new Map(
-                                    aiResult.forecast7days.map(
-                                        function(aiDay) {
-                                            return [
-                                                String(aiDay.date).slice(0, 10),
-                                                aiDay
-                                            ];
-                                        }
-                                    )
-                                );
-
-
-                            currentForecast7 =
-                                currentForecast7.map(
-                                    function(item) {
-
-                                        const itemDate =
-                                            String(item.date)
-                                                .slice(0, 10);
-
-
-                                        const ai =
-                                            aiForecastByDate.get(
-                                                itemDate
-                                            );
-
-
-                                        if (
-                                            !ai ||
-                                            ai.available !== true
-                                        ) {
-
-                                            return {
-                                                ...item,
-                                                aiAvailable: false,
-                                                aiError:
-                                                    ai
-                                                        ? ai.error
-                                                        : 'No matching AI forecast'
-                                            };
-
-                                        }
-
-
-                                        return {
-                                            ...item,
-                                            rainProbability:
-                                                ai.rainProbability,
-                                            rainfallMm:
-                                                ai.rainfallMm,
-                                            rawRainfallMm:
-                                                ai.rawRainfallMm,
-                                            rainExpected:
-                                                ai.rain,
-                                            aiThreshold:
-                                                ai.threshold,
-                                            aiAvailable: true,
-                                            aiDay:
-                                                ai.day
-                                        };
-                                    }
-                                );
-
+                            const aiForecastByDate = new Map(
+                                aiResult.forecast7days.map(function(aiDay) {
+                                    return [String(aiDay.date).slice(0, 10), aiDay];
+                                })
+                            );
+                            currentForecast7 = currentForecast7.map(function(item) {
+                                const itemDate = String(item.date).slice(0, 10);
+                                const ai = aiForecastByDate.get(itemDate);
+                                if (!ai || ai.available !== true) {
+                                    return {
+                                        ...item,
+                                        aiAvailable: false,
+                                        aiError: ai ? ai.error : 'No matching AI forecast'
+                                    };
+                                }
+                                return {
+                                    ...item,
+                                    rainProbability: ai.rainProbability,
+                                    rainfallMm: ai.rainfallMm,
+                                    rawRainfallMm: ai.rawRainfallMm,
+                                    rainExpected: ai.rain,
+                                    aiThreshold: ai.threshold,
+                                    aiAvailable: true,
+                                    aiDay: ai.day
+                                };
+                            });
                         }
-
                     } catch (aiError) {
-
-                        console.warn(
-                            'تعذر دمج تنبؤ AI:',
-                            aiError
-                        );
-
+                        console.warn('تعذر دمج تنبؤ AI:', aiError);
                     }
-
                 }
-
-
                 displayForecast();
-
-
             } catch (error) {
-
-                console.error(
-                    'خطأ في التنبؤ:',
-                    error
-                );
-
-
+                console.error('خطأ في التنبؤ:', error);
                 forecastContent.innerHTML = `
-
                     <div class="no-data">
-
-                        <i
-                            class="fas fa-exclamation-triangle fa-3x"
-                            style="
-                                color:#ef4444;
-                                margin-bottom:20px;
-                            ">
-                        </i>
-
-                        <h2
-                            style="
-                                color:#ef4444;
-                            ">
-
-                            خطأ في التنبؤ
-
-                        </h2>
-
-                        <p
-                            style="
-                                color:#94a3b8;
-                                margin-top:10px;
-                            ">
-
-                            ${error.message}
-
-                        </p>
-
+                        <i class="fas fa-exclamation-triangle fa-3x" style="color:#ef4444; margin-bottom:20px;"></i>
+                        <h2 style="color:#ef4444;">خطأ في التنبؤ</h2>
+                        <p style="color:#94a3b8; margin-top:10px;">${error.message}</p>
                     </div>
-
                 `;
-
-
             } finally {
-
                 showLoading(false);
-
             }
-
         }
 
 
@@ -3384,47 +2149,20 @@
         // =========================================
 
         function displayForecast() {
-
             forecastContent.innerHTML = `
-
                 <div class="forecast-tabs">
-
-                    <button
-                        id="forecast24Btn"
-                        class="forecast-tab active"
-                        onclick="showForecast24()">
-
+                    <button id="forecast24Btn" class="forecast-tab active" onclick="showForecast24()">
                         <i class="fas fa-clock"></i>
-
                         تنبؤ 24 ساعة
-
                     </button>
-
-
-                    <button
-                        id="forecast7Btn"
-                        class="forecast-tab"
-                        onclick="showForecast7()">
-
+                    <button id="forecast7Btn" class="forecast-tab" onclick="showForecast7()">
                         <i class="fas fa-calendar-week"></i>
-
                         تنبؤ 7 أيام
-
                     </button>
-
                 </div>
-
-
-                <div
-                    id="forecastTableContainer">
-
-                </div>
-
+                <div id="forecastTableContainer"></div>
             `;
-
-
             showForecast24();
-
         }
 
 
@@ -3433,233 +2171,79 @@
         // =========================================
 
         function showForecast24() {
+            const container = document.getElementById('forecastTableContainer');
+            if (!container) return;
+            document.getElementById('forecast24Btn').classList.add('active');
+            document.getElementById('forecast7Btn').classList.remove('active');
 
-            const container =
-                document.getElementById(
-                    'forecastTableContainer'
-                );
-
-
-            if (!container)
-                return;
-
-
-            document.getElementById(
-                'forecast24Btn'
-            ).classList.add('active');
-
-
-            document.getElementById(
-                'forecast7Btn'
-            ).classList.remove('active');
-
-
-            if (
-                !currentForecast24 ||
-                currentForecast24.length === 0
-            ) {
-
+            if (!currentForecast24 || currentForecast24.length === 0) {
                 container.innerHTML = `
-
                     <div class="no-data">
-
-                        <i
-                            class="fas fa-cloud-sun fa-3x"
-                            style="
-                                color:#64748b;
-                                margin-bottom:20px;
-                            ">
-                        </i>
-
-                        <h3>
-                            لا توجد بيانات تنبؤ
-                        </h3>
-
+                        <i class="fas fa-cloud-sun fa-3x" style="color:#64748b; margin-bottom:20px;"></i>
+                        <h3 style="color:#94a3b8;">لا توجد بيانات تنبؤ</h3>
                     </div>
-
                 `;
-
                 return;
-
             }
 
-
             let html = `
-
                 <h3 class="forecast-title">
-
                     <i class="fas fa-clock"></i>
-
-                    التنبؤ خلال 24 ساعة للمحطة
-                    ${currentDevice}
-
+                    التنبؤ خلال 24 ساعة للمحطة ${currentDevice}
                 </h3>
-
-
                 <div style="overflow-x:auto;">
-
                     <table class="archive-table">
-
                         <thead>
-
                             <tr>
-
                                 <th>الوقت</th>
-
                                 <th>الحرارة</th>
-
                                 <th>الرطوبة</th>
-
                                 <th>الضغط</th>
-
                                 <th>سرعة الرياح</th>
-
                                 <th>اتجاه الرياح</th>
-
                                 <th>احتمال المطر AI</th>
-
                             </tr>
-
                         </thead>
-
                         <tbody>
-
             `;
-
-
-            currentForecast24.forEach(
-                function(item) {
-
-                    const probability =
-                        Number(
-                            item.rainProbability
-                        ) || 0;
-
-
-                    let rainClass =
-                        'rain-low';
-
-
-                    let rainIcon =
-                        '☀️';
-
-
-                    if (
-                        item.aiAvailable === true
-                    ) {
-
-                        if (
-                            item.rainExpected === true
-                        ) {
-
-                            rainClass =
-                                'rain-high';
-
-                            rainIcon =
-                                '🌧️';
-
-                        } else if (
-                            probability >=
-                            (Number(item.aiThreshold) * 0.6)
-                        ) {
-
-                            rainClass =
-                                'rain-medium';
-
-                            rainIcon =
-                                '🌦️';
-
-                        }
-
+            currentForecast24.forEach(function(item) {
+                const probability = Number(item.rainProbability) || 0;
+                let rainClass = 'rain-low';
+                let rainIcon = '☀️';
+                if (item.aiAvailable === true) {
+                    if (item.rainExpected === true) {
+                        rainClass = 'rain-high';
+                        rainIcon = '🌧️';
+                    } else if (probability >= (Number(item.aiThreshold) * 0.6)) {
+                        rainClass = 'rain-medium';
+                        rainIcon = '🌦️';
                     }
-
-
-                    html += `
-
-                        <tr>
-
-                            <td>
-                                ${formatForecastTime(
-                                    item.time
-                                )}
-                            </td>
-
-                            <td>
-                                ${safeNumber(
-                                    item.temperature
-                                )} °C
-                            </td>
-
-                            <td>
-                                ${safeNumber(
-                                    item.humidity
-                                )} %
-                            </td>
-
-                            <td>
-                                ${safeNumber(
-                                    item.pressure
-                                )} hPa
-                            </td>
-
-                            <td>
-                                ${safeNumber(
-                                    item.windSpeed
-                                )} m/s
-                            </td>
-
-                            <td>
-                                ${item.windDirection || '--'}
-                            </td>
-
-                            <td
-                                class="${rainClass}">
-
-                                ${rainIcon}
-
-                                ${probability.toFixed(1)}%
-
-                                ${
-                                    item.aiAvailable === true
-                                        ? `
-                                            <div style="
-                                                font-size:11px;
-                                                color:#94a3b8;
-                                                margin-top:3px;
-                                            ">
-                                                Threshold:
-                                                ${Number(
-                                                    item.aiThreshold
-                                                ).toFixed(1)}%
-                                            </div>
-                                          `
-                                        : ''
-                                }
-
-                            </td>
-
-                        </tr>
-
-                    `;
-
                 }
-            );
-
-
+                html += `
+                    <tr>
+                        <td>${formatForecastTime(item.time)}</td>
+                        <td>${safeNumber(item.temperature)} °C</td>
+                        <td>${safeNumber(item.humidity)} %</td>
+                        <td>${safeNumber(item.pressure)} hPa</td>
+                        <td>${safeNumber(item.windSpeed)} m/s</td>
+                        <td>${item.windDirection || '--'}</td>
+                        <td class="${rainClass}">
+                            ${rainIcon} ${probability.toFixed(1)}%
+                            ${item.aiAvailable === true ? `
+                                <div style="font-size:11px; color:#94a3b8; margin-top:3px;">
+                                    Threshold: ${Number(item.aiThreshold).toFixed(1)}%
+                                </div>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
             html += `
-
                         </tbody>
-
                     </table>
-
                 </div>
-
             `;
-
-
-            container.innerHTML =
-                html;
-
+            container.innerHTML = html;
         }
 
 
@@ -3668,239 +2252,77 @@
         // =========================================
 
         function showForecast7() {
+            const container = document.getElementById('forecastTableContainer');
+            if (!container) return;
+            document.getElementById('forecast7Btn').classList.add('active');
+            document.getElementById('forecast24Btn').classList.remove('active');
 
-            const container =
-                document.getElementById(
-                    'forecastTableContainer'
-                );
-
-
-            if (!container)
-                return;
-
-
-            document.getElementById(
-                'forecast7Btn'
-            ).classList.add('active');
-
-
-            document.getElementById(
-                'forecast24Btn'
-            ).classList.remove('active');
-
-
-            if (
-                !currentForecast7 ||
-                currentForecast7.length === 0
-            ) {
-
+            if (!currentForecast7 || currentForecast7.length === 0) {
                 container.innerHTML = `
-
                     <div class="no-data">
-
-                        <i
-                            class="fas fa-calendar fa-3x"
-                            style="
-                                color:#64748b;
-                                margin-bottom:20px;
-                            ">
-                        </i>
-
-                        <h3>
-                            لا توجد بيانات تنبؤ
-                        </h3>
-
+                        <i class="fas fa-calendar fa-3x" style="color:#64748b; margin-bottom:20px;"></i>
+                        <h3 style="color:#94a3b8;">لا توجد بيانات تنبؤ</h3>
                     </div>
-
                 `;
-
                 return;
-
             }
 
-
             let html = `
-
                 <h3 class="forecast-title">
-
                     <i class="fas fa-calendar-week"></i>
-
-                    التنبؤ خلال 7 أيام للمحطة
-                    ${currentDevice}
-
+                    التنبؤ خلال 7 أيام للمحطة ${currentDevice}
                 </h3>
-
-
-                ${currentForecastAIInfo
-                    ? `
-                        <div style="
-                            margin:0 0 16px 0;
-                            padding:10px 14px;
-                            border-radius:10px;
-                            background:rgba(56,189,248,0.08);
-                            color:#94a3b8;
-                            font-size:14px;
-                        ">
-                            <i class="fas fa-brain"></i>
-                            احتمال وكمية المطر من AI
-                            — أيام تاريخية فعلية:
-                            ${currentForecastAIInfo.historyDays}
-                            ${currentForecastAIInfo.bootstrapped
-                                ? ' — وضع تمهيدي حتى يكتمل الأرشيف'
-                                : ''}
-                        </div>
-                    `
-                    : ''}
-
-
+                ${currentForecastAIInfo ? `
+                    <div style="margin:0 0 16px 0; padding:10px 16px; border-radius:var(--radius-sm); background:rgba(56,189,248,0.06); color:#94a3b8; font-size:0.85rem; border:1px solid rgba(56,189,248,0.06);">
+                        <i class="fas fa-brain" style="color:#60a5fa;"></i>
+                        احتمال وكمية المطر من AI — أيام تاريخية فعلية: ${currentForecastAIInfo.historyDays}
+                        ${currentForecastAIInfo.bootstrapped ? ' — وضع تمهيدي حتى يكتمل الأرشيف' : ''}
+                    </div>
+                ` : ''}
                 <div style="overflow-x:auto;">
-
                     <table class="archive-table">
-
                         <thead>
-
                             <tr>
-
                                 <th>التاريخ</th>
-
                                 <th>الحرارة</th>
-
                                 <th>الرطوبة</th>
-
                                 <th>الضغط</th>
-
                                 <th>سرعة الرياح</th>
-
                                 <th>اتجاه الرياح</th>
-
                                 <th>احتمال المطر</th>
-
                                 <th>كمية المطر AI</th>
-
                             </tr>
-
                         </thead>
-
                         <tbody>
-
             `;
-
-
-            currentForecast7.forEach(
-                function(item) {
-
-                    const probability =
-                        Number(
-                            item.rainProbability
-                        ) || 0;
-
-
-                    let rainClass =
-                        'rain-low';
-
-
-                    if (
-                        probability >= 70
-                    ) {
-
-                        rainClass =
-                            'rain-high';
-
-                    } else if (
-                        probability >= 40
-                    ) {
-
-                        rainClass =
-                            'rain-medium';
-
-                    }
-
-
-                    const rainIcon =
-                        probability >= 70
-                            ? '🌧️'
-                            : probability >= 40
-                                ? '🌦️'
-                                : '☀️';
-
-
-                    html += `
-
-                        <tr>
-
-                            <td>
-                                ${formatForecastDate(
-                                    item.date
-                                )}
-                            </td>
-
-                            <td>
-                                ${safeNumber(
-                                    item.temperature
-                                )} °C
-                            </td>
-
-                            <td>
-                                ${safeNumber(
-                                    item.humidity
-                                )} %
-                            </td>
-
-                            <td>
-                                ${safeNumber(
-                                    item.pressure
-                                )} hPa
-                            </td>
-
-                            <td>
-                                ${safeNumber(
-                                    item.windSpeed
-                                )} m/s
-                            </td>
-
-                            <td>
-                                ${item.windDirection || '--'}
-                            </td>
-
-                            <td
-                                class="${rainClass}">
-
-                                ${rainIcon}
-
-                                ${probability.toFixed(0)}%
-
-                            </td>
-
-                            <td>
-                                ${item.aiAvailable === true
-                                    ? safeNumber(
-                                        item.rainfallMm
-                                      ) + ' mm'
-                                    : '--'}
-                            </td>
-
-                        </tr>
-
-                    `;
-
+            currentForecast7.forEach(function(item) {
+                const probability = Number(item.rainProbability) || 0;
+                let rainClass = 'rain-low';
+                if (probability >= 70) {
+                    rainClass = 'rain-high';
+                } else if (probability >= 40) {
+                    rainClass = 'rain-medium';
                 }
-            );
-
-
+                const rainIcon = probability >= 70 ? '🌧️' : probability >= 40 ? '🌦️' : '☀️';
+                html += `
+                    <tr>
+                        <td>${formatForecastDate(item.date)}</td>
+                        <td>${safeNumber(item.temperature)} °C</td>
+                        <td>${safeNumber(item.humidity)} %</td>
+                        <td>${safeNumber(item.pressure)} hPa</td>
+                        <td>${safeNumber(item.windSpeed)} m/s</td>
+                        <td>${item.windDirection || '--'}</td>
+                        <td class="${rainClass}">${rainIcon} ${probability.toFixed(0)}%</td>
+                        <td>${item.aiAvailable === true ? safeNumber(item.rainfallMm) + ' mm' : '--'}</td>
+                    </tr>
+                `;
+            });
             html += `
-
                         </tbody>
-
                     </table>
-
                 </div>
-
             `;
-
-
-            container.innerHTML =
-                html;
-
+            container.innerHTML = html;
         }
 
 
@@ -3909,22 +2331,11 @@
         // =========================================
 
         function safeNumber(value) {
-
-            const number =
-                Number(value);
-
-
-            if (
-                isNaN(number)
-            ) {
-
+            const number = Number(value);
+            if (isNaN(number)) {
                 return '0.0';
-
             }
-
-
             return number.toFixed(1);
-
         }
 
 
@@ -3932,73 +2343,22 @@
         // تنسيق وقت التنبؤ
         // =========================================
 
-        function formatForecastTime(
-            dateString
-        ) {
-
-            if (!dateString)
-                return '--';
-
-
+        function formatForecastTime(dateString) {
+            if (!dateString) return '--';
             try {
-
-                const date =
-                    new Date(dateString);
-
-
-                if (
-                    isNaN(
-                        date.getTime()
-                    )
-                ) {
-
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) {
                     return '--';
-
                 }
-
-
-                let hours =
-                    date.getHours();
-
-
-                const minutes =
-                    date.getMinutes();
-
-
-                const ampm =
-                    hours >= 12
-                        ? 'مساءً'
-                        : 'صباحاً';
-
-
-                hours =
-                    hours % 12;
-
-
-                hours =
-                    hours || 12;
-
-
-                return (
-                    hours +
-                    ':' +
-                    (
-                        minutes < 10
-                            ? '0'
-                            : ''
-                    ) +
-                    minutes +
-                    ' ' +
-                    ampm
-                );
-
-
+                let hours = date.getHours();
+                const minutes = date.getMinutes();
+                const ampm = hours >= 12 ? 'مساءً' : 'صباحاً';
+                hours = hours % 12;
+                hours = hours || 12;
+                return hours + ':' + (minutes < 10 ? '0' : '') + minutes + ' ' + ampm;
             } catch (e) {
-
                 return '--';
-
             }
-
         }
 
 
@@ -4006,51 +2366,22 @@
         // تنسيق تاريخ التنبؤ
         // =========================================
 
-        function formatForecastDate(
-            dateString
-        ) {
-
-            if (!dateString)
-                return '--';
-
-
+        function formatForecastDate(dateString) {
+            if (!dateString) return '--';
             try {
-
-                const date =
-                    new Date(
-                        dateString +
-                        'T00:00:00'
-                    );
-
-
-                if (
-                    isNaN(
-                        date.getTime()
-                    )
-                ) {
-
+                const date = new Date(dateString + 'T00:00:00');
+                if (isNaN(date.getTime())) {
                     return dateString;
-
                 }
-
-
-                return date.toLocaleDateString(
-                    'ar-IQ',
-                    {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    }
-                );
-
-
+                return date.toLocaleDateString('ar-IQ', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
             } catch (e) {
-
                 return dateString;
-
             }
-
         }
 
 
@@ -4059,10 +2390,7 @@
         // =========================================
 
         function closeForecast() {
-
-            forecastModal.style.display =
-                'none';
-
+            forecastModal.style.display = 'none';
         }
 
 
@@ -4070,709 +2398,237 @@
         // أحداث النوافذ
         // =========================================
 
-        archiveModal.addEventListener(
-            'click',
-            function(e) {
-
-                if (
-                    e.target === this
-                ) {
-
-                    closeArchive();
-
-                }
-
+        archiveModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeArchive();
             }
-        );
+        });
 
-
-        forecastModal.addEventListener(
-            'click',
-            function(e) {
-
-                if (
-                    e.target === this
-                ) {
-
-                    closeForecast();
-
-                }
-
+        forecastModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeForecast();
             }
-        );
+        });
 
 
         // =========================================
         // بدء الصفحة
         // =========================================
 
-        window.weatherInitialized =
-            false;
+        window.weatherInitialized = false;
 
-
-        document.addEventListener(
-            'DOMContentLoaded',
-            function() {
-
-                createCurrentDataInterface();
-
-            }
-        );
-
+        document.addEventListener('DOMContentLoaded', function() {
+            createCurrentDataInterface();
+        });
 
 
         // =========================================
         // تبديل اللغة العربية / الإنجليزية
         // =========================================
 
-        let currentLanguage =
-            localStorage.getItem('weatherLanguage') === 'en'
-                ? 'en'
-                : 'ar';
-
+        let currentLanguage = localStorage.getItem('weatherLanguage') === 'en' ? 'en' : 'ar';
 
         const languagePairs = [
-
-            ['مركز بحوث وتكنولوجيا المعلومات والاتصالات - محطة الطقس',
-             'Research Center for Information and Communications Technology - Weather Station'],
-
-            ['وزارة التعليم العالي والبحث العلمي',
-             'Ministry of Higher Education and Scientific Research'],
-
-            ['هيئة البحث العلمي',
-             'Scientific Research Commission'],
-
-            ['مركز بحوث وتكنولوجيا المعلومات والاتصالات',
-             'Research Center for Information and Communications Technology'],
-
-            ['قسم الانتاج والتصنيع الالكتروني',
-             'Electronic Production and Manufacturing Department'],
-
-            ['دخول إلى محطة الطقس',
-             'Enter Weather Station'],
-
-            ['بغداد، العراق',
-             'Baghdad, Iraq'],
-
-            ['العودة',
-             'Back'],
-
-            ['محطة الطقس',
-             'Weather Station'],
-
-            ['محطة 1',
-             'Station 1'],
-
-            ['محطة 2',
-             'Station 2'],
-
-            ['محطة 3',
-             'Station 3'],
-
-            ['محطة 4',
-             'Station 4'],
-
-            ['جاري التحميل...',
-             'Loading...'],
-
-            ['تحديث',
-             'Refresh'],
-
-            ['تلقائي',
-             'Auto'],
-
-            ['متوقف',
-             'Stopped'],
-
-            ['جاري...',
-             'Loading...'],
-
-            ['أرشيف',
-             'Archive'],
-
-            ['التنبؤ',
-             'Forecast'],
-
-            ['اختر تاريخ',
-             'Select Date'],
-
-            ['بيانات الأرشيف',
-             'Archive Data'],
-
-            ['التنبؤ الجوي',
-             'Weather Forecast'],
-
-            ['الرجاء اختيار تاريخ أولاً',
-             'Please select a date first'],
-
-            ['لا توجد بيانات',
-             'No Data'],
-
-            ['لم يتم العثور على بيانات',
-             'No data found'],
-
-            ['للتاريخ المحدد',
-             'for the selected date'],
-
-            ['خطأ في التحميل',
-             'Loading Error'],
-
-            ['خطأ',
-             'Error'],
-
-            ['جاري إنشاء التنبؤ...',
-             'Generating forecast...'],
-
-            ['يتم تحليل بيانات المحطة',
-             'Analyzing station data'],
-
-            ['فشل إنشاء التنبؤ',
-             'Failed to generate forecast'],
-
-            ['تنبؤ 24 ساعة',
-             '24-Hour Forecast'],
-
-            ['تنبؤ 7 أيام',
-             '7-Day Forecast'],
-
-            ['لا توجد بيانات تنبؤ',
-             'No forecast data'],
-
-            ['التنبؤ خلال 24 ساعة للمحطة',
-             '24-Hour Forecast for Station'],
-
-            ['التنبؤ خلال 7 أيام للمحطة',
-             '7-Day Forecast for Station'],
-
-            ['احتمال وكمية المطر من AI',
-             'AI Rain Probability and Amount'],
-
-            ['أيام تاريخية فعلية:',
-             'Actual Historical Days:'],
-
-            ['وضع تمهيدي حتى يكتمل الأرشيف',
-             'Bootstrap mode until archive is complete'],
-
-            ['احتمال المطر AI',
-             'AI Rain Probability'],
-
-            ['كمية المطر AI',
-             'AI Rainfall'],
-
-            ['احتمال المطر',
-             'Rain Probability'],
-
-            ['القراءات',
-             'Readings'],
-
-            ['الحرارة',
-             'Temperature'],
-
-            ['الرطوبة',
-             'Humidity'],
-
-            ['الضغط',
-             'Pressure'],
-
-            ['سرعة الرياح',
-             'Wind Speed'],
-
-            ['اتجاه الرياح',
-             'Wind Direction'],
-
-            ['المطر',
-             'Rain'],
-
-            ['آخر تحديث:',
-             'Last Update:'],
-
-            ['🌧️ ممطر',
-             '🌧️ Rainy'],
-
-            ['☀️ غير ممطر',
-             '☀️ No Rain'],
-
-            ['متصل',
-             'Connected'],
-
-            ['غير متصل',
-             'Disconnected'],
-
-            ['غير معروف',
-             'Unknown'],
-
-            ['الآن',
-             'Now'],
-
-            ['صباحاً',
-             'AM'],
-
-            ['مساءً',
-             'PM'],
-
-            ['الوقت',
-             'Time'],
-
-            ['التاريخ',
-             'Date']
+            ['مركز بحوث وتكنولوجيا المعلومات والاتصالات - محطة الطقس', 'Research Center for Information and Communications Technology - Weather Station'],
+            ['وزارة التعليم العالي والبحث العلمي', 'Ministry of Higher Education and Scientific Research'],
+            ['هيئة البحث العلمي', 'Scientific Research Commission'],
+            ['مركز بحوث وتكنولوجيا المعلومات والاتصالات', 'Research Center for Information and Communications Technology'],
+            ['قسم الانتاج والتصنيع الالكتروني', 'Electronic Production and Manufacturing Department'],
+            ['دخول إلى محطة الطقس', 'Enter Weather Station'],
+            ['بغداد، العراق', 'Baghdad, Iraq'],
+            ['العودة', 'Back'],
+            ['محطة الطقس', 'Weather Station'],
+            ['محطة 1', 'Station 1'],
+            ['محطة 2', 'Station 2'],
+            ['محطة 3', 'Station 3'],
+            ['محطة 4', 'Station 4'],
+            ['جاري التحميل...', 'Loading...'],
+            ['تحديث', 'Refresh'],
+            ['تلقائي', 'Auto'],
+            ['متوقف', 'Stopped'],
+            ['جاري...', 'Loading...'],
+            ['أرشيف', 'Archive'],
+            ['التنبؤ', 'Forecast'],
+            ['اختر تاريخ', 'Select Date'],
+            ['بيانات الأرشيف', 'Archive Data'],
+            ['التنبؤ الجوي', 'Weather Forecast'],
+            ['الرجاء اختيار تاريخ أولاً', 'Please select a date first'],
+            ['لا توجد بيانات', 'No Data'],
+            ['لم يتم العثور على بيانات', 'No data found'],
+            ['للتاريخ المحدد', 'for the selected date'],
+            ['خطأ في التحميل', 'Loading Error'],
+            ['خطأ', 'Error'],
+            ['جاري إنشاء التنبؤ...', 'Generating forecast...'],
+            ['يتم تحليل بيانات المحطة', 'Analyzing station data'],
+            ['فشل إنشاء التنبؤ', 'Failed to generate forecast'],
+            ['تنبؤ 24 ساعة', '24-Hour Forecast'],
+            ['تنبؤ 7 أيام', '7-Day Forecast'],
+            ['لا توجد بيانات تنبؤ', 'No forecast data'],
+            ['التنبؤ خلال 24 ساعة للمحطة', '24-Hour Forecast for Station'],
+            ['التنبؤ خلال 7 أيام للمحطة', '7-Day Forecast for Station'],
+            ['احتمال وكمية المطر من AI', 'AI Rain Probability and Amount'],
+            ['أيام تاريخية فعلية:', 'Actual Historical Days:'],
+            ['وضع تمهيدي حتى يكتمل الأرشيف', 'Bootstrap mode until archive is complete'],
+            ['احتمال المطر AI', 'AI Rain Probability'],
+            ['كمية المطر AI', 'AI Rainfall'],
+            ['احتمال المطر', 'Rain Probability'],
+            ['القراءات', 'Readings'],
+            ['الحرارة', 'Temperature'],
+            ['الرطوبة', 'Humidity'],
+            ['الضغط', 'Pressure'],
+            ['سرعة الرياح', 'Wind Speed'],
+            ['اتجاه الرياح', 'Wind Direction'],
+            ['المطر', 'Rain'],
+            ['آخر تحديث:', 'Last Update:'],
+            ['🌧️ ممطر', '🌧️ Rainy'],
+            ['☀️ غير ممطر', '☀️ No Rain'],
+            ['متصل', 'Connected'],
+            ['غير متصل', 'Disconnected'],
+            ['غير معروف', 'Unknown'],
+            ['الآن', 'Now'],
+            ['صباحاً', 'AM'],
+            ['مساءً', 'PM'],
+            ['الوقت', 'Time'],
+            ['التاريخ', 'Date']
         ];
 
+        const arToEn = new Map(languagePairs);
+        const enToAr = new Map(languagePairs.map(function(pair) {
+            return [pair[1], pair[0]];
+        }));
 
-        const arToEn =
-            new Map(
-                languagePairs
-            );
-
-
-        const enToAr =
-            new Map(
-                languagePairs.map(
-                    function(pair) {
-
-                        return [
-                            pair[1],
-                            pair[0]
-                        ];
-
-                    }
-                )
-            );
-
-
-        function translateTextValue(
-            value
-        ) {
-
-            if (
-                typeof value !== 'string' ||
-                value.trim() === ''
-            ) {
-
+        function translateTextValue(value) {
+            if (typeof value !== 'string' || value.trim() === '') {
                 return value;
-
             }
-
-
-            let result =
-                value;
-
-
-            const map =
-                currentLanguage === 'en'
-                    ? arToEn
-                    : enToAr;
-
-
-            const entries =
-                Array.from(
-                    map.entries()
-                ).sort(
-                    function(a, b) {
-
-                        return (
-                            b[0].length -
-                            a[0].length
-                        );
-
-                    }
-                );
-
-
-            entries.forEach(
-                function(entry) {
-
-                    const from =
-                        entry[0];
-
-                    const to =
-                        entry[1];
-
-
-                    if (
-                        result.includes(from)
-                    ) {
-
-                        result =
-                            result.split(from)
-                                .join(to);
-
-                    }
-
+            let result = value;
+            const map = currentLanguage === 'en' ? arToEn : enToAr;
+            const entries = Array.from(map.entries()).sort(function(a, b) {
+                return b[0].length - a[0].length;
+            });
+            entries.forEach(function(entry) {
+                const from = entry[0];
+                const to = entry[1];
+                if (result.includes(from)) {
+                    result = result.split(from).join(to);
                 }
-            );
-
-
+            });
             return result;
-
         }
 
+        let languageUpdateRunning = false;
 
-        let languageUpdateRunning =
-            false;
-
-
-        function translateNode(
-            root
-        ) {
-
-            if (!root)
-                return;
-
-
-            if (
-                root.nodeType ===
-                Node.TEXT_NODE
-            ) {
-
-                const translated =
-                    translateTextValue(
-                        root.nodeValue
-                    );
-
-
-                if (
-                    translated !==
-                    root.nodeValue
-                ) {
-
-                    root.nodeValue =
-                        translated;
-
+        function translateNode(root) {
+            if (!root) return;
+            if (root.nodeType === Node.TEXT_NODE) {
+                const translated = translateTextValue(root.nodeValue);
+                if (translated !== root.nodeValue) {
+                    root.nodeValue = translated;
                 }
-
-
                 return;
-
             }
-
-
-            if (
-                root.nodeType !==
-                Node.ELEMENT_NODE &&
-                root.nodeType !==
-                Node.DOCUMENT_NODE
-            ) {
-
+            if (root.nodeType !== Node.ELEMENT_NODE && root.nodeType !== Node.DOCUMENT_NODE) {
                 return;
-
             }
-
-
-            if (
-                root.nodeType ===
-                Node.ELEMENT_NODE &&
-                (
-                    root.tagName === 'SCRIPT' ||
-                    root.tagName === 'STYLE'
-                )
-            ) {
-
+            if (root.nodeType === Node.ELEMENT_NODE && (root.tagName === 'SCRIPT' || root.tagName === 'STYLE')) {
                 return;
-
             }
-
-
-            const walker =
-                document.createTreeWalker(
-                    root,
-                    NodeFilter.SHOW_TEXT
-                );
-
-
+            const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
             const nodes = [];
-
             let node;
-
-
-            while (
-                node =
-                    walker.nextNode()
-            ) {
-
-                const parent =
-                    node.parentElement;
-
-
-                if (
-                    parent &&
-                    parent.tagName !== 'SCRIPT' &&
-                    parent.tagName !== 'STYLE'
-                ) {
-
+            while (node = walker.nextNode()) {
+                const parent = node.parentElement;
+                if (parent && parent.tagName !== 'SCRIPT' && parent.tagName !== 'STYLE') {
                     nodes.push(node);
-
                 }
-
             }
-
-
-            nodes.forEach(
-                function(textNode) {
-
-                    const translated =
-                        translateTextValue(
-                            textNode.nodeValue
-                        );
-
-
-                    if (
-                        translated !==
-                        textNode.nodeValue
-                    ) {
-
-                        textNode.nodeValue =
-                            translated;
-
-                    }
-
+            nodes.forEach(function(textNode) {
+                const translated = translateTextValue(textNode.nodeValue);
+                if (translated !== textNode.nodeValue) {
+                    textNode.nodeValue = translated;
                 }
-            );
-
+            });
         }
-
 
         function updateLanguageButton() {
-
-            const languageBtn =
-                document.getElementById(
-                    'languageBtn'
-                );
-
-
-            if (!languageBtn)
-                return;
-
-
-            const newHTML =
-                currentLanguage === 'ar'
-                    ? '<i class="fas fa-language"></i> English'
-                    : '<i class="fas fa-language"></i> العربية';
-
-
-            if (
-                languageBtn.innerHTML.trim() !==
-                newHTML.trim()
-            ) {
-
-                languageBtn.innerHTML =
-                    newHTML;
-
+            const languageBtn = document.getElementById('languageBtn');
+            if (!languageBtn) return;
+            const newHTML = currentLanguage === 'ar'
+                ? '<i class="fas fa-language"></i> English'
+                : '<i class="fas fa-language"></i> العربية';
+            if (languageBtn.innerHTML.trim() !== newHTML.trim()) {
+                languageBtn.innerHTML = newHTML;
             }
-
         }
-
 
         function updateLanguageDirection() {
-
-            const isArabic =
-                currentLanguage === 'ar';
-
-
-            document.documentElement.lang =
-                isArabic
-                    ? 'ar'
-                    : 'en';
-
-
-            document.documentElement.dir =
-                isArabic
-                    ? 'rtl'
-                    : 'ltr';
-
-
-            document.body.dir =
-                isArabic
-                    ? 'rtl'
-                    : 'ltr';
-
+            const isArabic = currentLanguage === 'ar';
+            document.documentElement.lang = isArabic ? 'ar' : 'en';
+            document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
+            document.body.dir = isArabic ? 'rtl' : 'ltr';
         }
-
 
         function updateLanguagePlaceholder() {
-
-            const archiveDate =
-                document.getElementById(
-                    'archiveDate'
-                );
-
-
+            const archiveDate = document.getElementById('archiveDate');
             if (archiveDate) {
-
-                archiveDate.placeholder =
-                    currentLanguage === 'ar'
-                        ? 'اختر تاريخ'
-                        : 'Select Date';
-
+                archiveDate.placeholder = currentLanguage === 'ar' ? 'اختر تاريخ' : 'Select Date';
             }
-
         }
-
 
         function updateFlatpickrLanguage() {
-
-            if (!flatpickrInstance)
-                return;
-
-
+            if (!flatpickrInstance) return;
             try {
-
-                if (
-                    currentLanguage === 'ar' &&
-                    flatpickr.l10ns &&
-                    flatpickr.l10ns.ar
-                ) {
-
-                    flatpickrInstance.set(
-                        'locale',
-                        flatpickr.l10ns.ar
-                    );
-
+                if (currentLanguage === 'ar' && flatpickr.l10ns && flatpickr.l10ns.ar) {
+                    flatpickrInstance.set('locale', flatpickr.l10ns.ar);
                 } else {
-
-                    flatpickrInstance.set(
-                        'locale',
-                        'default'
-                    );
-
+                    flatpickrInstance.set('locale', 'default');
                 }
-
             } catch (error) {
-
-                console.log(
-                    'Language calendar update:',
-                    error
-                );
-
+                console.log('Language calendar update:', error);
             }
-
         }
-
 
         function applyLanguage() {
-
-            if (languageUpdateRunning)
-                return;
-
-
-            languageUpdateRunning =
-                true;
-
-
+            if (languageUpdateRunning) return;
+            languageUpdateRunning = true;
             updateLanguageDirection();
-
-
-            document.title =
-                currentLanguage === 'ar'
-                    ? 'مركز بحوث وتكنولوجيا المعلومات والاتصالات - محطة الطقس'
-                    : 'Research Center for Information and Communications Technology - Weather Station';
-
-
-            translateNode(
-                document.body
-            );
-
-
+            document.title = currentLanguage === 'ar'
+                ? 'مركز بحوث وتكنولوجيا المعلومات والاتصالات - محطة الطقس'
+                : 'Research Center for Information and Communications Technology - Weather Station';
+            translateNode(document.body);
             updateLanguagePlaceholder();
-
             updateLanguageButton();
-
             updateFlatpickrLanguage();
-
-
-            languageUpdateRunning =
-                false;
-
+            languageUpdateRunning = false;
         }
-
 
         function toggleLanguage() {
-
-            currentLanguage =
-                currentLanguage === 'ar'
-                    ? 'en'
-                    : 'ar';
-
-
-            localStorage.setItem(
-                'weatherLanguage',
-                currentLanguage
-            );
-
-
+            currentLanguage = currentLanguage === 'ar' ? 'en' : 'ar';
+            localStorage.setItem('weatherLanguage', currentLanguage);
             applyLanguage();
-
         }
 
+        const languageObserver = new MutationObserver(function(mutations) {
+            if (languageUpdateRunning) return;
+            if (currentLanguage !== 'en') return;
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    translateNode(node);
+                });
+            });
+            updateLanguageButton();
+        });
 
-        const languageObserver =
-            new MutationObserver(
-                function(mutations) {
+        languageObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
 
-                    if (
-                        languageUpdateRunning
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    if (
-                        currentLanguage !== 'en'
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    mutations.forEach(
-                        function(mutation) {
-
-                            mutation.addedNodes.forEach(
-                                function(node) {
-
-                                    translateNode(
-                                        node
-                                    );
-
-                                }
-                            );
-
-                        }
-                    );
-
-
-                    updateLanguageButton();
-
-                }
-            );
-
-
-        languageObserver.observe(
-            document.body,
-            {
-                childList: true,
-                subtree: true
-            }
-        );
-
-
-        document.addEventListener(
-            'DOMContentLoaded',
-            function() {
-
-                setTimeout(
-                    function() {
-
-                        applyLanguage();
-
-                    },
-                    150
-                );
-
-            }
-        );
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                applyLanguage();
+            }, 150);
+        });
 
     </script>
 
