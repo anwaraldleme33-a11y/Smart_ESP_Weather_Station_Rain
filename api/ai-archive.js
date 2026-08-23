@@ -2,10 +2,11 @@ import { neon } from "@neondatabase/serverless";
 
 const sql = neon(process.env.DATABASE_URL);
 
+
 // =========================================
 // حساب Dew Point
-// Magnus Formula
 // =========================================
+
 function calculateDewPoint(tempC, humidity) {
 
   if (
@@ -26,15 +27,19 @@ function calculateDewPoint(tempC, humidity) {
     (a * tempC) / (b + tempC);
 
   const dewPoint =
-    (b * gamma) / (a - gamma);
+    (b * gamma) /
+    (a - gamma);
 
-  return Number(dewPoint.toFixed(2));
+  return Number(
+    dewPoint.toFixed(2)
+  );
 }
 
 
 // =========================================
-// تحويل اتجاه الرياح إلى درجة
+// اتجاه الرياح إلى درجة
 // =========================================
+
 function windDirectionToDegree(direction) {
 
   if (!direction) return 0;
@@ -45,26 +50,33 @@ function windDirectionToDegree(direction) {
       .toUpperCase();
 
   const map = {
-    "N": 0,
-    "NE": 45,
-    "E": 90,
-    "SE": 135,
-    "S": 180,
-    "SW": 225,
-    "W": 270,
-    "NW": 315
+    N: 0,
+    NE: 45,
+    E: 90,
+    SE: 135,
+    S: 180,
+    SW: 225,
+    W: 270,
+    NW: 315
   };
 
-  if (map[d] !== undefined) {
+  if (
+    map[d] !== undefined
+  ) {
     return map[d];
   }
 
-  // إذا كانت القيمة رقمية أصلاً
   const num =
     parseFloat(d);
 
   if (!isNaN(num)) {
-    return num % 360;
+
+    return (
+      (
+        num % 360
+      ) + 360
+    ) % 360;
+
   }
 
   return 0;
@@ -72,8 +84,9 @@ function windDirectionToDegree(direction) {
 
 
 // =========================================
-// حساب متوسط اتجاه الرياح Circular Mean
+// المتوسط الدائري لاتجاه الرياح
 // =========================================
+
 function circularMean(degreesArray) {
 
   if (
@@ -90,7 +103,9 @@ function circularMean(degreesArray) {
     function(deg) {
 
       const rad =
-        deg * Math.PI / 180;
+        deg *
+        Math.PI /
+        180;
 
       sinSum +=
         Math.sin(rad);
@@ -101,23 +116,32 @@ function circularMean(degreesArray) {
     }
   );
 
+
   const avgSin =
     sinSum /
     degreesArray.length;
+
 
   const avgCos =
     cosSum /
     degreesArray.length;
 
+
   let angle =
     Math.atan2(
       avgSin,
       avgCos
-    ) * 180 / Math.PI;
+    ) *
+    180 /
+    Math.PI;
 
-  if (angle < 0) {
+
+  if (
+    angle < 0
+  ) {
     angle += 360;
   }
+
 
   return Number(
     angle.toFixed(2)
@@ -126,14 +150,314 @@ function circularMean(degreesArray) {
 
 
 // =========================================
+// إنشاء سجل يومي واحد
+// =========================================
+
+async function createDailyAIArchive(
+  device,
+  targetDate
+) {
+
+  const rows =
+    await sql`
+
+      SELECT
+        device_id,
+        temperture,
+        humidity,
+        pressure,
+        winds,
+        windd,
+        rainy,
+        reading_date,
+        time
+
+      FROM weather_archive
+
+      WHERE
+        device_id = ${device}
+
+      AND
+        reading_date = ${targetDate}
+
+      ORDER BY
+        time ASC
+
+    `;
+
+
+  if (
+    !rows ||
+    rows.length === 0
+  ) {
+
+    return {
+      success: false,
+      date: targetDate,
+      reason: "No source readings"
+    };
+
+  }
+
+
+  let tempSum = 0;
+  let humiditySum = 0;
+  let pressureSum = 0;
+  let windSpeedSum = 0;
+
+  let tempCount = 0;
+  let humidityCount = 0;
+  let pressureCount = 0;
+  let windSpeedCount = 0;
+
+  let rainyCount = 0;
+
+  const directions = [];
+
+
+  rows.forEach(
+    function(row) {
+
+      const temp =
+        parseFloat(
+          row.temperture
+        );
+
+      const humidity =
+        parseFloat(
+          row.humidity
+        );
+
+      const pressure =
+        parseFloat(
+          row.pressure
+        );
+
+      const windSpeed =
+        parseFloat(
+          row.winds
+        );
+
+
+      if (
+        !isNaN(temp)
+      ) {
+
+        tempSum += temp;
+        tempCount++;
+
+      }
+
+
+      if (
+        !isNaN(humidity)
+      ) {
+
+        humiditySum +=
+          humidity;
+
+        humidityCount++;
+
+      }
+
+
+      if (
+        !isNaN(pressure)
+      ) {
+
+        pressureSum +=
+          pressure;
+
+        pressureCount++;
+
+      }
+
+
+      if (
+        !isNaN(windSpeed)
+      ) {
+
+        windSpeedSum +=
+          windSpeed;
+
+        windSpeedCount++;
+
+      }
+
+
+      if (
+        row.rainy === true ||
+        row.rainy === 1 ||
+        row.rainy === "1" ||
+        String(row.rainy)
+          .toLowerCase() ===
+          "true"
+      ) {
+
+        rainyCount++;
+
+      }
+
+
+      directions.push(
+        windDirectionToDegree(
+          row.windd
+        )
+      );
+
+    }
+  );
+
+
+  const avgTemperature =
+    tempCount > 0
+      ? tempSum /
+        tempCount
+      : 0;
+
+
+  const avgHumidity =
+    humidityCount > 0
+      ? humiditySum /
+        humidityCount
+      : 0;
+
+
+  const avgPressure =
+    pressureCount > 0
+      ? pressureSum /
+        pressureCount
+      : 0;
+
+
+  const avgWindSpeed =
+    windSpeedCount > 0
+      ? windSpeedSum /
+        windSpeedCount
+      : 0;
+
+
+  const avgWindDirection =
+    circularMean(
+      directions
+    );
+
+
+  const dewPoint =
+    calculateDewPoint(
+      avgTemperature,
+      avgHumidity
+    );
+
+
+  // =========================================
+  // المطر المؤقت
+  // =========================================
+
+  const rainfall =
+    rainyCount > 0
+      ? 0.2
+      : 0;
+
+
+  // =========================================
+  // حفظ / تحديث
+  // =========================================
+
+  const saved =
+    await sql`
+
+      INSERT INTO
+        ai_weather_archive
+      (
+        device_id,
+        reading_date,
+        temperature,
+        humidity,
+        dewpoint,
+        pressure,
+        wind_speed,
+        wind_direction,
+        rainfall
+      )
+
+      VALUES
+      (
+        ${device},
+        ${targetDate},
+        ${avgTemperature.toFixed(2)},
+        ${avgHumidity.toFixed(2)},
+        ${dewPoint},
+        ${avgPressure.toFixed(2)},
+        ${avgWindSpeed.toFixed(2)},
+        ${avgWindDirection},
+        ${rainfall}
+      )
+
+      ON CONFLICT
+      (
+        device_id,
+        reading_date
+      )
+
+      DO UPDATE SET
+
+        temperature =
+          EXCLUDED.temperature,
+
+        humidity =
+          EXCLUDED.humidity,
+
+        dewpoint =
+          EXCLUDED.dewpoint,
+
+        pressure =
+          EXCLUDED.pressure,
+
+        wind_speed =
+          EXCLUDED.wind_speed,
+
+        wind_direction =
+          EXCLUDED.wind_direction,
+
+        rainfall =
+          EXCLUDED.rainfall
+
+      RETURNING *
+
+    `;
+
+
+  return {
+
+    success: true,
+
+    date:
+      targetDate,
+
+    sourceReadings:
+      rows.length,
+
+    dailyData:
+      saved[0]
+
+  };
+
+}
+
+
+// =========================================
 // API
 // =========================================
+
 export default async function handler(
   req,
   res
 ) {
 
-  if (req.method !== "GET") {
+  if (
+    req.method !== "GET"
+  ) {
 
     return res
       .status(405)
@@ -144,319 +468,161 @@ export default async function handler(
 
   }
 
+
   try {
 
     const device =
       req.query.device ||
       "max1";
 
-    const date =
-      req.query.date;
-
 
     // =========================================
-    // إذا لم يرسل تاريخ
-    // استخدم آخر يوم موجود في weather_archive
+    // 1. جلب كل الأيام الموجودة في
+    // weather_archive
+    // وغير الموجودة في AI archive
     // =========================================
 
-    let targetDate =
-      date;
-
-
-    if (!targetDate) {
-
-      const lastDate =
-        await sql`
-          SELECT
-            MAX(reading_date) AS reading_date
-          FROM weather_archive
-          WHERE device_id = ${device}
-        `;
-
-
-      if (
-        !lastDate ||
-        lastDate.length === 0 ||
-        !lastDate[0].reading_date
-      ) {
-
-        return res
-          .status(404)
-          .json({
-            success: false,
-            error:
-              "No archive data found for this device"
-          });
-
-      }
-
-
-      targetDate =
-        String(
-          lastDate[0].reading_date
-        ).slice(0, 10);
-
-    }
-
-
-    // =========================================
-    // جلب بيانات اليوم
-    // =========================================
-
-    const rows =
+    const missingDates =
       await sql`
-        SELECT
-          device_id,
-          temperture,
-          humidity,
-          pressure,
-          winds,
-          windd,
-          rainy,
-          reading_date,
-          time
-        FROM weather_archive
-        WHERE device_id = ${device}
-        AND reading_date = ${targetDate}
-        ORDER BY time ASC
+
+        SELECT DISTINCT
+          w.reading_date
+
+        FROM weather_archive w
+
+        LEFT JOIN ai_weather_archive a
+
+          ON
+            a.device_id =
+            w.device_id
+
+          AND
+            a.reading_date =
+            w.reading_date
+
+        WHERE
+          w.device_id =
+          ${device}
+
+        AND
+          a.id IS NULL
+
+        ORDER BY
+          w.reading_date ASC
+
       `;
 
 
+    // =========================================
+    // لا توجد أيام ناقصة
+    // =========================================
+
     if (
-      !rows ||
-      rows.length === 0
+      !missingDates ||
+      missingDates.length === 0
     ) {
 
       return res
-        .status(404)
+        .status(200)
         .json({
-          success: false,
-          device: device,
-          date: targetDate,
-          error:
-            "No archive data found for this date"
+
+          success: true,
+
+          message:
+            "AI archive is already up to date",
+
+          device:
+            device,
+
+          missingDays:
+            0,
+
+          createdDays:
+            0,
+
+          results:
+            []
+
         });
 
     }
 
 
     // =========================================
-    // حساب المتوسطات
+    // 2. إنشاء جميع الأيام الناقصة
     // =========================================
 
-    let tempSum = 0;
-    let humiditySum = 0;
-    let pressureSum = 0;
-    let windSpeedSum = 0;
-
-    let tempCount = 0;
-    let humidityCount = 0;
-    let pressureCount = 0;
-    let windSpeedCount = 0;
-
-    let rainyCount = 0;
-
-    const directions =
+    const results =
       [];
 
 
-    rows.forEach(
-      function(row) {
+    for (
+      const row
+      of missingDates
+    ) {
 
-        const temp =
-          parseFloat(
-            row.temperture
-          );
-
-        const humidity =
-          parseFloat(
-            row.humidity
-          );
-
-        const pressure =
-          parseFloat(
-            row.pressure
-          );
-
-        const windSpeed =
-          parseFloat(
-            row.winds
-          );
-
-
-        if (!isNaN(temp)) {
-
-          tempSum += temp;
-          tempCount++;
-
-        }
-
-
-        if (!isNaN(humidity)) {
-
-          humiditySum +=
-            humidity;
-
-          humidityCount++;
-
-        }
-
-
-        if (!isNaN(pressure)) {
-
-          pressureSum +=
-            pressure;
-
-          pressureCount++;
-
-        }
-
-
-        if (!isNaN(windSpeed)) {
-
-          windSpeedSum +=
-            windSpeed;
-
-          windSpeedCount++;
-
-        }
-
-
-        if (
-          row.rainy === true ||
-          row.rainy === 1 ||
-          row.rainy === "true" ||
-          row.rainy === "1"
-        ) {
-
-          rainyCount++;
-
-        }
-
-
-        directions.push(
-          windDirectionToDegree(
-            row.windd
-          )
+      const date =
+        String(
+          row.reading_date
+        ).slice(
+          0,
+          10
         );
 
+
+      try {
+
+        const result =
+          await createDailyAIArchive(
+            device,
+            date
+          );
+
+
+        results.push(
+          result
+        );
+
+
+      } catch (
+        error
+      ) {
+
+        results.push({
+
+          success: false,
+
+          date:
+            date,
+
+          error:
+            error.message
+
+        });
+
       }
-    );
 
-
-    const avgTemperature =
-      tempCount > 0
-        ? tempSum / tempCount
-        : 0;
-
-
-    const avgHumidity =
-      humidityCount > 0
-        ? humiditySum /
-          humidityCount
-        : 0;
-
-
-    const avgPressure =
-      pressureCount > 0
-        ? pressureSum /
-          pressureCount
-        : 0;
-
-
-    const avgWindSpeed =
-      windSpeedCount > 0
-        ? windSpeedSum /
-          windSpeedCount
-        : 0;
-
-
-    const avgWindDirection =
-      circularMean(
-        directions
-      );
-
-
-    const dewPoint =
-      calculateDewPoint(
-        avgTemperature,
-        avgHumidity
-      );
+    }
 
 
     // =========================================
-    // المطر
-    //
-    // حاليا الحساس Boolean فقط.
-    // إذا ظهر المطر مرة واحدة على الأقل
-    // نضع 0.2 mm مؤقتاً.
+    // 3. الإحصائيات
     // =========================================
 
-    const rainfall =
-      rainyCount > 0
-        ? 0.2
-        : 0;
+    const createdDays =
+      results.filter(
+        item =>
+          item.success ===
+          true
+      ).length;
 
 
-    // =========================================
-    // الحفظ في جدول AI
-    // =========================================
-
-    const saved =
-      await sql`
-        INSERT INTO ai_weather_archive (
-          device_id,
-          reading_date,
-          temperature,
-          humidity,
-          dewpoint,
-          pressure,
-          wind_speed,
-          wind_direction,
-          rainfall
-        )
-        VALUES (
-          ${device},
-          ${targetDate},
-          ${avgTemperature.toFixed(2)},
-          ${avgHumidity.toFixed(2)},
-          ${dewPoint},
-          ${avgPressure.toFixed(2)},
-          ${avgWindSpeed.toFixed(2)},
-          ${avgWindDirection},
-          ${rainfall}
-        )
-
-        ON CONFLICT (
-          device_id,
-          reading_date
-        )
-
-        DO UPDATE SET
-
-          temperature =
-            EXCLUDED.temperature,
-
-          humidity =
-            EXCLUDED.humidity,
-
-          dewpoint =
-            EXCLUDED.dewpoint,
-
-          pressure =
-            EXCLUDED.pressure,
-
-          wind_speed =
-            EXCLUDED.wind_speed,
-
-          wind_direction =
-            EXCLUDED.wind_direction,
-
-          rainfall =
-            EXCLUDED.rainfall
-
-        RETURNING *
-      `;
+    const failedDays =
+      results.filter(
+        item =>
+          item.success !==
+          true
+      ).length;
 
 
     // =========================================
@@ -466,26 +632,34 @@ export default async function handler(
     return res
       .status(200)
       .json({
-        success: true,
+
+        success:
+          true,
 
         message:
-          "AI daily archive created successfully",
+          "Missing AI archive days processed",
 
         device:
           device,
 
-        date:
-          targetDate,
+        missingDays:
+          missingDates.length,
 
-        sourceReadings:
-          rows.length,
+        createdDays:
+          createdDays,
 
-        dailyData:
-          saved[0]
+        failedDays:
+          failedDays,
+
+        results:
+          results
+
       });
 
 
-  } catch (error) {
+  } catch (
+    error
+  ) {
 
     console.error(
       "AI Archive Error:",
@@ -496,9 +670,13 @@ export default async function handler(
     return res
       .status(500)
       .json({
-        success: false,
+
+        success:
+          false,
+
         error:
           error.message
+
       });
 
   }
