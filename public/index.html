@@ -1385,6 +1385,59 @@
             }
         }
 
+    
+        /* =========================================
+           Reading size + slightly smaller cards
+           Visual changes only
+        ========================================= */
+
+        #weatherPage .reading-value {
+            font-size: clamp(1.35rem, 2.1vw, 1.85rem);
+            line-height: 1.15;
+            font-weight: 700;
+        }
+
+        #weatherPage .reading-value .unit {
+            font-size: clamp(0.78rem, 1vw, 0.95rem);
+        }
+
+        #weatherPage .reading-info h3 {
+            font-size: clamp(0.72rem, 0.9vw, 0.85rem);
+        }
+
+        #weatherPage .readings-card,
+        #weatherPage .compass-card {
+            padding: 8px 10px;
+        }
+
+        #weatherPage .reading-item {
+            padding: 6px 8px;
+            gap: 9px;
+        }
+
+        #weatherPage .reading-icon {
+            width: 32px;
+            height: 32px;
+        }
+
+        #weatherPage .card-title {
+            margin-bottom: 7px;
+        }
+
+        #weatherPage .readings-grid {
+            gap: 6px;
+        }
+
+        #weatherPage .system-info {
+            margin-top: 4px;
+            padding: 4px 8px;
+        }
+
+        #weatherPage .compass-wrapper {
+            width: min(22vh, 175px);
+            height: min(22vh, 175px);
+        }
+
     </style>
 </head>
 
