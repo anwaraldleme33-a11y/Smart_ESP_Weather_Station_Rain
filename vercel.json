@@ -5,10 +5,15 @@
       "includeFiles": "ai_models_json/**"
     }
   },
+
   "crons": [
     {
       "path": "/api/archive",
       "schedule": "10 21 * * *"
+    },
+    {
+      "path": "/api/ai-archive-cron",
+      "schedule": "20 21 * * *"
     }
   ]
 }
