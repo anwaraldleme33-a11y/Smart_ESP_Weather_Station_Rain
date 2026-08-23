@@ -37,47 +37,73 @@ function calculateDewPoint(tempC, humidity) {
 
 
 // =========================================
-// اتجاه الرياح إلى درجة
+// تحويل اتجاه الرياح إلى درجة
 // =========================================
 
 function windDirectionToDegree(direction) {
 
-  if (!direction) return 0;
+  if (!direction) {
+    return 0;
+  }
 
   const d =
     String(direction)
       .trim()
       .toUpperCase();
 
+
   const map = {
+
     N: 0,
+    NNE: 22.5,
     NE: 45,
+    ENE: 67.5,
+
     E: 90,
+    ESE: 112.5,
     SE: 135,
+    SSE: 157.5,
+
     S: 180,
+    SSW: 202.5,
     SW: 225,
+    WSW: 247.5,
+
     W: 270,
-    NW: 315
+    WNW: 292.5,
+    NW: 315,
+    NNW: 337.5
+
   };
+
 
   if (
     map[d] !== undefined
   ) {
+
     return map[d];
+
   }
 
+
+  // إذا كانت القيمة رقمية
   const num =
     parseFloat(d);
 
-  if (!isNaN(num)) {
+
+  if (
+    !isNaN(num)
+  ) {
 
     return (
       (
         num % 360
-      ) + 360
+      ) +
+      360
     ) % 360;
 
   }
+
 
   return 0;
 }
@@ -93,11 +119,15 @@ function circularMean(degreesArray) {
     !degreesArray ||
     degreesArray.length === 0
   ) {
+
     return 0;
+
   }
+
 
   let sinSum = 0;
   let cosSum = 0;
+
 
   degreesArray.forEach(
     function(deg) {
@@ -107,8 +137,10 @@ function circularMean(degreesArray) {
         Math.PI /
         180;
 
+
       sinSum +=
         Math.sin(rad);
+
 
       cosSum +=
         Math.cos(rad);
@@ -139,7 +171,9 @@ function circularMean(degreesArray) {
   if (
     angle < 0
   ) {
+
     angle += 360;
+
   }
 
 
@@ -150,13 +184,17 @@ function circularMean(degreesArray) {
 
 
 // =========================================
-// إنشاء سجل يومي واحد
+// إنشاء سجل يومي واحد للـ AI
 // =========================================
 
 async function createDailyAIArchive(
   device,
   targetDate
 ) {
+
+  // =========================================
+  // جلب قراءات اليوم من weather_archive
+  // =========================================
 
   const rows =
     await sql`
@@ -186,34 +224,57 @@ async function createDailyAIArchive(
     `;
 
 
+  // =========================================
+  // لا توجد بيانات
+  // =========================================
+
   if (
     !rows ||
     rows.length === 0
   ) {
 
     return {
-      success: false,
-      date: targetDate,
-      reason: "No source readings"
+
+      success:
+        false,
+
+      date:
+        targetDate,
+
+      reason:
+        "No source readings"
+
     };
 
   }
 
+
+  // =========================================
+  // متغيرات المتوسط
+  // =========================================
 
   let tempSum = 0;
   let humiditySum = 0;
   let pressureSum = 0;
   let windSpeedSum = 0;
 
+
   let tempCount = 0;
   let humidityCount = 0;
   let pressureCount = 0;
   let windSpeedCount = 0;
 
+
   let rainyCount = 0;
 
-  const directions = [];
 
+  const directions =
+    [];
+
+
+  // =========================================
+  // قراءة البيانات
+  // =========================================
 
   rows.forEach(
     function(row) {
@@ -223,15 +284,18 @@ async function createDailyAIArchive(
           row.temperture
         );
 
+
       const humidity =
         parseFloat(
           row.humidity
         );
 
+
       const pressure =
         parseFloat(
           row.pressure
         );
+
 
       const windSpeed =
         parseFloat(
@@ -239,16 +303,20 @@ async function createDailyAIArchive(
         );
 
 
+      // Temperature
       if (
         !isNaN(temp)
       ) {
 
-        tempSum += temp;
+        tempSum +=
+          temp;
+
         tempCount++;
 
       }
 
 
+      // Humidity
       if (
         !isNaN(humidity)
       ) {
@@ -261,6 +329,7 @@ async function createDailyAIArchive(
       }
 
 
+      // Pressure
       if (
         !isNaN(pressure)
       ) {
@@ -273,6 +342,7 @@ async function createDailyAIArchive(
       }
 
 
+      // Wind speed
       if (
         !isNaN(windSpeed)
       ) {
@@ -285,11 +355,14 @@ async function createDailyAIArchive(
       }
 
 
+      // Rain
       if (
         row.rainy === true ||
         row.rainy === 1 ||
         row.rainy === "1" ||
-        String(row.rainy)
+        String(
+          row.rainy
+        )
           .toLowerCase() ===
           "true"
       ) {
@@ -299,15 +372,22 @@ async function createDailyAIArchive(
       }
 
 
+      // Wind direction
       directions.push(
+
         windDirectionToDegree(
           row.windd
         )
+
       );
 
     }
   );
 
+
+  // =========================================
+  // المتوسطات
+  // =========================================
 
   const avgTemperature =
     tempCount > 0
@@ -343,6 +423,10 @@ async function createDailyAIArchive(
     );
 
 
+  // =========================================
+  // Dew Point
+  // =========================================
+
   const dewPoint =
     calculateDewPoint(
       avgTemperature,
@@ -351,7 +435,10 @@ async function createDailyAIArchive(
 
 
   // =========================================
-  // المطر المؤقت
+  // كمية المطر المؤقتة
+  //
+  // الحساس الحالي Boolean
+  // true = 0.2 mm مؤقتاً
   // =========================================
 
   const rainfall =
@@ -361,7 +448,7 @@ async function createDailyAIArchive(
 
 
   // =========================================
-  // حفظ / تحديث
+  // الحفظ في ai_weather_archive
   // =========================================
 
   const saved =
@@ -394,11 +481,13 @@ async function createDailyAIArchive(
         ${rainfall}
       )
 
+
       ON CONFLICT
       (
         device_id,
         reading_date
       )
+
 
       DO UPDATE SET
 
@@ -423,14 +512,20 @@ async function createDailyAIArchive(
         rainfall =
           EXCLUDED.rainfall
 
+
       RETURNING *
 
     `;
 
 
+  // =========================================
+  // النتيجة
+  // =========================================
+
   return {
 
-    success: true,
+    success:
+      true,
 
     date:
       targetDate,
@@ -455,15 +550,25 @@ export default async function handler(
   res
 ) {
 
+  // =========================================
+  // Method
+  // =========================================
+
   if (
-    req.method !== "GET"
+    req.method !==
+    "GET"
   ) {
 
     return res
       .status(405)
       .json({
-        success: false,
-        error: "Method not allowed"
+
+        success:
+          false,
+
+        error:
+          "Method not allowed"
+
       });
 
   }
@@ -471,44 +576,115 @@ export default async function handler(
 
   try {
 
+    // =========================================
+    // Device
+    // =========================================
+
     const device =
       req.query.device ||
       "max1";
 
 
     // =========================================
-    // 1. جلب كل الأيام الموجودة في
-    // weather_archive
-    // وغير الموجودة في AI archive
+    // إذا تم تمرير تاريخ يدوي
+    //
+    // مثال:
+    // ?device=max1&date=2026-08-18
+    // =========================================
+
+    const requestedDate =
+      req.query.date;
+
+
+    if (
+      requestedDate
+    ) {
+
+      const result =
+        await createDailyAIArchive(
+          device,
+          requestedDate
+        );
+
+
+      return res
+        .status(
+          result.success
+            ? 200
+            : 404
+        )
+        .json({
+
+          success:
+            result.success,
+
+          message:
+            result.success
+              ? "AI daily archive created successfully"
+              : "No archive data found",
+
+          device:
+            device,
+
+          date:
+            requestedDate,
+
+          result:
+            result
+
+        });
+
+    }
+
+
+    // =========================================
+    // جلب الأيام الناقصة
+    //
+    // TO_CHAR يحل مشكلة:
+    // Wed Aug 19
+    //
+    // ويعيد:
+    // 2026-08-19
     // =========================================
 
     const missingDates =
       await sql`
 
         SELECT DISTINCT
+
+          TO_CHAR(
+            w.reading_date,
+            'YYYY-MM-DD'
+          )
+          AS reading_date
+
+        FROM
+          weather_archive w
+
+
+        LEFT JOIN
+          ai_weather_archive a
+
+        ON
+          a.device_id =
+          w.device_id
+
+        AND
+          a.reading_date =
           w.reading_date
 
-        FROM weather_archive w
-
-        LEFT JOIN ai_weather_archive a
-
-          ON
-            a.device_id =
-            w.device_id
-
-          AND
-            a.reading_date =
-            w.reading_date
 
         WHERE
           w.device_id =
           ${device}
 
+
         AND
           a.id IS NULL
 
+
         ORDER BY
-          w.reading_date ASC
+          reading_date ASC
 
       `;
 
@@ -526,7 +702,8 @@ export default async function handler(
         .status(200)
         .json({
 
-          success: true,
+          success:
+            true,
 
           message:
             "AI archive is already up to date",
@@ -540,6 +717,9 @@ export default async function handler(
           createdDays:
             0,
 
+          failedDays:
+            0,
+
           results:
             []
 
@@ -549,7 +729,7 @@ export default async function handler(
 
 
     // =========================================
-    // 2. إنشاء جميع الأيام الناقصة
+    // إنشاء جميع الأيام الناقصة
     // =========================================
 
     const results =
@@ -561,13 +741,10 @@ export default async function handler(
       of missingDates
     ) {
 
+      // التاريخ الآن أصلاً:
+      // YYYY-MM-DD
       const date =
-        String(
-          row.reading_date
-        ).slice(
-          0,
-          10
-        );
+        row.reading_date;
 
 
       try {
@@ -590,7 +767,8 @@ export default async function handler(
 
         results.push({
 
-          success: false,
+          success:
+            false,
 
           date:
             date,
@@ -606,7 +784,7 @@ export default async function handler(
 
 
     // =========================================
-    // 3. الإحصائيات
+    // حساب الأيام الناجحة
     // =========================================
 
     const createdDays =
@@ -617,6 +795,10 @@ export default async function handler(
       ).length;
 
 
+    // =========================================
+    // حساب الأيام الفاشلة
+    // =========================================
+
     const failedDays =
       results.filter(
         item =>
@@ -626,7 +808,7 @@ export default async function handler(
 
 
     // =========================================
-    // النتيجة
+    // النتيجة النهائية
     // =========================================
 
     return res
