@@ -1362,6 +1362,11 @@
                     أرشيف
                 </button>
 
+                <button class="control-btn success" onclick="loadAIArchiveData()">
+                    <i class="fas fa-brain"></i>
+                    أرشيف AI
+                </button>
+
                 <button class="control-btn forecast" onclick="loadForecastData()">
                     <i class="fas fa-cloud-sun-rain"></i>
                     التنبؤ
@@ -1406,6 +1411,31 @@
             </div>
 
             <div id="archiveContent"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- نافذة أرشيف AI -->
+    <!-- ========================================= -->
+
+    <div id="aiArchiveModal" class="archive-modal">
+
+        <div class="archive-content">
+
+            <div class="archive-header">
+                <h2 class="card-title">
+                    <i class="fas fa-brain"></i>
+                    أرشيف الذكاء الاصطناعي
+                </h2>
+                <button class="close-archive" onclick="closeAIArchive()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div id="aiArchiveContent"></div>
 
         </div>
 
@@ -1492,6 +1522,8 @@
         const autoRefreshText = document.getElementById('autoRefreshText');
         const archiveModal = document.getElementById('archiveModal');
         const archiveContent = document.getElementById('archiveContent');
+        const aiArchiveModal = document.getElementById('aiArchiveModal');
+        const aiArchiveContent = document.getElementById('aiArchiveContent');
         const forecastModal = document.getElementById('forecastModal');
         const forecastContent = document.getElementById('forecastContent');
         const loadingOverlay = document.getElementById('loadingOverlay');
@@ -1956,6 +1988,262 @@
 
 
         // =========================================
+        // أرشيف AI
+        // =========================================
+
+        async function loadAIArchiveData() {
+
+            try {
+
+                showLoading(true);
+
+                aiArchiveModal.style.display = 'flex';
+
+                aiArchiveContent.innerHTML = `
+                    <div style="text-align:center; padding:50px 20px;">
+                        <i class="fas fa-spinner fa-spin fa-3x"></i>
+                        <div style="margin-top:15px;">
+                            جاري تحميل أرشيف AI...
+                        </div>
+                    </div>
+                `;
+
+                const response =
+                    await fetch(
+                        '/api/ai-archive-view?device=' +
+                        encodeURIComponent(currentDevice)
+                    );
+
+                if (!response.ok) {
+                    throw new Error(
+                        'خطأ في الخادم: ' +
+                        response.status
+                    );
+                }
+
+                const result =
+                    await response.json();
+
+                if (!result.success) {
+                    throw new Error(
+                        result.error ||
+                        'خطأ في تحميل البيانات'
+                    );
+                }
+
+                const rows =
+                    result.data || [];
+
+                if (rows.length === 0) {
+
+                    aiArchiveContent.innerHTML = `
+                        <div class="no-data">
+                            <i
+                                class="fas fa-brain fa-3x"
+                                style="
+                                    color:#64748b;
+                                    margin-bottom:15px;
+                                ">
+                            </i>
+
+                            <div>
+                                لا توجد بيانات في أرشيف AI
+                            </div>
+                        </div>
+                    `;
+
+                    return;
+                }
+
+                let html = `
+                    <div
+                        style="
+                            margin-bottom:15px;
+                            color:#94a3b8;
+                        ">
+
+                        <i class="fas fa-brain"></i>
+
+                        الجهاز:
+                        ${currentDevice}
+
+                        —
+
+                        عدد الأيام:
+                        ${rows.length}
+
+                    </div>
+
+                    <div style="overflow-x:auto;">
+
+                        <table class="archive-table">
+
+                            <thead>
+                                <tr>
+                                    <th>التاريخ</th>
+                                    <th>الحرارة</th>
+                                    <th>الرطوبة</th>
+                                    <th>نقطة الندى</th>
+                                    <th>الضغط</th>
+                                    <th>سرعة الرياح</th>
+                                    <th>اتجاه الرياح</th>
+                                    <th>المطر</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                `;
+
+                rows.forEach(
+                    function(row) {
+
+                        const temperature =
+                            Number(row.temperature);
+
+                        const humidity =
+                            Number(row.humidity);
+
+                        const dewpoint =
+                            Number(row.dewpoint);
+
+                        const pressure =
+                            Number(row.pressure);
+
+                        const windSpeed =
+                            Number(row.wind_speed);
+
+                        const windDirection =
+                            Number(row.wind_direction);
+
+                        const rainfall =
+                            Number(row.rainfall);
+
+                        html += `
+                            <tr>
+
+                                <td>${row.reading_date}</td>
+
+                                <td>
+                                    ${
+                                        Number.isFinite(temperature)
+                                            ? temperature.toFixed(2)
+                                            : '-'
+                                    } °C
+                                </td>
+
+                                <td>
+                                    ${
+                                        Number.isFinite(humidity)
+                                            ? humidity.toFixed(2)
+                                            : '-'
+                                    } %
+                                </td>
+
+                                <td>
+                                    ${
+                                        Number.isFinite(dewpoint)
+                                            ? dewpoint.toFixed(2)
+                                            : '-'
+                                    } °C
+                                </td>
+
+                                <td>
+                                    ${
+                                        Number.isFinite(pressure)
+                                            ? pressure.toFixed(2)
+                                            : '-'
+                                    } hPa
+                                </td>
+
+                                <td>
+                                    ${
+                                        Number.isFinite(windSpeed)
+                                            ? windSpeed.toFixed(2)
+                                            : '-'
+                                    } m/s
+                                </td>
+
+                                <td>
+                                    ${
+                                        Number.isFinite(windDirection)
+                                            ? windDirection.toFixed(2)
+                                            : '-'
+                                    } °
+                                </td>
+
+                                <td>
+                                    ${
+                                        Number.isFinite(rainfall)
+                                            ? rainfall.toFixed(2)
+                                            : '-'
+                                    } mm
+                                </td>
+
+                            </tr>
+                        `;
+
+                    }
+                );
+
+                html += `
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                `;
+
+                aiArchiveContent.innerHTML =
+                    html;
+
+            } catch (error) {
+
+                console.error(
+                    'AI Archive Error:',
+                    error
+                );
+
+                aiArchiveContent.innerHTML = `
+                    <div class="no-data">
+
+                        <i
+                            class="fas fa-exclamation-triangle fa-3x"
+                            style="
+                                color:#ef4444;
+                                margin-bottom:15px;
+                            ">
+                        </i>
+
+                        <div>
+                            خطأ في تحميل أرشيف AI
+                        </div>
+
+                        <div
+                            style="
+                                margin-top:10px;
+                                color:#94a3b8;
+                            ">
+                            ${error.message}
+                        </div>
+
+                    </div>
+                `;
+
+            } finally {
+
+                showLoading(false);
+
+            }
+
+        }
+
+
+        function closeAIArchive() {
+            aiArchiveModal.style.display = 'none';
+        }
+
+
+        // =========================================
         // التحديث التلقائي
         // =========================================
 
@@ -2411,6 +2699,13 @@
         });
 
 
+        aiArchiveModal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAIArchive();
+            }
+        });
+
+
         // =========================================
         // بدء الصفحة
         // =========================================
@@ -2447,6 +2742,14 @@
             ['تلقائي', 'Auto'],
             ['متوقف', 'Stopped'],
             ['جاري...', 'Loading...'],
+            ['أرشيف الذكاء الاصطناعي', 'AI Archive'],
+            ['جاري تحميل أرشيف AI...', 'Loading AI Archive...'],
+            ['لا توجد بيانات في أرشيف AI', 'No data in AI Archive'],
+            ['خطأ في تحميل أرشيف AI', 'Error loading AI Archive'],
+            ['نقطة الندى', 'Dew Point'],
+            ['عدد الأيام:', 'Number of Days:'],
+            ['الجهاز:', 'Device:'],
+            ['أرشيف AI', 'AI Archive'],
             ['أرشيف', 'Archive'],
             ['التنبؤ', 'Forecast'],
             ['اختر تاريخ', 'Select Date'],
