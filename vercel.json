@@ -1,19 +1,15 @@
 {
   "functions": {
     "api/*.js": {
-      "maxDuration": 30,
+      "maxDuration": 60,
       "includeFiles": "ai_models_json/**"
     }
   },
 
   "crons": [
     {
-      "path": "/api/archive",
+      "path": "/api/daily-archive-cron",
       "schedule": "10 21 * * *"
-    },
-    {
-      "path": "/api/ai-archive-cron",
-      "schedule": "20 21 * * *"
     }
   ]
 }
