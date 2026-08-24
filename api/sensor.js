@@ -1,6 +1,10 @@
 import { neon } from "@neondatabase/serverless";
 
-const sql = neon(process.env.DATABASE_URL);
+const sql =
+  neon(
+    process.env.DATABASE_URL
+  );
+
 
 const allowedDevices =
   new Set([
@@ -11,10 +15,30 @@ const allowedDevices =
   ]);
 
 
+// =========================================
+// API
+// =========================================
+
 export default async function handler(
   req,
   res
 ) {
+
+  // منع Cache / 304
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate"
+  );
+
+  res.setHeader(
+    "CDN-Cache-Control",
+    "no-store"
+  );
+
+  res.setHeader(
+    "Vercel-CDN-Cache-Control",
+    "no-store"
+  );
 
   res.setHeader(
     "Access-Control-Allow-Origin",
@@ -31,6 +55,10 @@ export default async function handler(
     "Content-Type"
   );
 
+
+  // =========================================
+  // OPTIONS
+  // =========================================
 
   if (
     req.method === "OPTIONS"
@@ -59,12 +87,16 @@ export default async function handler(
         temperture,
         humidity,
         pressure,
+
         windS,
         windD,
+
         winds,
         windd,
+
         rainy
-      } = req.body || {};
+      } =
+        req.body || {};
 
 
       if (
@@ -77,7 +109,8 @@ export default async function handler(
           .status(400)
           .json({
             success: false,
-            error: "Invalid device"
+            error:
+              "Invalid device"
           });
 
       }
@@ -121,8 +154,9 @@ export default async function handler(
         rainy === true ||
         rainy === 1 ||
         rainy === "1" ||
-        String(rainy)
-          .toLowerCase() ===
+        String(
+          rainy
+        ).toLowerCase() ===
           "true";
 
 
@@ -146,7 +180,7 @@ export default async function handler(
           .json({
             success: false,
             error:
-              "Invalid sensor values"
+              "Invalid sensor data"
           });
 
       }
@@ -154,13 +188,12 @@ export default async function handler(
 
       // =========================================
       // حفظ القراءة
-      //
-      // القراءة والتاريخ حسب بغداد
       // =========================================
 
       await sql`
 
-        INSERT INTO weather_data
+        INSERT INTO
+          weather_data
         (
           device_id,
           temperture,
@@ -176,11 +209,17 @@ export default async function handler(
         VALUES
         (
           ${device_id},
+
           ${temperatureValue},
+
           ${humidityValue},
+
           ${pressureValue},
+
           ${windSpeedValue},
+
           ${windDirectionValue},
+
           ${rainyValue},
 
           (
@@ -209,7 +248,7 @@ export default async function handler(
     ) {
 
       console.error(
-        "Sensor POST error:",
+        "Sensor POST Error:",
         error
       );
 
@@ -229,7 +268,6 @@ export default async function handler(
 
   // =========================================
   // GET
-  // الصفحة -> آخر قراءة فقط
   // =========================================
 
   if (
@@ -243,6 +281,10 @@ export default async function handler(
         "max1";
 
 
+      const date =
+        req.query.date;
+
+
       if (
         !allowedDevices.has(
           device
@@ -253,16 +295,81 @@ export default async function handler(
           .status(400)
           .json({
             success: false,
-            error: "Invalid device"
+            error:
+              "Invalid device"
           });
 
       }
 
 
       // =========================================
-      // مهم جداً:
-      // جلب آخر قراءة فقط
-      // بدلاً من آلاف قراءات اليوم
+      // إذا يوجد date
+      //
+      // الصفحة تطلب الأرشيف
+      // =========================================
+
+      if (
+        date
+      ) {
+
+        const archiveRows =
+          await sql`
+
+            SELECT
+
+              id,
+
+              device_id,
+
+              temperture,
+
+              humidity,
+
+              pressure,
+
+              winds,
+
+              windd,
+
+              rainy,
+
+              reading_date,
+
+              time
+
+            FROM
+              weather_archive
+
+            WHERE
+              device_id =
+              ${device}
+
+            AND
+              reading_date =
+              ${date}
+
+            ORDER BY
+              time ASC
+
+          `;
+
+
+        // مهم:
+        // الصفحة الحالية تتوقع Array
+        return res
+          .status(200)
+          .json(
+            archiveRows
+          );
+
+      }
+
+
+      // =========================================
+      // بدون date
+      //
+      // الصفحة الرئيسية:
+      // آخر قراءة فقط
       // =========================================
 
       const rows =
@@ -271,14 +378,23 @@ export default async function handler(
           SELECT
 
             id,
+
             device_id,
+
             temperture,
+
             humidity,
+
             pressure,
+
             winds,
+
             windd,
+
             rainy,
+
             reading_date,
+
             time
 
           FROM
@@ -296,8 +412,11 @@ export default async function handler(
         `;
 
 
-      // الصفحة الحالية تتوقع today[]
-      // لذلك نحافظ على نفس الشكل
+      /*
+        نحافظ على شكل الاستجابة
+        الذي تدعمه الصفحة الحالية.
+      */
+
       return res
         .status(200)
         .json({
@@ -319,7 +438,7 @@ export default async function handler(
     ) {
 
       console.error(
-        "Sensor GET error:",
+        "Sensor GET Error:",
         error
       );
 
@@ -337,11 +456,16 @@ export default async function handler(
   }
 
 
+  // =========================================
+  // غير مسموح
+  // =========================================
+
   return res
     .status(405)
     .json({
       success: false,
-      error: "Method not allowed"
+      error:
+        "Method not allowed"
     });
 
 }
