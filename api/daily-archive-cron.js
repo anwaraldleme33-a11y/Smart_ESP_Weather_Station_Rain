@@ -2,561 +2,9 @@ import { neon } from "@neondatabase/serverless";
 
 const sql = neon(process.env.DATABASE_URL);
 
-const RAIN_PROXY_MM = 0.2;
-
 
 // =========================================
-// Dew Point
-// =========================================
-
-function calculateDewPoint(
-  tempC,
-  humidity
-) {
-
-  const t =
-    Number(tempC);
-
-  const h =
-    Number(humidity);
-
-
-  if (
-    !Number.isFinite(t) ||
-    !Number.isFinite(h) ||
-    h <= 0
-  ) {
-
-    return null;
-
-  }
-
-
-  const a = 17.62;
-  const b = 243.12;
-
-
-  const gamma =
-    Math.log(h / 100) +
-    (
-      a * t
-    ) /
-    (
-      b + t
-    );
-
-
-  const dewPoint =
-    (
-      b * gamma
-    ) /
-    (
-      a - gamma
-    );
-
-
-  return Number(
-    dewPoint.toFixed(2)
-  );
-
-}
-
-
-// =========================================
-// Wind direction
-// =========================================
-
-function windDirectionToDegree(
-  direction
-) {
-
-  if (
-    direction === null ||
-    direction === undefined
-  ) {
-
-    return 0;
-
-  }
-
-
-  const d =
-    String(direction)
-      .trim()
-      .toUpperCase();
-
-
-  const directions = {
-
-    N: 0,
-    NNE: 22.5,
-    NE: 45,
-    ENE: 67.5,
-
-    E: 90,
-    ESE: 112.5,
-    SE: 135,
-    SSE: 157.5,
-
-    S: 180,
-    SSW: 202.5,
-    SW: 225,
-    WSW: 247.5,
-
-    W: 270,
-    WNW: 292.5,
-    NW: 315,
-    NNW: 337.5
-
-  };
-
-
-  if (
-    directions[d] !==
-    undefined
-  ) {
-
-    return directions[d];
-
-  }
-
-
-  const number =
-    Number(d);
-
-
-  if (
-    Number.isFinite(number)
-  ) {
-
-    return (
-      (
-        number % 360
-      ) +
-      360
-    ) % 360;
-
-  }
-
-
-  return 0;
-
-}
-
-
-// =========================================
-// Circular wind mean
-// =========================================
-
-function circularMean(
-  degreesArray
-) {
-
-  if (
-    !degreesArray ||
-    degreesArray.length === 0
-  ) {
-
-    return 0;
-
-  }
-
-
-  let sinSum = 0;
-  let cosSum = 0;
-
-
-  for (
-    const degree
-    of degreesArray
-  ) {
-
-    const rad =
-      degree *
-      Math.PI /
-      180;
-
-
-    sinSum +=
-      Math.sin(rad);
-
-
-    cosSum +=
-      Math.cos(rad);
-
-  }
-
-
-  let angle =
-    Math.atan2(
-      sinSum /
-      degreesArray.length,
-
-      cosSum /
-      degreesArray.length
-    ) *
-    180 /
-    Math.PI;
-
-
-  if (
-    angle < 0
-  ) {
-
-    angle += 360;
-
-  }
-
-
-  return Number(
-    angle.toFixed(2)
-  );
-
-}
-
-
-// =========================================
-// Create one AI day
-// =========================================
-
-async function createAIDay(
-  device,
-  targetDate
-) {
-
-  const rows =
-    await sql`
-
-      SELECT
-
-        temperture,
-
-        humidity,
-
-        pressure,
-
-        winds,
-
-        windd,
-
-        rainy
-
-      FROM
-        weather_archive
-
-      WHERE
-        device_id =
-        ${device}
-
-      AND
-        reading_date =
-        ${targetDate}
-
-    `;
-
-
-  if (
-    !rows.length
-  ) {
-
-    return {
-
-      success:
-        false,
-
-      date:
-        targetDate,
-
-      error:
-        "No source readings"
-
-    };
-
-  }
-
-
-  let temperatureSum = 0;
-  let temperatureCount = 0;
-
-  let humiditySum = 0;
-  let humidityCount = 0;
-
-  let pressureSum = 0;
-  let pressureCount = 0;
-
-  let windSum = 0;
-  let windCount = 0;
-
-  let rainy =
-    false;
-
-
-  const directions =
-    [];
-
-
-  for (
-    const row
-    of rows
-  ) {
-
-    const temperature =
-      Number(
-        row.temperture
-      );
-
-
-    const humidity =
-      Number(
-        row.humidity
-      );
-
-
-    const pressure =
-      Number(
-        row.pressure
-      );
-
-
-    const wind =
-      Number(
-        row.winds
-      );
-
-
-    if (
-      Number.isFinite(
-        temperature
-      )
-    ) {
-
-      temperatureSum +=
-        temperature;
-
-      temperatureCount++;
-
-    }
-
-
-    if (
-      Number.isFinite(
-        humidity
-      )
-    ) {
-
-      humiditySum +=
-        humidity;
-
-      humidityCount++;
-
-    }
-
-
-    if (
-      Number.isFinite(
-        pressure
-      )
-    ) {
-
-      pressureSum +=
-        pressure;
-
-      pressureCount++;
-
-    }
-
-
-    if (
-      Number.isFinite(
-        wind
-      )
-    ) {
-
-      windSum +=
-        wind;
-
-      windCount++;
-
-    }
-
-
-    directions.push(
-      windDirectionToDegree(
-        row.windd
-      )
-    );
-
-
-    if (
-      row.rainy === true ||
-      row.rainy === 1 ||
-      row.rainy === "1" ||
-      String(
-        row.rainy
-      )
-        .toLowerCase() ===
-        "true"
-    ) {
-
-      rainy =
-        true;
-
-    }
-
-  }
-
-
-  const temperature =
-    temperatureCount
-      ? (
-          temperatureSum /
-          temperatureCount
-        )
-      : 0;
-
-
-  const humidity =
-    humidityCount
-      ? (
-          humiditySum /
-          humidityCount
-        )
-      : 0;
-
-
-  const pressure =
-    pressureCount
-      ? (
-          pressureSum /
-          pressureCount
-        )
-      : 0;
-
-
-  const windSpeed =
-    windCount
-      ? (
-          windSum /
-          windCount
-        )
-      : 0;
-
-
-  const windDirection =
-    circularMean(
-      directions
-    );
-
-
-  const dewpoint =
-    calculateDewPoint(
-      temperature,
-      humidity
-    );
-
-
-  const rainfall =
-    rainy
-      ? RAIN_PROXY_MM
-      : 0;
-
-
-  await sql`
-
-    INSERT INTO
-      ai_weather_archive
-    (
-      device_id,
-
-      reading_date,
-
-      temperature,
-
-      humidity,
-
-      dewpoint,
-
-      pressure,
-
-      wind_speed,
-
-      wind_direction,
-
-      rainfall
-    )
-
-    VALUES
-    (
-      ${device},
-
-      ${targetDate},
-
-      ${temperature.toFixed(2)},
-
-      ${humidity.toFixed(2)},
-
-      ${dewpoint},
-
-      ${pressure.toFixed(2)},
-
-      ${windSpeed.toFixed(2)},
-
-      ${windDirection},
-
-      ${rainfall}
-    )
-
-
-    ON CONFLICT
-    (
-      device_id,
-      reading_date
-    )
-
-    DO UPDATE SET
-
-      temperature =
-        EXCLUDED.temperature,
-
-      humidity =
-        EXCLUDED.humidity,
-
-      dewpoint =
-        EXCLUDED.dewpoint,
-
-      pressure =
-        EXCLUDED.pressure,
-
-      wind_speed =
-        EXCLUDED.wind_speed,
-
-      wind_direction =
-        EXCLUDED.wind_direction,
-
-      rainfall =
-        EXCLUDED.rainfall
-
-  `;
-
-
-  return {
-
-    success:
-      true,
-
-    date:
-      targetDate,
-
-    sourceReadings:
-      rows.length
-
-  };
-
-}
-
-
-// =========================================
-// Main Cron
+// Main Daily Cron
 // =========================================
 
 export default async function handler(
@@ -565,20 +13,15 @@ export default async function handler(
 ) {
 
   if (
-    req.method !==
-    "GET"
+    req.method !== "GET"
   ) {
 
     return res
       .status(405)
       .json({
-
-        success:
-          false,
-
+        success: false,
         error:
           "Method not allowed"
-
       });
 
   }
@@ -615,104 +58,133 @@ export default async function handler(
 
 
     // =========================================
-    // 2. Move previous days to weather_archive
+    // 2. نقل بيانات الأيام السابقة
+    //
+    // PostgreSQL يقوم بالعملية داخلياً.
+    // لا يتم إرسال آلاف الصفوف إلى Vercel.
     // =========================================
 
-    const inserted =
+    const archiveResult =
       await sql`
 
-        INSERT INTO
-          weather_archive
-        (
-          device_id,
+        WITH moved AS (
 
-          temperture,
+          INSERT INTO
+            weather_archive
+          (
+            device_id,
+            temperture,
+            humidity,
+            pressure,
+            winds,
+            windd,
+            rainy,
+            reading_date,
+            time
+          )
 
-          humidity,
+          SELECT
 
-          pressure,
+            device_id,
+            temperture,
+            humidity,
+            pressure,
+            winds,
+            windd,
+            rainy,
+            reading_date,
+            time
 
-          winds,
+          FROM
+            weather_data
 
-          windd,
+          WHERE
+            reading_date <
+            (
+              NOW()
+              AT TIME ZONE
+              'Asia/Baghdad'
+            )::date
 
-          rainy,
 
-          reading_date,
+          ON CONFLICT
+          (
+            device_id,
+            time
+          )
 
-          time
+          DO NOTHING
+
+
+          RETURNING 1
+
         )
 
         SELECT
+          COUNT(*)::integer
+          AS count
 
-          device_id,
-
-          temperture,
-
-          humidity,
-
-          pressure,
-
-          winds,
-
-          windd,
-
-          rainy,
-
-          reading_date,
-
-          time
-
-        FROM
-          weather_data
-
-        WHERE
-          reading_date <
-          (
-            NOW()
-            AT TIME ZONE
-            'Asia/Baghdad'
-          )::date
-
-
-        ON CONFLICT
-        (
-          device_id,
-          time
-        )
-
-        DO NOTHING
-
-        RETURNING id
+        FROM moved
 
       `;
 
 
+    const insertedCount =
+      Number(
+        archiveResult[0]
+          ?.count ||
+        0
+      );
+
+
     // =========================================
-    // 3. Delete transferred old readings
+    // 3. حذف البيانات التي تم أرشفتها
+    //
+    // نرجع العدد فقط وليس كل IDs
     // =========================================
 
-    const deleted =
+    const deleteResult =
       await sql`
 
-        DELETE FROM
-          weather_data
+        WITH deleted AS (
 
-        WHERE
-          reading_date <
-          (
-            NOW()
-            AT TIME ZONE
-            'Asia/Baghdad'
-          )::date
+          DELETE FROM
+            weather_data
 
-        RETURNING id
+          WHERE
+            reading_date <
+            (
+              NOW()
+              AT TIME ZONE
+              'Asia/Baghdad'
+            )::date
+
+          RETURNING 1
+
+        )
+
+        SELECT
+          COUNT(*)::integer
+          AS count
+
+        FROM deleted
 
       `;
 
 
+    const deletedCount =
+      Number(
+        deleteResult[0]
+          ?.count ||
+        0
+      );
+
+
     // =========================================
-    // 4. Find all missing AI days
+    // 4. الأيام الناقصة في AI Archive
+    //
+    // هنا لا نقرأ القراءات نفسها.
+    // نحصل فقط على device + date.
     // =========================================
 
     const missingDates =
@@ -726,7 +198,6 @@ export default async function handler(
             w.reading_date,
             'YYYY-MM-DD'
           )
-
           AS reading_date
 
         FROM
@@ -756,37 +227,467 @@ export default async function handler(
       `;
 
 
-    // =========================================
-    // 5. Create missing AI archive days
-    // =========================================
-
     const aiResults =
       [];
 
 
+    // =========================================
+    // 5. إنشاء AI Archive
+    //
+    // كل العمليات الحسابية تتم داخل Neon.
+    //
+    // لا يتم تنزيل آلاف القراءات إلى Vercel.
+    // =========================================
+
     for (
-      const row
+      const item
       of missingDates
     ) {
+
+      const device =
+        item.device_id;
+
+
+      const date =
+        item.reading_date;
+
 
       try {
 
         const result =
-          await createAIDay(
+          await sql`
 
-            row.device_id,
+            WITH daily AS (
 
-            row.reading_date
+              SELECT
 
-          );
+                AVG(
+                  temperture
+                )::double precision
+                AS temperature,
+
+
+                AVG(
+                  humidity
+                )::double precision
+                AS humidity,
+
+
+                AVG(
+                  pressure
+                )::double precision
+                AS pressure,
+
+
+                AVG(
+                  winds
+                )::double precision
+                AS wind_speed,
+
+
+                BOOL_OR(
+                  COALESCE(
+                    rainy,
+                    false
+                  )
+                )
+                AS rainy,
+
+
+                AVG(
+
+                  SIN(
+
+                    RADIANS(
+
+                      CASE
+                        WHEN UPPER(TRIM(windd)) = 'N'
+                          THEN 0
+                        WHEN UPPER(TRIM(windd)) = 'NNE'
+                          THEN 22.5
+                        WHEN UPPER(TRIM(windd)) = 'NE'
+                          THEN 45
+                        WHEN UPPER(TRIM(windd)) = 'ENE'
+                          THEN 67.5
+                        WHEN UPPER(TRIM(windd)) = 'E'
+                          THEN 90
+                        WHEN UPPER(TRIM(windd)) = 'ESE'
+                          THEN 112.5
+                        WHEN UPPER(TRIM(windd)) = 'SE'
+                          THEN 135
+                        WHEN UPPER(TRIM(windd)) = 'SSE'
+                          THEN 157.5
+                        WHEN UPPER(TRIM(windd)) = 'S'
+                          THEN 180
+                        WHEN UPPER(TRIM(windd)) = 'SSW'
+                          THEN 202.5
+                        WHEN UPPER(TRIM(windd)) = 'SW'
+                          THEN 225
+                        WHEN UPPER(TRIM(windd)) = 'WSW'
+                          THEN 247.5
+                        WHEN UPPER(TRIM(windd)) = 'W'
+                          THEN 270
+                        WHEN UPPER(TRIM(windd)) = 'WNW'
+                          THEN 292.5
+                        WHEN UPPER(TRIM(windd)) = 'NW'
+                          THEN 315
+                        WHEN UPPER(TRIM(windd)) = 'NNW'
+                          THEN 337.5
+                        ELSE 0
+                      END
+
+                    )
+
+                  )
+
+                )
+                AS wind_sin,
+
+
+                AVG(
+
+                  COS(
+
+                    RADIANS(
+
+                      CASE
+                        WHEN UPPER(TRIM(windd)) = 'N'
+                          THEN 0
+                        WHEN UPPER(TRIM(windd)) = 'NNE'
+                          THEN 22.5
+                        WHEN UPPER(TRIM(windd)) = 'NE'
+                          THEN 45
+                        WHEN UPPER(TRIM(windd)) = 'ENE'
+                          THEN 67.5
+                        WHEN UPPER(TRIM(windd)) = 'E'
+                          THEN 90
+                        WHEN UPPER(TRIM(windd)) = 'ESE'
+                          THEN 112.5
+                        WHEN UPPER(TRIM(windd)) = 'SE'
+                          THEN 135
+                        WHEN UPPER(TRIM(windd)) = 'SSE'
+                          THEN 157.5
+                        WHEN UPPER(TRIM(windd)) = 'S'
+                          THEN 180
+                        WHEN UPPER(TRIM(windd)) = 'SSW'
+                          THEN 202.5
+                        WHEN UPPER(TRIM(windd)) = 'SW'
+                          THEN 225
+                        WHEN UPPER(TRIM(windd)) = 'WSW'
+                          THEN 247.5
+                        WHEN UPPER(TRIM(windd)) = 'W'
+                          THEN 270
+                        WHEN UPPER(TRIM(windd)) = 'WNW'
+                          THEN 292.5
+                        WHEN UPPER(TRIM(windd)) = 'NW'
+                          THEN 315
+                        WHEN UPPER(TRIM(windd)) = 'NNW'
+                          THEN 337.5
+                        ELSE 0
+                      END
+
+                    )
+
+                  )
+
+                )
+                AS wind_cos,
+
+
+                COUNT(*)::integer
+                AS source_readings
+
+
+              FROM
+                weather_archive
+
+
+              WHERE
+                device_id =
+                ${device}
+
+              AND
+                reading_date =
+                ${date}
+
+            ),
+
+
+            calculated AS (
+
+              SELECT
+
+                temperature,
+
+                humidity,
+
+                pressure,
+
+                wind_speed,
+
+                rainy,
+
+                source_readings,
+
+
+                DEGREES(
+
+                  ATAN2(
+                    wind_sin,
+                    wind_cos
+                  )
+
+                )
+
+                AS wind_direction
+
+
+              FROM
+                daily
+
+            ),
+
+
+            final_data AS (
+
+              SELECT
+
+                temperature,
+
+                humidity,
+
+                pressure,
+
+                wind_speed,
+
+                rainy,
+
+                source_readings,
+
+
+                CASE
+
+                  WHEN
+                    wind_direction < 0
+
+                  THEN
+                    wind_direction + 360
+
+                  ELSE
+                    wind_direction
+
+                END
+
+                AS wind_direction,
+
+
+                CASE
+
+                  WHEN
+                    humidity > 0
+
+                  THEN
+
+                    (
+                      243.12 *
+
+                      (
+                        LN(
+                          humidity /
+                          100.0
+                        )
+
+                        +
+
+                        (
+                          17.62 *
+                          temperature
+                        )
+
+                        /
+
+                        (
+                          243.12 +
+                          temperature
+                        )
+                      )
+                    )
+
+                    /
+
+                    (
+                      17.62
+
+                      -
+
+                      (
+                        LN(
+                          humidity /
+                          100.0
+                        )
+
+                        +
+
+                        (
+                          17.62 *
+                          temperature
+                        )
+
+                        /
+
+                        (
+                          243.12 +
+                          temperature
+                        )
+                      )
+                    )
+
+                  ELSE
+                    NULL
+
+                END
+
+                AS dewpoint
+
+
+              FROM
+                calculated
+
+            ),
+
+
+            saved AS (
+
+              INSERT INTO
+                ai_weather_archive
+              (
+                device_id,
+
+                reading_date,
+
+                temperature,
+
+                humidity,
+
+                dewpoint,
+
+                pressure,
+
+                wind_speed,
+
+                wind_direction,
+
+                rainfall
+              )
+
+              SELECT
+
+                ${device},
+
+                ${date},
+
+                ROUND(
+                  temperature::numeric,
+                  2
+                ),
+
+                ROUND(
+                  humidity::numeric,
+                  2
+                ),
+
+                ROUND(
+                  dewpoint::numeric,
+                  2
+                ),
+
+                ROUND(
+                  pressure::numeric,
+                  2
+                ),
+
+                ROUND(
+                  wind_speed::numeric,
+                  2
+                ),
+
+                ROUND(
+                  wind_direction::numeric,
+                  2
+                ),
+
+                CASE
+                  WHEN rainy
+                    THEN 0.2
+                  ELSE 0
+                END
+
+              FROM
+                final_data
+
+
+              ON CONFLICT
+              (
+                device_id,
+                reading_date
+              )
+
+              DO UPDATE SET
+
+                temperature =
+                  EXCLUDED.temperature,
+
+                humidity =
+                  EXCLUDED.humidity,
+
+                dewpoint =
+                  EXCLUDED.dewpoint,
+
+                pressure =
+                  EXCLUDED.pressure,
+
+                wind_speed =
+                  EXCLUDED.wind_speed,
+
+                wind_direction =
+                  EXCLUDED.wind_direction,
+
+                rainfall =
+                  EXCLUDED.rainfall
+
+
+              RETURNING 1
+
+            )
+
+
+            SELECT
+
+              source_readings
+
+            FROM
+              final_data
+
+          `;
 
 
         aiResults.push({
 
-          device:
-            row.device_id,
+          success:
+            true,
 
-          ...result
+          device:
+            device,
+
+          date:
+            date,
+
+          sourceReadings:
+            Number(
+              result[0]
+                ?.source_readings ||
+              0
+            )
 
         });
 
@@ -801,10 +702,10 @@ export default async function handler(
             false,
 
           device:
-            row.device_id,
+            device,
 
           date:
-            row.reading_date,
+            date,
 
           error:
             error.message
@@ -818,22 +719,20 @@ export default async function handler(
 
     const aiCreated =
       aiResults.filter(
-        item =>
-          item.success ===
-          true
+        x =>
+          x.success
       ).length;
 
 
     const aiFailed =
       aiResults.filter(
-        item =>
-          item.success !==
-          true
+        x =>
+          !x.success
       ).length;
 
 
     // =========================================
-    // Final result
+    // Final response
     // =========================================
 
     return res
@@ -852,10 +751,10 @@ export default async function handler(
         weatherArchive: {
 
           inserted:
-            inserted.length,
+            insertedCount,
 
           deleted:
-            deleted.length
+            deletedCount
 
         },
 
