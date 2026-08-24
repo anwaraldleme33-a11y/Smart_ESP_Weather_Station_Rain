@@ -2,25 +2,57 @@ import { neon } from "@neondatabase/serverless";
 
 const sql = neon(process.env.DATABASE_URL);
 
-const allowedDevices = ["max1", "max2", "max3", "max4"];
+const allowedDevices =
+  new Set([
+    "max1",
+    "max2",
+    "max3",
+    "max4"
+  ]);
 
-export default async function handler(req, res) {
 
-  // ================= CORS =================
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+export default async function handler(
+  req,
+  res
+) {
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "*"
+  );
+
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS"
+  );
+
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type"
+  );
+
+
+  if (
+    req.method === "OPTIONS"
+  ) {
+
+    return res
+      .status(200)
+      .end();
+
   }
 
-  try {
 
-    // ========================================
-    // POST - استقبال بيانات المحطة
-    // ========================================
-    if (req.method === "POST") {
+  // =========================================
+  // POST
+  // ESP32 -> Neon
+  // =========================================
+
+  if (
+    req.method === "POST"
+  ) {
+
+    try {
 
       const {
         device_id,
@@ -29,249 +61,287 @@ export default async function handler(req, res) {
         pressure,
         windS,
         windD,
-        rain
+        winds,
+        windd,
+        rainy
       } = req.body || {};
 
-      if (!allowedDevices.includes(device_id)) {
-        return res.status(400).json({
-          error: "جهاز غير صالح"
-        });
+
+      if (
+        !allowedDevices.has(
+          device_id
+        )
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+            error: "Invalid device"
+          });
+
       }
 
-      // تحويل قيمة المطر إلى Boolean
-      let rainValue = false;
 
-      if (rain !== undefined && rain !== null) {
+      const temperatureValue =
+        Number(
+          temperture
+        );
 
-        if (typeof rain === "string") {
 
-          rainValue =
-            rain.toLowerCase() === "rainy" ||
-            rain.toLowerCase() === "true" ||
-            rain === "1";
+      const humidityValue =
+        Number(
+          humidity
+        );
 
-        } else {
 
-          rainValue = Boolean(rain);
+      const pressureValue =
+        Number(
+          pressure
+        );
 
-        }
+
+      const windSpeedValue =
+        Number(
+          windS ??
+          winds ??
+          0
+        );
+
+
+      const windDirectionValue =
+        String(
+          windD ??
+          windd ??
+          "N"
+        );
+
+
+      const rainyValue =
+        rainy === true ||
+        rainy === 1 ||
+        rainy === "1" ||
+        String(rainy)
+          .toLowerCase() ===
+          "true";
+
+
+      if (
+        !Number.isFinite(
+          temperatureValue
+        ) ||
+        !Number.isFinite(
+          humidityValue
+        ) ||
+        !Number.isFinite(
+          pressureValue
+        ) ||
+        !Number.isFinite(
+          windSpeedValue
+        )
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+            error:
+              "Invalid sensor values"
+          });
+
       }
 
-      // توقيت بغداد UTC+3
-      const now = new Date();
 
-      const baghdadTime = new Date(
-        now.getTime() + (3 * 60 * 60 * 1000)
-      );
+      // =========================================
+      // حفظ القراءة
+      //
+      // القراءة والتاريخ حسب بغداد
+      // =========================================
 
-      const baghdadDate =
-        baghdadTime.toISOString().split("T")[0];
-
-      const baghdadTimeStr =
-        baghdadTime.toISOString();
-
-      // حفظ القراءة الحالية
       await sql`
+
         INSERT INTO weather_data
         (
           device_id,
           temperture,
           humidity,
           pressure,
-          windS,
-          windD,
+          winds,
+          windd,
           rainy,
           reading_date,
           time
         )
+
         VALUES
         (
           ${device_id},
-          ${Number(temperture)},
-          ${Number(humidity)},
-          ${Number(pressure)},
-          ${Number(windS)},
-          ${windD},
-          ${rainValue},
-          ${baghdadDate},
-          ${baghdadTimeStr}
+          ${temperatureValue},
+          ${humidityValue},
+          ${pressureValue},
+          ${windSpeedValue},
+          ${windDirectionValue},
+          ${rainyValue},
+
+          (
+            NOW()
+            AT TIME ZONE
+            'Asia/Baghdad'
+          )::date,
+
+          NOW()
         )
+
       `;
 
-      return res.status(200).json({
-        status: "saved",
-        device_id: device_id,
-        rainy: rainValue
-      });
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+          message:
+            "Sensor reading saved"
+        });
+
+
+    } catch (
+      error
+    ) {
+
+      console.error(
+        "Sensor POST error:",
+        error
+      );
+
+
+      return res
+        .status(500)
+        .json({
+          success: false,
+          error:
+            error.message
+        });
+
     }
 
+  }
 
-    // ========================================
-    // GET - جلب البيانات
-    // ========================================
-    if (req.method === "GET") {
 
-      const { device, date } = req.query;
+  // =========================================
+  // GET
+  // الصفحة -> آخر قراءة فقط
+  // =========================================
 
-      if (!allowedDevices.includes(device)) {
-        return res.status(400).json({
-          error: "جهاز غير صالح"
-        });
+  if (
+    req.method === "GET"
+  ) {
+
+    try {
+
+      const device =
+        req.query.device ||
+        "max1";
+
+
+      if (
+        !allowedDevices.has(
+          device
+        )
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+            error: "Invalid device"
+          });
+
       }
 
 
-      // ======================================
-      // جلب الأرشيف حسب التاريخ
-      // ======================================
-      if (date) {
+      // =========================================
+      // مهم جداً:
+      // جلب آخر قراءة فقط
+      // بدلاً من آلاف قراءات اليوم
+      // =========================================
 
-        const rows = await sql`
+      const rows =
+        await sql`
 
           SELECT
+
             id,
             device_id,
             temperture,
             humidity,
             pressure,
-            winds AS "windS",
-            windd AS "windD",
+            winds,
+            windd,
             rainy,
             reading_date,
             time
 
-          FROM weather_archive
+          FROM
+            weather_data
 
-          WHERE device_id = ${device}
-          AND reading_date = ${date}
+          WHERE
+            device_id =
+            ${device}
 
-          ORDER BY time ASC
+          ORDER BY
+            time DESC
 
-        `;
-
-        return res.status(200).json(rows);
-      }
-
-
-      // ======================================
-      // حساب تاريخ بغداد
-      // ======================================
-      const now = new Date();
-
-      const baghdadTime = new Date(
-        now.getTime() + (3 * 60 * 60 * 1000)
-      );
-
-      const baghdadDate =
-        baghdadTime.toISOString().split("T")[0];
-
-
-      // ======================================
-      // جلب بيانات اليوم
-      // ======================================
-      let todayRows = await sql`
-
-        SELECT *
-
-        FROM weather_data
-
-        WHERE device_id = ${device}
-        AND reading_date = ${baghdadDate}
-
-        ORDER BY time ASC
-
-      `;
-
-
-      // إذا لم توجد بيانات اليوم
-      // جلب آخر 20 قراءة
-      if (todayRows.length === 0) {
-
-        todayRows = await sql`
-
-          SELECT *
-
-          FROM weather_data
-
-          WHERE device_id = ${device}
-
-          ORDER BY time DESC
-
-          LIMIT 20
+          LIMIT 1
 
         `;
 
-        todayRows = todayRows.reverse();
-      }
+
+      // الصفحة الحالية تتوقع today[]
+      // لذلك نحافظ على نفس الشكل
+      return res
+        .status(200)
+        .json({
+
+          success:
+            true,
+
+          device:
+            device,
+
+          today:
+            rows
+
+        });
 
 
-      // ======================================
-      // حساب تاريخ الأمس
-      // ======================================
-      const yesterdayDate = new Date(baghdadTime);
+    } catch (
+      error
+    ) {
 
-      yesterdayDate.setDate(
-        yesterdayDate.getDate() - 1
+      console.error(
+        "Sensor GET error:",
+        error
       );
 
-      const yesterdayDateStr =
-        yesterdayDate.toISOString().split("T")[0];
 
+      return res
+        .status(500)
+        .json({
+          success: false,
+          error:
+            error.message
+        });
 
-      // ======================================
-      // جلب بيانات الأمس من الأرشيف
-      // ======================================
-      const yesterdayRows = await sql`
-
-        SELECT
-          id,
-          device_id,
-          temperture,
-          humidity,
-          pressure,
-          winds AS "windS",
-          windd AS "windD",
-          rainy,
-          reading_date,
-          time
-
-        FROM weather_archive
-
-        WHERE device_id = ${device}
-        AND reading_date = ${yesterdayDateStr}
-
-        ORDER BY time ASC
-
-      `;
-
-
-      return res.status(200).json({
-
-        today: todayRows,
-
-        yesterday: yesterdayRows
-
-      });
     }
 
-
-    return res.status(405).json({
-      error: "طريقة غير مسموحة"
-    });
-
-  } catch (error) {
-
-    console.error(
-      "خطأ في الخادم:",
-      error
-    );
-
-    return res.status(500).json({
-
-      error: "خطأ في الخادم",
-
-      message: error.message
-
-    });
-
   }
+
+
+  return res
+    .status(405)
+    .json({
+      success: false,
+      error: "Method not allowed"
+    });
+
 }
