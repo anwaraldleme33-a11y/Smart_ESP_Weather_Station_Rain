@@ -1740,6 +1740,11 @@
         // =========================================
 
         function initializeCalendar() {
+            if (typeof flatpickr !== 'function') {
+                console.warn('Flatpickr غير متاح، سيتم تشغيل القراءات الحالية بدون التقويم.');
+                return;
+            }
+
             flatpickrInstance = flatpickr("#archiveDate", {
                 locale: "ar",
                 dateFormat: "Y-m-d",
@@ -1818,7 +1823,10 @@
         async function loadCurrentData() {
             try {
                 showLoadingEffect();
-                const response = await fetch('/api/sensor?device=' + encodeURIComponent(currentDevice));
+                const response = await fetch(
+                    '/api/sensor?device=' + encodeURIComponent(currentDevice) + '&_=' + Date.now(),
+                    { cache: 'no-store' }
+                );
                 if (!response.ok) {
                     throw new Error('خطأ في الخادم: ' + response.status);
                 }
