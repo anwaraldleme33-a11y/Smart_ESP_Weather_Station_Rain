@@ -1,30 +1,17 @@
 import { neon } from "@neondatabase/serverless";
 
-const sql =
-  neon(
-    process.env.DATABASE_URL
-  );
+const sql = neon(process.env.DATABASE_URL);
 
+const allowedDevices = ["max1", "max2", "max3", "max4"];
 
-const allowedDevices =
-  new Set([
-    "max1",
-    "max2",
-    "max3",
-    "max4"
-  ]);
+export default async function handler(req, res) {
 
+  // ================= CORS =================
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-// =========================================
-// API
-// =========================================
-
-export default async function handler(
-  req,
-  res
-) {
-
-  // منع Cache / 304
+  // منع التخزين المؤقت للقراءات الحالية
   res.setHeader(
     "Cache-Control",
     "no-store, no-cache, must-revalidate, proxy-revalidate"
@@ -40,167 +27,107 @@ export default async function handler(
     "no-store"
   );
 
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "*"
-  );
 
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS"
-  );
-
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Content-Type"
-  );
-
-
-  // =========================================
-  // OPTIONS
-  // =========================================
-
-  if (
-    req.method === "OPTIONS"
-  ) {
-
-    return res
-      .status(200)
-      .end();
-
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
   }
 
 
-  // =========================================
-  // POST
-  // ESP32 -> Neon
-  // =========================================
+  try {
 
-  if (
-    req.method === "POST"
-  ) {
-
-    try {
+    // ========================================
+    // POST - استقبال بيانات المحطة
+    // ========================================
+    if (req.method === "POST") {
 
       const {
         device_id,
         temperture,
         humidity,
         pressure,
-
         windS,
         windD,
-
-        winds,
-        windd,
-
-        rainy
-      } =
-        req.body || {};
+        rain
+      } = req.body || {};
 
 
-      if (
-        !allowedDevices.has(
-          device_id
-        )
-      ) {
+      if (!allowedDevices.includes(device_id)) {
 
-        return res
-          .status(400)
-          .json({
-            success: false,
-            error:
-              "Invalid device"
-          });
+        return res.status(400).json({
+          error: "جهاز غير صالح"
+        });
 
       }
 
 
-      const temperatureValue =
-        Number(
-          temperture
-        );
-
-
-      const humidityValue =
-        Number(
-          humidity
-        );
-
-
-      const pressureValue =
-        Number(
-          pressure
-        );
-
-
-      const windSpeedValue =
-        Number(
-          windS ??
-          winds ??
-          0
-        );
-
-
-      const windDirectionValue =
-        String(
-          windD ??
-          windd ??
-          "N"
-        );
-
-
-      const rainyValue =
-        rainy === true ||
-        rainy === 1 ||
-        rainy === "1" ||
-        String(
-          rainy
-        ).toLowerCase() ===
-          "true";
+      // تحويل قيمة المطر إلى Boolean
+      let rainValue = false;
 
 
       if (
-        !Number.isFinite(
-          temperatureValue
-        ) ||
-        !Number.isFinite(
-          humidityValue
-        ) ||
-        !Number.isFinite(
-          pressureValue
-        ) ||
-        !Number.isFinite(
-          windSpeedValue
-        )
+        rain !== undefined &&
+        rain !== null
       ) {
 
-        return res
-          .status(400)
-          .json({
-            success: false,
-            error:
-              "Invalid sensor data"
-          });
+        if (
+          typeof rain === "string"
+        ) {
+
+          rainValue =
+            rain.toLowerCase() === "rainy" ||
+            rain.toLowerCase() === "true" ||
+            rain === "1";
+
+        } else {
+
+          rainValue =
+            Boolean(rain);
+
+        }
 
       }
 
 
-      // =========================================
-      // حفظ القراءة
-      // =========================================
+      // ========================================
+      // توقيت بغداد UTC+3
+      // ========================================
+
+      const now =
+        new Date();
+
+
+      const baghdadTime =
+        new Date(
+          now.getTime() +
+          (3 * 60 * 60 * 1000)
+        );
+
+
+      const baghdadDate =
+        baghdadTime
+          .toISOString()
+          .split("T")[0];
+
+
+      const baghdadTimeStr =
+        baghdadTime
+          .toISOString();
+
+
+      // ========================================
+      // حفظ القراءة الحالية
+      // ========================================
 
       await sql`
 
-        INSERT INTO
-          weather_data
+        INSERT INTO weather_data
         (
           device_id,
           temperture,
           humidity,
           pressure,
-          winds,
-          windd,
+          windS,
+          windD,
           rainy,
           reading_date,
           time
@@ -209,26 +136,14 @@ export default async function handler(
         VALUES
         (
           ${device_id},
-
-          ${temperatureValue},
-
-          ${humidityValue},
-
-          ${pressureValue},
-
-          ${windSpeedValue},
-
-          ${windDirectionValue},
-
-          ${rainyValue},
-
-          (
-            NOW()
-            AT TIME ZONE
-            'Asia/Baghdad'
-          )::date,
-
-          NOW()
+          ${Number(temperture)},
+          ${Number(humidity)},
+          ${Number(pressure)},
+          ${Number(windS)},
+          ${windD},
+          ${rainValue},
+          ${baghdadDate},
+          ${baghdadTimeStr}
         )
 
       `;
@@ -237,104 +152,67 @@ export default async function handler(
       return res
         .status(200)
         .json({
-          success: true,
-          message:
-            "Sensor reading saved"
-        });
 
+          status:
+            "saved",
 
-    } catch (
-      error
-    ) {
+          device_id:
+            device_id,
 
-      console.error(
-        "Sensor POST Error:",
-        error
-      );
+          rainy:
+            rainValue
 
-
-      return res
-        .status(500)
-        .json({
-          success: false,
-          error:
-            error.message
         });
 
     }
 
-  }
 
+    // ========================================
+    // GET - جلب البيانات
+    // ========================================
+    if (req.method === "GET") {
 
-  // =========================================
-  // GET
-  // =========================================
-
-  if (
-    req.method === "GET"
-  ) {
-
-    try {
-
-      const device =
-        req.query.device ||
-        "max1";
-
-
-      const date =
-        req.query.date;
+      const {
+        device,
+        date
+      } =
+        req.query;
 
 
       if (
-        !allowedDevices.has(
-          device
-        )
+        !allowedDevices.includes(device)
       ) {
 
-        return res
-          .status(400)
-          .json({
-            success: false,
-            error:
-              "Invalid device"
-          });
+        return res.status(400).json({
+          error: "جهاز غير صالح"
+        });
 
       }
 
 
-      // =========================================
-      // إذا يوجد date
-      //
-      // الصفحة تطلب الأرشيف
-      // =========================================
+      // ======================================
+      // جلب الأرشيف حسب التاريخ
+      // لم يتم تغيير هذا الجزء
+      // ======================================
+      if (date) {
 
-      if (
-        date
-      ) {
-
-        const archiveRows =
+        const rows =
           await sql`
 
             SELECT
 
               id,
-
               device_id,
-
               temperture,
-
               humidity,
-
               pressure,
 
-              winds,
+              winds AS "windS",
 
-              windd,
+              windd AS "windD",
 
               rainy,
-
               reading_date,
-
               time
 
             FROM
@@ -354,48 +232,44 @@ export default async function handler(
           `;
 
 
-        // مهم:
-        // الصفحة الحالية تتوقع Array
         return res
           .status(200)
-          .json(
-            archiveRows
-          );
+          .json(rows);
 
       }
 
 
-      // =========================================
-      // بدون date
-      //
-      // الصفحة الرئيسية:
-      // آخر قراءة فقط
-      // =========================================
+      // ======================================
+      // حساب تاريخ بغداد
+      // ======================================
 
-      const rows =
+      const now =
+        new Date();
+
+
+      const baghdadTime =
+        new Date(
+          now.getTime() +
+          (3 * 60 * 60 * 1000)
+        );
+
+
+      const baghdadDate =
+        baghdadTime
+          .toISOString()
+          .split("T")[0];
+
+
+      // ======================================
+      // جلب آخر قراءة لليوم فقط
+      //
+      // بدل جلب آلاف القراءات
+      // ======================================
+
+      let todayRows =
         await sql`
 
-          SELECT
-
-            id,
-
-            device_id,
-
-            temperture,
-
-            humidity,
-
-            pressure,
-
-            winds,
-
-            windd,
-
-            rainy,
-
-            reading_date,
-
-            time
+          SELECT *
 
           FROM
             weather_data
@@ -403,6 +277,10 @@ export default async function handler(
           WHERE
             device_id =
             ${device}
+
+          AND
+            reading_date =
+            ${baghdadDate}
 
           ORDER BY
             time DESC
@@ -412,60 +290,93 @@ export default async function handler(
         `;
 
 
-      /*
-        نحافظ على شكل الاستجابة
-        الذي تدعمه الصفحة الحالية.
-      */
+      // ======================================
+      // إذا لم توجد بيانات اليوم
+      // جلب آخر قراءة موجودة
+      // ======================================
+
+      if (
+        todayRows.length === 0
+      ) {
+
+        todayRows =
+          await sql`
+
+            SELECT *
+
+            FROM
+              weather_data
+
+            WHERE
+              device_id =
+              ${device}
+
+            ORDER BY
+              time DESC
+
+            LIMIT 1
+
+          `;
+
+      }
+
+
+      // ======================================
+      // النتيجة
+      //
+      // نحافظ على نفس شكل JSON
+      // الذي تستخدمه الصفحة
+      // ======================================
 
       return res
         .status(200)
         .json({
 
-          success:
-            true,
-
-          device:
-            device,
-
           today:
-            rows
+            todayRows,
 
-        });
+          yesterday:
+            []
 
-
-    } catch (
-      error
-    ) {
-
-      console.error(
-        "Sensor GET Error:",
-        error
-      );
-
-
-      return res
-        .status(500)
-        .json({
-          success: false,
-          error:
-            error.message
         });
 
     }
 
+
+    // ========================================
+    // Method Not Allowed
+    // ========================================
+
+    return res
+      .status(405)
+      .json({
+
+        error:
+          "طريقة غير مسموحة"
+
+      });
+
+
+  } catch (error) {
+
+    console.error(
+      "خطأ في الخادم:",
+      error
+    );
+
+
+    return res
+      .status(500)
+      .json({
+
+        error:
+          "خطأ في الخادم",
+
+        message:
+          error.message
+
+      });
+
   }
-
-
-  // =========================================
-  // غير مسموح
-  // =========================================
-
-  return res
-    .status(405)
-    .json({
-      success: false,
-      error:
-        "Method not allowed"
-    });
 
 }
